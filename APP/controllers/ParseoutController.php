@@ -136,7 +136,7 @@ class ParseoutController extends AppController {
 
 
         // Инициализация парсера
-        $aparser = new \Aparser('http://217.25.90.106:9091/API', '', array('debug'=>'false'));
+        $aparser = new \Aparser('http://91.210.171.153:9091/API', '', array('debug'=>'false'));
 
 
         // ОБНОВЛЕНИЕ ПАРСИНГА IN!!!!!
