@@ -11,11 +11,12 @@ class SpredController extends AppController {
     public $BreadcrumbsControllerLabel = "Панель управления";
     public $BreadcrumbsControllerUrl = "/panel";
 
-    public $ApiKey = "U5I2AoIrTk4gBR7XLB";
-    public $SecretKey = "HUfZrWiVqUlLM65Ba8TXvQvC68kn1AabMDgE";
-
+//    public $ApiKey = "U5I2AoIrTk4gBR7XLB";
+//    public $SecretKey = "HUfZrWiVqUlLM65Ba8TXvQvC68kn1AabMDgE";
 
     private $TickerBinance =[];
+
+
 
     // ТЕХНИЧЕСКИЕ ПЕРЕМЕННЫЕ
     public function indexAction()
@@ -44,58 +45,53 @@ class SpredController extends AppController {
         //  show(\ccxt\Exchange::$exchanges); // print a list of all available exchange classes
 
         //Запуск CCXT
-        $exchange = new \ccxt\binance (array (
+        $exchangeBinance = new \ccxt\binance (array (
           //  'verbose' => true,
             'timeout' => 30000,
         ));
 
- //       $this->BaseKurs = $exchange->fetch_ticker ("USDT/RUB")['close'];
-        $this->TickerBinance = $exchange->fetch_tickers();
+
+
+
+        $this->TickerBinance = $exchangeBinance->fetch_tickers();
+
+
+
+
+      //  $this->TickerBybit =
+
         $TickersBDIN = $this->LoadTickersBD("IN");
 
 
-
         echo "<h2>БАЗОВЫЕ ПАРАМЕТРЫ ЗАХОДА</h2>";
+        $STARTPRICE['BTC'] = $this->GetPriceAct("BTC");
+        $STARTPRICE['ETH'] = $this->GetPriceAct("ETH");
+        $STARTPRICE['USDT'] = $this->GetPriceAct("USDT");
 
 
-        //show($this->TickerBinance);
-    //    exit("111");
+         echo "<b>Стартовая цена захода BTC: </b>".$STARTPRICE['BTC']."<br>";
+         echo "<b>Стартовая цена захода ETH: </b>".$STARTPRICE['ETH']."<br>";
+         echo "<b>Стартовая цена захода USDT: </b>".$STARTPRICE['USDT']."<br>";
 
-
-
-     // show($TickersBDIN);
-
-        $priceBTC =  $this->GetPriceAct("BTC");
-        $priceETH =  $this->GetPriceAct("ETH");
-        $priceUSDT =  $this->GetPriceAct("USDT");
-
-
-         echo "<b>Стартовая цена захода BTC: </b>".$priceBTC."<br>";
-         echo "<b>Стартовая цена захода ETH: </b>".$priceETH."<br>";
-         echo "<b>Стартовая цена захода USDT: </b>".$priceUSDT."<br>";
-
-
-
-
-
+/*
         // Проверяем лучшую цену через заход в BTC
         echo "<h3>ВХОД ЧЕРЕЗ МОНЕТЫ - BTC</h3>";
-        $RENDER = $this->CheckBestPrice("BTC", $TickersBDIN);
+        $RENDER = $this->CheckBestPrice("BTC", $TickersBDIN, $STARTPRICE);
         echo "<b>Самый выгодный символ:</b> ".$RENDER['BestSpredSymbol']." <br>";
         echo "Лучшая цена ".$RENDER['BestPrice']."<br>";
-
 
         echo "<h3>ВХОД ЧЕРЕЗ МОНЕТЫ - ETH</h3>";
-        $RENDER = $this->CheckBestPrice("ETH", $TickersBDIN);
+        $RENDER = $this->CheckBestPrice("ETH", $TickersBDIN, $STARTPRICE);
         echo "<b>Самый выгодный символ:</b> ".$RENDER['BestSpredSymbol']." <br>";
         echo "Лучшая цена ".$RENDER['BestPrice']."<br>";
-
 
 
         echo "<h3>ВХОД ЧЕРЕЗ МОНЕТЫ - USDT</h3>";
-        $RENDER = $this->CheckBestPrice("USDT", $TickersBDIN);
+        $RENDER = $this->CheckBestPrice("USDT", $TickersBDIN, $STARTPRICE);
         echo "<b>Самый выгодный символ:</b> ".$RENDER['BestSpredSymbol']." <br>";
         echo "Лучшая цена ".$RENDER['BestPrice']."<br>";
+*/
+
 
 
 
@@ -109,7 +105,7 @@ class SpredController extends AppController {
 
 
 
-    private function CheckBestPrice($MONETA, $TICKERS){
+    private function CheckBestPrice($MONETA, $TICKERS, $STARTPRICE){
 
         $RENDER['BestPrice'] = 0;
         $RENDER['BestSpredSymbol'] = "";
@@ -144,11 +140,6 @@ class SpredController extends AppController {
 
 
 
-
-
-
-
-
             if (empty($ExPRICE)) continue;
 
         //    echo "Монета :".$MONETA."<br>";
@@ -156,7 +147,7 @@ class SpredController extends AppController {
          //   echo "Цена на монеты :".$ExPRICE."<br>";
          //   echo "Сколько получим BTC :".$BtcConvertPrice."<br>";
 
-            $RENDER =  $this->RenderPercent($RENDER, $TickerWork, $ExchangeTicker, $ExPRICE, $MONETA);
+            $RENDER =  $this->RenderPercent($RENDER, $TickerWork, $ExchangeTicker, $ExPRICE, $MONETA, $STARTPRICE);
 
 
 
@@ -181,7 +172,7 @@ class SpredController extends AppController {
 
 
 
-    private function RenderPercent($RENDER, $TickerWork, $ExchangeTicker, $ExPRICE, $MONETA)
+    private function RenderPercent($RENDER, $TickerWork, $ExchangeTicker, $ExPRICE, $MONETA, $STARTPRICE)
     {
 
 
@@ -193,9 +184,15 @@ class SpredController extends AppController {
      //   $countMoneta = $ExPRICE;
     //    $countMoneta = round($countMoneta,20);
 
+        $change = changemet($BtcConvertPrice, $STARTPRICE[$MONETA] );
+        if ($change > 0) $change = "<font color='green'><b>".$change."</b></font>";
+        if ($change <= 0) $change = "<font color='#8b0000'>".$change."</font>";
+
+
         echo "<b>1.</b> Покупаем в обменнике: <b>".$TickerWork['ticker']."</b> по цене  ".$TickerWork['price']." и зачисляем на кошелек биржи <br>";
         echo "<b>2.</b> На бирже меняем: <b>".$TickerWork['ticker']."</b> &#10144;   <b>".$MONETA."</b>  <br>";
-        echo "<b>3</b> Получаем кол-во  ".$MONETA." | Это кол-во будет равно закупки по курсу  <b>".$MONETA."</b> = ".$BtcConvertPrice." ";
+        echo "<b>3.</b> Получаем кол-во  ".$MONETA." | Это кол-во будет равно закупки по курсу  <b>".$MONETA."</b> = ".$BtcConvertPrice." <br> ";
+        echo "<b>4.</b> СПРЕД ВХОДА: ".$change." % <br>" ;
 
 
         echo "<hr>";

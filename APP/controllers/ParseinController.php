@@ -17,7 +17,7 @@ class ParseinController extends AppController {
     public $TICKERSqiwiIN = [];
     public $TICKERSvisaOUT = [];
 
-    public $vremya = 400; // Секунд
+    public $vremya = 200; // Секунд
 
 
 
@@ -108,7 +108,7 @@ class ParseinController extends AppController {
         // БАЗОВАЯ ТАБЛИЦА С ТИКЕРАМИ
 
         // Инициализация парсера
-        $aparser = new \Aparser('http://91.210.171.153:9091/API', '', array('debug'=>false));
+        $aparser = new \Aparser('http://91.210.171.153:9091/API', '', array('debug'=>true));
 
 
         // ОБНОВЛЕНИЕ ПАРСИНГА IN!!!!!
@@ -159,11 +159,17 @@ class ParseinController extends AppController {
 
         }
 
-
-
         // Смотрим СТАТУС!
         $AparserIN =   $aparser->getTaskState($StatusTable['taskid']);
-        echo "<font color='#8b0000'>ПАРСИНГ IN В РАБОТЕ</font><br>";
+
+      if ($AparserIN['status'] == "work")
+      {
+          echo "ПАУЗА<br>";
+          echo "<font color='#8b0000'>ПАРСИНГ IN В РАБОТЕ</font><br>";
+          sleep(10);
+
+      }
+
 
 
         if ($AparserIN['status'] == "completed"){
