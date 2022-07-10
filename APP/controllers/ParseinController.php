@@ -17,7 +17,7 @@ class ParseinController extends AppController {
     public $TICKERSqiwiIN = [];
     public $TICKERSvisaOUT = [];
 
-    public $vremya = 300; // Секунд
+    public $vremya = 400; // Секунд
 
 
 

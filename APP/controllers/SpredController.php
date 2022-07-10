@@ -124,17 +124,27 @@ class SpredController extends AppController {
             // Проверяемый тикер
             $ExchangeTicker = $TickerWork['ticker']."/".$MONETA."";
             // Цена на бирже ЭТОЙ монеты
+
+
+            // Перекрестные тикеры
+            if ($ExchangeTicker == "USDT/BTC") $ExchangeTicker = "BTC/USDT";
+            if ($ExchangeTicker == "BTC/ETH") $ExchangeTicker = "ETH/BTC";
+            if ($ExchangeTicker == "USDT/ETH") $ExchangeTicker = "ETH/USDT";
+
+
+            if (empty(($this->TickerBinance[$ExchangeTicker]['close']))) continue;
+
             $ExPRICE = $this->TickerBinance[$ExchangeTicker]['close'];
-            if (empty($ExPRICE)) continue;
+
+            // Перекрестные тикеры
+            if ($ExchangeTicker == "BTC/USDT") $ExPRICE = 1 / $ExPRICE;
+            if ($ExchangeTicker == "ETH/USDT") $ExPRICE = 1 / $ExPRICE;
+            if ($ExchangeTicker == "ETH/BTC") $ExPRICE = 1 / $ExPRICE;
 
 
 
-            // КОНТРОЛЬ ПЕРЕКРЕСТНЫХ ТИКЕРОВ
-            if ($ExchangeTicker == "USDT/BTC"){
-                $ExchangeTicker = "BTC/USDT";
-                $ExPRICE = $this->TickerBinance[$ExchangeTicker]['close'];
-                $ExPRICE = 1/$ExPRICE;
-            }
+
+
 
 
 
