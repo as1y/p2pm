@@ -127,9 +127,9 @@ class SpredController extends AppController {
 
 
             // Перекрестные тикеры
-            if ($ExchangeTicker == "USDT/BTC") $ExchangeTicker = "BTC/USDT";
-            if ($ExchangeTicker == "BTC/ETH") $ExchangeTicker = "ETH/BTC";
-            if ($ExchangeTicker == "USDT/ETH") $ExchangeTicker = "ETH/USDT";
+            if ($MONETA == "BTC" && $ExchangeTicker == "USDT/BTC") $ExchangeTicker = "BTC/USDT";
+            if ($MONETA == "ETH" && $ExchangeTicker == "BTC/ETH") $ExchangeTicker = "ETH/BTC";
+            if ($MONETA == "ETH" && $ExchangeTicker == "USDT/ETH") $ExchangeTicker = "ETH/USDT";
 
 
             if (empty(($this->TickerBinance[$ExchangeTicker]['close']))) continue;
@@ -137,9 +137,10 @@ class SpredController extends AppController {
             $ExPRICE = $this->TickerBinance[$ExchangeTicker]['close'];
 
             // Перекрестные тикеры
-            if ($ExchangeTicker == "BTC/USDT") $ExPRICE = 1 / $ExPRICE;
-            if ($ExchangeTicker == "ETH/USDT") $ExPRICE = 1 / $ExPRICE;
-            if ($ExchangeTicker == "ETH/BTC") $ExPRICE = 1 / $ExPRICE;
+            if ($MONETA == "BTC" && $ExchangeTicker == "BTC/USDT") $ExPRICE = 1 / $ExPRICE;
+            if ($MONETA == "ETH" && $ExchangeTicker == "ETH/BTC") $ExPRICE = 1 / $ExPRICE;
+            if ($MONETA == "ETH" && $ExchangeTicker == "ETH/USDT") $ExPRICE = 1 / $ExPRICE;
+
 
 
 

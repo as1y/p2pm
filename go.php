@@ -20,10 +20,9 @@ $result = curl_exec($ch);
 
 curl_close($ch);
 
-show($result);
+//show($result);
 
 echo "fu";
-
 
 exit();
 

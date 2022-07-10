@@ -108,7 +108,7 @@ class ParseinController extends AppController {
         // БАЗОВАЯ ТАБЛИЦА С ТИКЕРАМИ
 
         // Инициализация парсера
-        $aparser = new \Aparser('http://91.210.171.153:9091/API', '', array('debug'=>'false'));
+        $aparser = new \Aparser('http://91.210.171.153:9091/API', '', array('debug'=>false));
 
 
         // ОБНОВЛЕНИЕ ПАРСИНГА IN!!!!!
@@ -176,7 +176,7 @@ class ParseinController extends AppController {
             $content = explode("\n", $content);
 
             // ОБНОВЛЯЕМ ТАБЛИЦУ
-            show($content);
+           // show($content);
 
             // Обновляем в БД цены
             $this->RenewTickers($content, "IN");
