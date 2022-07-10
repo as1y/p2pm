@@ -50,28 +50,28 @@ class SpredController extends AppController {
             'timeout' => 30000,
         ));
 
-
-        $this->BaseKurs = $exchange->fetch_ticker ("USDT/RUB")['close'];
+ //       $this->BaseKurs = $exchange->fetch_ticker ("USDT/RUB")['close'];
         $this->TickerBinance = $exchange->fetch_tickers();
-
-
         $TickersBDIN = $this->LoadTickersBD("IN");
-        $TickersBDOUT = $this->LoadTickersBD("OUT");
 
-        echo "<h1>СПРЕДЫ НА ВХОД</h1>";
+        $oborot = 10000;
 
-        $RENDER['BestSpred'] = 0;
+        echo "<h2> 2 УРОВНЯ BTC </h2>";
+        echo "Объем: ".$oborot."<br>";
+
+        $RENDER['BestPrice'] = 0;
+
+
         foreach ($TickersBDIN as $TickerWork)
         {
-
             if ($TickerWork['price'] == "none") continue;
 
             $RENDER =  $this->RenderPercent($RENDER, $TickerWork);
 
             echo "<b>СИМВОЛ:</b> ".$RENDER['Symbol']." <br>";
-            echo "Цена BINANCE ".$RENDER['BinancePrice']."<br>";
-            echo "Цена BestChange ".$RENDER['ObmenPrice']."<br>";
-            echo "<b> СПРЕД ВХОДА </b> ".$RENDER['Spred']." % <br>";
+            echo "Лучшая цена ".$RENDER['BestPrice']."<br>";
+        //    echo "Цена BestChange ".$RENDER['ObmenPrice']."<br>";
+        //    echo "<b> СПРЕД ВХОДА </b> ".$RENDER['Spred']." % <br>";
             echo "<hr>";
 
 
@@ -79,33 +79,11 @@ class SpredController extends AppController {
 
 
         show($RENDER['BestSpredSymbol']);
-        show($RENDER['BestSpred']);
-
-
-        echo "<h1>СПРЕДЫ НА ВЫХОД</h1>";
-        $RENDER = [];
-        $RENDER['BestSpred'] = 0;
-
-        foreach ($TickersBDOUT as $TickerWork)
-        {
-
-            if ($TickerWork['price'] == "none") continue;
-
-            $RENDER =  $this->RenderPercent($RENDER, $TickerWork);
-
-            echo "<b>СИМВОЛ:</b> ".$RENDER['Symbol']." <br>";
-            echo "Цена BINANCE ".$RENDER['BinancePrice']."<br>";
-            echo "Цена BestChange ".$RENDER['ObmenPrice']."<br>";
-            echo "<b> СПРЕД ВХОДА </b> ".$RENDER['Spred']." % <br>";
-            echo "<hr>";
-
-
-        }
+        show($RENDER['BestPrice']);
 
 
 
-        show($RENDER['BestSpredSymbol']);
-        show($RENDER['BestSpred']);
+
 
 
 
@@ -125,32 +103,42 @@ class SpredController extends AppController {
     private function RenderPercent($RENDER, $TickerWork)
     {
 
-        $symbolbinance = $TickerWork['ticker']."/USDT";
-        $BinancePRICE = $this->TickerBinance[$symbolbinance]['close'];
-        $BinancePRICE = $BinancePRICE*$this->BaseKurs;
-        $RENDER['Symbol'] = $symbolbinance;
-        $RENDER['BinancePrice'] = $BinancePRICE;
-        $RENDER['ObmenPrice'] = $TickerWork['price'];
+        $symbolBTC = $TickerWork['ticker']."/BTC";
+
+        $RENDER['Symbol'] = $symbolBTC;
 
 
-        $spredzahoda = 100 - $BinancePRICE/$TickerWork['price']*100;
-        $spredzahoda = round($spredzahoda, 2);
-        $RENDER['Spred'] = $spredzahoda;
+        if ($symbolBTC == "BTC/BTC")
+        {
+            $BinancePRICE = 1;
+            $BtcConvertPrice = $TickerWork['price'];
+        }
 
+        if ($symbolBTC != "BTC/BTC")
+        {
+            $BinancePRICE = $this->TickerBinance[$symbolBTC]['close'];
+            $BtcConvertPrice = $TickerWork['price']/$BinancePRICE;
 
-
-        if ($RENDER['BestSpred'] == 0) $RENDER['BestSpred'] = $spredzahoda;
-
-
-        if ($RENDER['BestSpred'] >= $spredzahoda && $TickerWork['type'] == "IN") {
-            $RENDER['BestSpred'] = $spredzahoda;
-            $RENDER['BestSpredSymbol'] = $symbolbinance;
         }
 
 
-        if ($spredzahoda >= $RENDER['BestSpred']  && $TickerWork['type'] == "OUT") {
-            $RENDER['BestSpred'] = $spredzahoda;
-            $RENDER['BestSpredSymbol'] = $symbolbinance;
+        echo "За 1 единицу: ".$TickerWork['ticker']." - цена в обменнике: ".$TickerWork['price']." -  по итогу получаем:  ".$BinancePRICE." BTC == ".$BtcConvertPrice." <br>";
+
+
+
+        if ($RENDER['BestPrice'] == 0)
+        {
+            $RENDER['BestPrice'] = $BtcConvertPrice;
+            $RENDER['BestSpredSymbol'] = $symbolBTC;
+        //    return $RENDER;
+        }
+
+
+        if ($RENDER['BestPrice'] > $BtcConvertPrice) {
+       //     echo "Меняем".$RENDER['BestPrice']." на ".$BtcConvertPrice."<br>";
+            $RENDER['BestPrice'] = $BtcConvertPrice;
+            $RENDER['BestSpredSymbol'] = $symbolBTC;
+
         }
 
 

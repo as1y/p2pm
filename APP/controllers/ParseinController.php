@@ -14,10 +14,11 @@ class ParseinController extends AppController {
     public $ApiKey = "U5I2AoIrTk4gBR7XLB";
     public $SecretKey = "HUfZrWiVqUlLM65Ba8TXvQvC68kn1AabMDgE";
 
-    private $BaseKurs = 0;
-
     public $TICKERSqiwiIN = [];
     public $TICKERSvisaOUT = [];
+
+    public $vremya = 300; // Секунд
+
 
 
     // ТЕХНИЧЕСКИЕ ПЕРЕМЕННЫЕ
@@ -48,48 +49,9 @@ class ParseinController extends AppController {
         //  show(\ccxt\Exchange::$exchanges); // print a list of all available exchange classes
         // ПАРАМЕТРЫ ДЛЯ БАЗОВОЙ ТАБЛИЦЫ!
 
-        $this->TICKERSvisaOUT = [
-            'https://www.bestchange.ru/bitcoin-to-visa-mastercard-rub.html' => 'BTC',
-            'https://www.bestchange.ru/bitcoin-cash-to-visa-mastercard-rub.html' => 'BCH',
-            'https://www.bestchange.ru/bitcoin-gold-to-visa-mastercard-rub.html' => 'BTG',
-            'https://www.bestchange.ru/ethereum-to-visa-mastercard-rub.html' => 'ETH',
-            'https://www.bestchange.ru/ethereum-classic-to-visa-mastercard-rub.html' => 'ETC',
-            'https://www.bestchange.ru/litecoin-to-visa-mastercard-rub.html' => 'LTC',
-            'https://www.bestchange.ru/ripple-to-visa-mastercard-rub.html' => 'XRP',
-            'https://www.bestchange.ru/monero-to-visa-mastercard-rub.html' => 'XMR',
-            'https://www.bestchange.ru/dogecoin-to-visa-mastercard-rub.html' => 'DOGE',
-            'https://www.bestchange.ru/polygon-to-visa-mastercard-rub.html' => 'MATIC',
-            'https://www.bestchange.ru/dash-to-visa-mastercard-rub.html' => 'DASH',
-            'https://www.bestchange.ru/zcash-to-visa-mastercard-rub.html' => 'ZEC',
-            'https://www.bestchange.ru/nem-to-visa-mastercard-rub.html' => 'XEM',
-            'https://www.bestchange.ru/neo-to-visa-mastercard-rub.html' => 'NEO',
-            'https://www.bestchange.ru/eos-to-visa-mastercard-rub.html' => 'EOS',
-            'https://www.bestchange.ru/cardano-to-visa-mastercard-rub.html' => 'ADA',
-            'https://www.bestchange.ru/stellar-to-visa-mastercard-rub.html' => 'XLM',
-            'https://www.bestchange.ru/tron-to-visa-mastercard-rub.html' => 'TRX',
-            'https://www.bestchange.ru/waves-to-visa-mastercard-rub.html' => 'WAVES',
-            'https://www.bestchange.ru/omg-to-visa-mastercard-rub.html' => 'OMG',
-            'https://www.bestchange.ru/binance-coin-to-visa-mastercard-rub.html' => 'BNB',
-            'https://www.bestchange.ru/bat-to-visa-mastercard-rub.html' => 'BAT',
-            'https://www.bestchange.ru/qtum-to-visa-mastercard-rub.html' => 'QTUM',
-            'https://www.bestchange.ru/chainlink-to-visa-mastercard-rub.html' => 'LINK',
-            'https://www.bestchange.ru/cosmos-to-visa-mastercard-rub.html' => 'ATOM',
-            'https://www.bestchange.ru/tezos-to-visa-mastercard-rub.html' => 'XTZ',
-            'https://www.bestchange.ru/polkadot-to-visa-mastercard-rub.html' => 'DOT',
-            'https://www.bestchange.ru/uniswap-to-visa-mastercard-rub.html' => 'UNI',
-            'https://www.bestchange.ru/ravencoin-to-visa-mastercard-rub.html' => 'RVN',
-            'https://www.bestchange.ru/solana-to-visa-mastercard-rub.html' => 'SOL',
-            'https://www.bestchange.ru/vechain-to-visa-mastercard-rub.html' => 'VET',
-            'https://www.bestchange.ru/algorand-to-visa-mastercard-rub.html' => 'ALGO',
-            'https://www.bestchange.ru/maker-to-visa-mastercard-rub.html' => 'MKR',
-            'https://www.bestchange.ru/avalanche-to-visa-mastercard-rub.html' => 'AVAX',
-            'https://www.bestchange.ru/yearn-finance-to-visa-mastercard-rub.html' => 'YFI',
-            'https://www.bestchange.ru/terra-to-visa-mastercard-rub.html' => 'LUNA',
-
-        ];
-
        $this->TICKERSqiwiIN = [
-            "https://www.bestchange.ru/qiwi-to-bitcoin.html" => "BTC",
+
+           "https://www.bestchange.ru/qiwi-to-bitcoin.html" => "BTC",
 "https://www.bestchange.ru/qiwi-to-bitcoin-cash.html" => "BCH",
 "https://www.bestchange.ru/qiwi-to-bitcoin-gold.html" => "BTG",
 "https://www.bestchange.ru/qiwi-to-ethereum.html" => "ETH",
@@ -128,12 +90,21 @@ class ParseinController extends AppController {
         ];
 
 
-        // БАЗОВАЯ ТАБЛИЦА С ТИКЕРАМИ
-       $basetable =  $this->GetBaseTable("IN");
-        $this->WorkTable($basetable);
-        // БАЗОВАЯ ТАБЛИЦА С ТИКЕРАМИ
 
- 
+       echo "<h2>PARSE-IN-V2 | ПАРСИНГ BESTCHANGE</h2><br>";
+
+
+
+        // БАЗОВАЯ ТАБЛИЦА С ТИКЕРАМИ
+       $basetable =  $this->GetBaseTable("IN"); // Создаем BaseTickers
+        if (empty($basetable))
+        {
+            $this->WorkTable($basetable); // Если таблица пустая, то создаем
+            exit("::");
+        }
+
+
+        // БАЗОВАЯ ТАБЛИЦА С ТИКЕРАМИ
 
         // Инициализация парсера
         $aparser = new \Aparser('http://91.210.171.153:9091/API', '', array('debug'=>'false'));
@@ -141,26 +112,56 @@ class ParseinController extends AppController {
 
         // ОБНОВЛЕНИЕ ПАРСИНГА IN!!!!!
 
-        $Table =  $this->GetStatusTable("IN");
+        $StatusTable =  $this->GetStatusTable("IN"); // Таблица статусТейбл
 
         // Если таблица статуса парсинга пустая, то запускаем парсинг
-        if (empty($Table))
+        if (empty($StatusTable))
         {
 
-            // ДОБАВЛЯЕМ В СПИСОК УРЛ QIWI_IN
-            foreach ($this->TICKERSqiwiIN as $url => $ticker)
+            // Проверяем созданную таблицу страниц
+            foreach ($basetable as $key=>$val)
             {
-                $ZaprosiIN[] = $url;
+
+                $proshlo = time() - $val['time'];
+
+                echo "URL: ".$val['price']."<br>";
+                echo "Цена в БД: ".$val['price']."<br>";
+                echo "Прошло времени: ".$proshlo."<br>";
+
+                if ($proshlo > $this->vremya)
+                {
+                    echo "<i>Цена не актуальная! Пора обновлять</i><br>";
+                    $ZaprosiIN[] = $val['url'];
+                }
+
+                echo "<hr>";
+
+
+
+
             }
-            $taskUid = $aparser->addTask('default', 'BestIN', 'text', $ZaprosiIN);
+
+
+            if (empty($ZaprosiIN))
+            {
+                echo "<font color='green'>Информация актуальная. Парсить нет необходимости </font><br>";
+                return true;
+            }
+
+
+            echo "Кол-во запросов ".(count($ZaprosiIN))."<br>";
+
+
+            $taskUid = $aparser->addTask('20', 'BestIN', 'text', $ZaprosiIN);
             $this->AddTaskBD($taskUid, "IN");
             return true;
 
         }
 
 
+
         // Смотрим СТАТУС!
-        $AparserIN =   $aparser->getTaskState($Table['taskid']);
+        $AparserIN =   $aparser->getTaskState($StatusTable['taskid']);
         echo "<font color='#8b0000'>ПАРСИНГ IN В РАБОТЕ</font><br>";
 
 
@@ -168,7 +169,7 @@ class ParseinController extends AppController {
 
             echo "<font color='green'>ПАРСИНГ IN ЗАКОНЧЕН</font><br>";
 
-            $result = $aparser->getTaskResultsFile($Table['taskid']);
+            $result = $aparser->getTaskResultsFile($StatusTable['taskid']);
             $content = file_get_contents($result);
             $content = str_replace(" ", "", $content); // Убираем пробелы
             $content = explode("\n", $content);
@@ -180,7 +181,7 @@ class ParseinController extends AppController {
             $this->RenewTickers($content, "IN");
 
             // Очищаем статус таблицу
-            R::trash($Table);
+            R::trash($StatusTable);
 
 
         }
@@ -211,18 +212,6 @@ class ParseinController extends AppController {
                 $this->AddTable($ZAPIS);
             }
             echo "<hr>";
-
-            // СОЗДАЕМ ТАБЛИЦУ НА КАРТУ ВЫХОД
-            foreach ($this->TICKERSvisaOUT as $url => $ticker)
-            {
-                $ZAPIS['global'] = "VISA";
-                $ZAPIS['type'] = "OUT";
-                $ZAPIS['url'] = $url;
-                $ZAPIS['ticker'] = $ticker;
-                $this->AddTable($ZAPIS);
-            }
-            echo "<hr>";
-
 
 
 
@@ -258,11 +247,19 @@ class ParseinController extends AppController {
         $TICKERS = $this->GetBaseTable($type);
 
 
+      //  show($MASSIV);
+
+
         // Добавляем в БД данные из спарсенного контента!
         foreach ($TICKERS as $ticker)
         {
+
+            if (empty($MASSIV[$ticker['url']])) continue;
+            if ($MASSIV[$ticker['url']][0] == "none") continue;
+
            $ticker->price = $MASSIV[$ticker['url']][0];
            $ticker->limit = $MASSIV[$ticker['url']][1];
+           $ticker->time = time();
             R::store($ticker);
 
         }
