@@ -14,7 +14,6 @@ class SpredController extends AppController {
     public $ApiKey = "U5I2AoIrTk4gBR7XLB";
     public $SecretKey = "HUfZrWiVqUlLM65Ba8TXvQvC68kn1AabMDgE";
 
-    private $BaseKurs = 0;
 
     private $TickerBinance =[];
 
@@ -54,39 +53,49 @@ class SpredController extends AppController {
         $this->TickerBinance = $exchange->fetch_tickers();
         $TickersBDIN = $this->LoadTickersBD("IN");
 
-        $oborot = 10000;
-
-        echo "<h2> 2 УРОВНЯ BTC </h2>";
-        echo "Объем: ".$oborot."<br>";
-
-        $RENDER['BestPrice'] = 0;
 
 
-        foreach ($TickersBDIN as $TickerWork)
-        {
-            if ($TickerWork['price'] == "none") continue;
-
-            $RENDER =  $this->RenderPercent($RENDER, $TickerWork);
-
-            echo "<b>СИМВОЛ:</b> ".$RENDER['Symbol']." <br>";
-            echo "Лучшая цена ".$RENDER['BestPrice']."<br>";
-        //    echo "Цена BestChange ".$RENDER['ObmenPrice']."<br>";
-        //    echo "<b> СПРЕД ВХОДА </b> ".$RENDER['Spred']." % <br>";
-            echo "<hr>";
+        echo "<h2>БАЗОВЫЕ ПАРАМЕТРЫ ЗАХОДА</h2>";
 
 
-        }
+        //show($this->TickerBinance);
+    //    exit("111");
 
 
-        show($RENDER['BestSpredSymbol']);
-        show($RENDER['BestPrice']);
+
+     // show($TickersBDIN);
+
+        $priceBTC =  $this->GetPriceAct("BTC");
+        $priceETH =  $this->GetPriceAct("ETH");
+        $priceUSDT =  $this->GetPriceAct("USDT");
+
+
+         echo "<b>Стартовая цена захода BTC: </b>".$priceBTC."<br>";
+         echo "<b>Стартовая цена захода ETH: </b>".$priceETH."<br>";
+         echo "<b>Стартовая цена захода USDT: </b>".$priceUSDT."<br>";
 
 
 
 
 
+        // Проверяем лучшую цену через заход в BTC
+        echo "<h3>ВХОД ЧЕРЕЗ МОНЕТЫ - BTC</h3>";
+        $RENDER = $this->CheckBestPrice("BTC", $TickersBDIN);
+        echo "<b>Самый выгодный символ:</b> ".$RENDER['BestSpredSymbol']." <br>";
+        echo "Лучшая цена ".$RENDER['BestPrice']."<br>";
 
 
+        echo "<h3>ВХОД ЧЕРЕЗ МОНЕТЫ - ETH</h3>";
+        $RENDER = $this->CheckBestPrice("ETH", $TickersBDIN);
+        echo "<b>Самый выгодный символ:</b> ".$RENDER['BestSpredSymbol']." <br>";
+        echo "Лучшая цена ".$RENDER['BestPrice']."<br>";
+
+
+
+        echo "<h3>ВХОД ЧЕРЕЗ МОНЕТЫ - USDT</h3>";
+        $RENDER = $this->CheckBestPrice("USDT", $TickersBDIN);
+        echo "<b>Самый выгодный символ:</b> ".$RENDER['BestSpredSymbol']." <br>";
+        echo "Лучшая цена ".$RENDER['BestPrice']."<br>";
 
 
 
@@ -100,36 +109,94 @@ class SpredController extends AppController {
 
 
 
-    private function RenderPercent($RENDER, $TickerWork)
+    private function CheckBestPrice($MONETA, $TICKERS){
+
+        $RENDER['BestPrice'] = 0;
+        $RENDER['BestSpredSymbol'] = "";
+
+        foreach ($TICKERS as $TickerWork)
+        {
+
+            if ($TickerWork['price'] == "none") continue;
+            if ($TickerWork['ticker'] == $MONETA) continue;
+
+
+            // Проверяемый тикер
+            $ExchangeTicker = $TickerWork['ticker']."/".$MONETA."";
+            // Цена на бирже ЭТОЙ монеты
+            $ExPRICE = $this->TickerBinance[$ExchangeTicker]['close'];
+            if (empty($ExPRICE)) continue;
+
+
+
+            // КОНТРОЛЬ ПЕРЕКРЕСТНЫХ ТИКЕРОВ
+            if ($ExchangeTicker == "USDT/BTC"){
+                $ExchangeTicker = "BTC/USDT";
+                $ExPRICE = $this->TickerBinance[$ExchangeTicker]['close'];
+                $ExPRICE = 1/$ExPRICE;
+            }
+
+
+
+            if (empty($ExPRICE)) continue;
+
+        //    echo "Монета :".$MONETA."<br>";
+         //   echo "Тикер на бирже :".$ExchangeTicker."<br>";
+         //   echo "Цена на монеты :".$ExPRICE."<br>";
+         //   echo "Сколько получим BTC :".$BtcConvertPrice."<br>";
+
+            $RENDER =  $this->RenderPercent($RENDER, $TickerWork, $ExchangeTicker, $ExPRICE, $MONETA);
+
+
+
+        }
+
+
+        echo "<hr>";
+
+        return $RENDER;
+
+
+    }
+
+
+
+    private function GetPriceAct($MONETA){
+        $zapis = R::findOne("basetickers", 'WHERE global =? AND ticker=?', ["QIWI", $MONETA]);
+        return $zapis['price'];
+
+    }
+
+
+
+
+    private function RenderPercent($RENDER, $TickerWork, $ExchangeTicker, $ExPRICE, $MONETA)
     {
 
-        $symbolBTC = $TickerWork['ticker']."/BTC";
 
-        $RENDER['Symbol'] = $symbolBTC;
+        $RENDER['Symbol'] = $ExchangeTicker;
 
+        $BtcConvertPrice = $TickerWork['price']/$ExPRICE;
+        $BtcConvertPrice = round($BtcConvertPrice, 2);
 
-        if ($symbolBTC == "BTC/BTC")
-        {
-            $BinancePRICE = 1;
-            $BtcConvertPrice = $TickerWork['price'];
-        }
+     //   $countMoneta = $ExPRICE;
+    //    $countMoneta = round($countMoneta,20);
 
-        if ($symbolBTC != "BTC/BTC")
-        {
-            $BinancePRICE = $this->TickerBinance[$symbolBTC]['close'];
-            $BtcConvertPrice = $TickerWork['price']/$BinancePRICE;
-
-        }
+        echo "<b>1.</b> Покупаем в обменнике: <b>".$TickerWork['ticker']."</b> по цене  ".$TickerWork['price']." и зачисляем на кошелек биржи <br>";
+        echo "<b>2.</b> На бирже меняем: <b>".$TickerWork['ticker']."</b> &#10144;   <b>".$MONETA."</b>  <br>";
+        echo "<b>3</b> Получаем кол-во  ".$MONETA." | Это кол-во будет равно закупки по курсу  <b>".$MONETA."</b> = ".$BtcConvertPrice." ";
 
 
-        echo "За 1 единицу: ".$TickerWork['ticker']." - цена в обменнике: ".$TickerWork['price']." -  по итогу получаем:  ".$BinancePRICE." BTC == ".$BtcConvertPrice." <br>";
+        echo "<hr>";
 
+
+      //  echo "Покупаем в обменнике: < b>".$TickerWork['ticker']."</b> по цене  ".$TickerWork['price']."  &#10144; переводим на биржу  ".$ExPRICE." BTC == ".$BtcConvertPrice." <br>";
 
 
         if ($RENDER['BestPrice'] == 0)
         {
             $RENDER['BestPrice'] = $BtcConvertPrice;
-            $RENDER['BestSpredSymbol'] = $symbolBTC;
+            $RENDER['BestSpredSymbol'] = $ExchangeTicker;
         //    return $RENDER;
         }
 
@@ -137,7 +204,7 @@ class SpredController extends AppController {
         if ($RENDER['BestPrice'] > $BtcConvertPrice) {
        //     echo "Меняем".$RENDER['BestPrice']." на ".$BtcConvertPrice."<br>";
             $RENDER['BestPrice'] = $BtcConvertPrice;
-            $RENDER['BestSpredSymbol'] = $symbolBTC;
+            $RENDER['BestSpredSymbol'] = $ExchangeTicker;
 
         }
 

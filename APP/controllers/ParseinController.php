@@ -87,6 +87,7 @@ class ParseinController extends AppController {
 "https://www.bestchange.ru/qiwi-to-avalanche.html" => "AVAX",
 "https://www.bestchange.ru/qiwi-to-yearn-finance.html" => "YFI",
 "https://www.bestchange.ru/qiwi-to-terra.html" => "LUNA",
+"https://www.bestchange.ru/qiwi-to-tether-erc20.html" => "USDT"
         ];
 
 
