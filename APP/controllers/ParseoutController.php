@@ -14,7 +14,7 @@ class ParseoutController extends AppController {
     public $TICKERSvisaOUT = [];
 
 
-    public $vremya = 150; // Секунд
+    public $vremya = 200; // Секунд
     public $type = "OUT";
     public $debug = false;
     public $sleep = 10;
@@ -65,6 +65,7 @@ class ParseoutController extends AppController {
             'https://www.bestchange.ru/avalanche-to-visa-mastercard-rub.html' => 'AVAX',
             'https://www.bestchange.ru/yearn-finance-to-visa-mastercard-rub.html' => 'YFI',
             'https://www.bestchange.ru/terra-to-visa-mastercard-rub.html' => 'LUNA',
+            'https://www.bestchange.ru/tether-erc20-to-visa-mastercard-rub.html' => 'USDT',
 
         ];
 
@@ -103,7 +104,8 @@ class ParseoutController extends AppController {
         if ($AparserIN['status'] == "work")
         {
             echo "<font color='#8b0000'>ПАРСИНГ IN В РАБОТЕ</font><br>";
-            sleep(rand($this->sleep, $this->sleep*2));
+            $sleep = rand($this->sleep, $this->sleep*2);
+            sleep($sleep);
         }
 
 

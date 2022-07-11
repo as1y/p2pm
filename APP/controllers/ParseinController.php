@@ -109,7 +109,9 @@ class ParseinController extends AppController {
       if ($AparserIN['status'] == "work")
       {
           echo "<font color='#8b0000'>ПАРСИНГ IN В РАБОТЕ</font><br>";
-          sleep(rand($this->sleep, $this->sleep*2));
+          $sleep = rand($this->sleep, $this->sleep*2);
+          sleep($sleep);
+
       }
 
 
