@@ -16,8 +16,8 @@ class ParseinController extends AppController {
 
     public $vremya = 200; // Секунд
     public $type = "IN";
-    public $debug = false;
-    public $sleep = 10;
+    public $debug = true;
+    public $sleep = 20;
 
 
     // ТЕХНИЧЕСКИЕ ПЕРЕМЕННЫЕ
@@ -109,7 +109,7 @@ class ParseinController extends AppController {
       if ($AparserIN['status'] == "work")
       {
           echo "<font color='#8b0000'>ПАРСИНГ IN В РАБОТЕ</font><br>";
-          sleep($this->sleep);
+          sleep(rand(1, $this->sleep));
       }
 
 

@@ -5,7 +5,7 @@ require 'vendor/autoload.php';
 require 'lib/functions.php'; //ОБЩИЕ ФУНКЦИИ
 require 'lib/functions_app.php'; //ФУНКЦИИ ПРИЛОЖЕНИЯ
 
-$url = "https://p2pmarket.me/parsein";
+$url = "https://p2pmarket.me/parseout";
 
 $ch = curl_init();
 curl_setopt($ch, CURLOPT_URL, $url);

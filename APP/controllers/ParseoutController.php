@@ -16,8 +16,8 @@ class ParseoutController extends AppController {
 
     public $vremya = 200; // Секунд
     public $type = "OUT";
-    public $debug = false;
-    public $sleep = 10;
+    public $debug = true;
+    public $sleep = 20;
 
 
     // ТЕХНИЧЕСКИЕ ПЕРЕМЕННЫЕ
@@ -103,7 +103,7 @@ class ParseoutController extends AppController {
         if ($AparserIN['status'] == "work")
         {
             echo "<font color='#8b0000'>ПАРСИНГ IN В РАБОТЕ</font><br>";
-            sleep($this->sleep);
+            sleep(rand(1, $this->sleep));
         }
 
 
@@ -114,10 +114,11 @@ class ParseoutController extends AppController {
             $result = $aparser->getTaskResultsFile($StatusTable['taskid']);
             $content = file_get_contents($result);
             $content = str_replace(" ", "", $content); // Убираем пробелы
+            $content = str_replace("  ", "", $content); // Убираем пробелы
             $content = explode("\n", $content);
 
             // ОБНОВЛЯЕМ ТАБЛИЦУ
-            // show($content);
+          //   show($content);
 
             // Обновляем в БД цены
             $this->RenewTickers($content, $this->type);
