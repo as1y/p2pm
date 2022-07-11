@@ -17,6 +17,8 @@ class ParseinController extends AppController {
 
     public $vremya = 200; // Секунд
     public $type = "IN";
+    public $debug = true;
+
 
 
     // ТЕХНИЧЕСКИЕ ПЕРЕМЕННЫЕ
@@ -24,12 +26,6 @@ class ParseinController extends AppController {
     {
 
         $this->layaout = false;
-
-        date_default_timezone_set('UTC');
-
-
-        //  show(\ccxt\Exchange::$exchanges); // print a list of all available exchange classes
-        // ПАРАМЕТРЫ ДЛЯ БАЗОВОЙ ТАБЛИЦЫ!
 
        $this->TICKERSqiwiIN = [
 
@@ -78,66 +74,39 @@ class ParseinController extends AppController {
         ];
 
 
-
        echo "<h2>PARSE-IN-V2 | ПАРСИНГ BESTCHANGE</h2><br>";
 
-
-        // БАЗОВАЯ ТАБЛИЦА С ТИКЕРАМИ
-       $basetable =  $this->GetBaseTable(); // Создаем BaseTickers
-
-        if (empty($basetable))
-        {
-            $this->WorkTable($basetable); // Если таблица пустая, то создаем
-            exit("::");
-        }
-
-
-        // БАЗОВАЯ ТАБЛИЦА С ТИКЕРАМИ
-
         // Инициализация парсера
-        $aparser = new \Aparser('http://91.210.171.153:9091/API', '', array('debug'=>true));
+        $aparser = new \Aparser('http://91.210.171.153:9091/API', '', array('debug'=>$this->debug));
 
+        // Таблица статуса работы парсера
+        $StatusTable =  $this->GetStatusTable($this->type);
 
-        // ОБНОВЛЕНИЕ ПАРСИНГА IN!!!!!
+        // Парсер не запущен. Формируем запрос;
 
-        $StatusTable =  $this->GetStatusTable("IN"); // Таблица статусТейбл
-
-        // Если таблица статуса парсинга пустая, то запускаем парсинг
         if (empty($StatusTable))
         {
 
-            // Проверяем созданную таблицу страниц
-            foreach ($basetable as $key=>$val)
-            {
-
-                $proshlo = time() - $val['time'];
-
-                echo "URL: ".$val['price']."<br>";
-                echo "Цена в БД: ".$val['price']."<br>";
-                echo "Прошло времени: ".$proshlo."<br>";
-
-                if ($proshlo > $this->vremya)
-                {
-                    echo "<i>Цена не актуальная! Пора обновлять</i><br>";
-                    $ZaprosiIN[] = $val['url'];
-                }
-
-                echo "<hr>";
-
-
-
-
-            }
-
-
-            if (empty($ZaprosiIN))
+            $ZAPROS = $this->GetZapros();
+            if (empty($ZAPROS))
             {
                 echo "<font color='green'>Информация актуальная. Парсить нет необходимости </font><br>";
                 return true;
             }
 
+        }
 
-            echo "Кол-во запросов ".(count($ZaprosiIN))."<br>";
+
+
+
+
+
+
+        // Если таблица статуса парсинга пустая, то значит парсинга нет и нужно формировать запрос
+        if (empty($StatusTable))
+        {
+
+            $this->GetZapros();
 
 
             $taskUid = $aparser->addTask('20', 'BestIN', 'text', $ZaprosiIN);
@@ -158,8 +127,7 @@ class ParseinController extends AppController {
       }
 
 
-
-        if ($AparserIN['status'] == "completed"){
+      if ($AparserIN['status'] == "completed"){
 
             echo "<font color='green'>ПАРСИНГ IN ЗАКОНЧЕН</font><br>";
 
@@ -191,39 +159,56 @@ class ParseinController extends AppController {
 
 
 
-    private function WorkTable($basetable)
+
+
+
+    private function GetZapros(){
+
+        $ZAPROS = [];
+
+        $obmenin =  $this->GetBaseTable(); // Создаем BaseTickers
+        if (empty($obmenin)) $this->CreateTable(); // Если таблица пустая, то создаем
+
+
+        // Проверяем созданную таблицу страниц
+        foreach ($obmenin as $key=>$val)
+        {
+
+            $proshlo = time() - $val['time'];
+
+            echo "Method: ".$val['method']."<br>";
+            echo "Ticker: ".$val['ticker']."<br>";
+            echo "Прошло: ".$proshlo."<br>";
+
+            if ($proshlo > $this->vremya)
+            {
+                echo "<i>Цена не актуальная! Пора обновлять</i><br>";
+                $ZAPROS[] = $val['url'];
+            }
+
+        }
+        
+        return $ZAPROS;
+
+    }
+
+    private function CreateTable()
     {
 
-        if (empty($basetable))
+
+        // СОЗДАЕМ ТАБЛИЦУ НА КИВИ ВХОД
+        foreach ($this->TICKERSqiwiIN as $url => $ticker)
         {
-            // СОЗДАЕМ ТАБЛИЦУ НА КИВИ ВХОД
-            foreach ($this->TICKERSqiwiIN as $url => $ticker)
-            {
-                $ZAPIS['method'] = "QIWI";
-                $ZAPIS['url'] = $url;
-                $ZAPIS['ticker'] = $ticker;
-
-                $ARR['method'] = $ZAPIS['global'];
-                $ARR['url'] = $ZAPIS['url'];
-                $ARR['ticker'] = $ZAPIS['ticker'];
-
-                $this->AddARRinBD($ARR, "basetickers");
-                echo "<b><font color='green'>Добавили запись</font></b>";
-                // Добавление ТРЕКА в БД
-
-
-
-                $this->AddTable($ZAPIS);
-
-
-            }
-            echo "<hr>";
-
-
-
-            echo "<font color='green'>Таблица с тикерами создана!</font> <br>";
+            $ARR['method'] = "QIWI";
+            $ARR['url'] = $url;
+            $ARR['ticker'] = $ticker;
+            $this->AddARRinBD($ARR, "obmenin");
+            //echo "<b><font color='green'>Добавили запись</font></b>";
+            // Добавление ТРЕКА в БД
         }
 
+        echo "<hr>";
+        echo "<font color='green'>Таблица с ценами из обменников создана!!</font> <br>";
 
         return true;
 
@@ -305,7 +290,7 @@ class ParseinController extends AppController {
 
     private function GetBaseTable()
     {
-        $table = R::findAll("basetickersin");
+        $table = R::findAll("obmenin");
         return $table;
     }
 
