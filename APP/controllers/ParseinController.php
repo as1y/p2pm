@@ -18,7 +18,7 @@ class ParseinController extends AppController {
     public $vremya = 200; // Секунд
     public $type = "IN";
     public $debug = true;
-
+    public $sleep = 1;
 
 
     // ТЕХНИЧЕСКИЕ ПЕРЕМЕННЫЕ
@@ -26,7 +26,9 @@ class ParseinController extends AppController {
     {
 
         $this->layaout = false;
+        $Panel =  new Panel();
 
+        
        $this->TICKERSqiwiIN = [
 
            "https://www.bestchange.ru/qiwi-to-bitcoin.html" => "BTC",
@@ -80,50 +82,35 @@ class ParseinController extends AppController {
         $aparser = new \Aparser('http://91.210.171.153:9091/API', '', array('debug'=>$this->debug));
 
         // Таблица статуса работы парсера
-        $StatusTable =  $this->GetStatusTable($this->type);
+        $StatusTable =  $this->GetStatusTable();
 
         // Парсер не запущен. Формируем запрос;
-
         if (empty($StatusTable))
         {
 
             $ZAPROS = $this->GetZapros();
+
             if (empty($ZAPROS))
             {
                 echo "<font color='green'>Информация актуальная. Парсить нет необходимости </font><br>";
                 return true;
             }
 
-        }
-
-
-
-
-
-
-
-        // Если таблица статуса парсинга пустая, то значит парсинга нет и нужно формировать запрос
-        if (empty($StatusTable))
-        {
-
-            $this->GetZapros();
-
-
-            $taskUid = $aparser->addTask('20', 'BestIN', 'text', $ZaprosiIN);
-            $this->AddTaskBD($taskUid, "IN");
+            $taskUid = $aparser->addTask('20', 'BestIN', 'text', $ZAPROS);
+            $this->AddTaskBD($taskUid, $this->type);
             return true;
 
         }
 
+
         // Смотрим СТАТУС!
         $AparserIN =   $aparser->getTaskState($StatusTable['taskid']);
 
+
       if ($AparserIN['status'] == "work")
       {
-          echo "ПАУЗА<br>";
           echo "<font color='#8b0000'>ПАРСИНГ IN В РАБОТЕ</font><br>";
-          sleep(10);
-
+          sleep($this->sleep);
       }
 
 
@@ -140,7 +127,7 @@ class ParseinController extends AppController {
            // show($content);
 
             // Обновляем в БД цены
-            $this->RenewTickers($content, "IN");
+            $this->RenewTickers($content, $this->type);
 
             // Очищаем статус таблицу
             R::trash($StatusTable);
@@ -187,7 +174,7 @@ class ParseinController extends AppController {
             }
 
         }
-        
+
         return $ZAPROS;
 
     }
@@ -221,7 +208,6 @@ class ParseinController extends AppController {
 
         echo "МАССИВ ПАРСИНГА<br>";
 
-
         // Преобразовываем массив в примемлемый вид
         $MASSIV = [];
         foreach ($content as $key=>$value)
@@ -235,14 +221,14 @@ class ParseinController extends AppController {
 
 
 
-        $TICKERS = $this->GetBaseTable($this->type);
+        $obmenin = $this->GetBaseTable();
 
 
       //  show($MASSIV);
 
 
         // Добавляем в БД данные из спарсенного контента!
-        foreach ($TICKERS as $ticker)
+        foreach ($obmenin as $ticker)
         {
 
             if (empty($MASSIV[$ticker['url']])) continue;
@@ -267,26 +253,14 @@ class ParseinController extends AppController {
     {
 
         $ARR = [];
+        $ARR['taskid'] = $taskid;
+        $ARR['type'] = $type;
 
-        if ($type == "IN")
-        {
-            $ARR['taskid'] = $taskid;
-            $ARR['type'] = "IN";
-        }
-        if ($type == "OUT"){
-            $ARR['taskid'] = $taskid;
-            $ARR['type'] = "OUT";
-
-        }
         $this->AddARRinBD($ARR, "statustable");
         echo "<b><font color='green'>Добавили запись</font></b>";
         // Добавление ТРЕКА в БД
 
     }
-
-
-
-
 
     private function GetBaseTable()
     {
@@ -294,16 +268,12 @@ class ParseinController extends AppController {
         return $table;
     }
 
-
-    private function GetStatusTable($type)
+    private function GetStatusTable()
     {
-        $table = R::findOne("statustable", "WHERE type=?", [$type]);
+
+        $table = R::findOne("statustable", "WHERE type=?", [$this->type]);
         return $table;
     }
-
-
-
-
 
 
     private function AddARRinBD($ARR, $BD = false)
