@@ -16,8 +16,8 @@ class ParseoutController extends AppController {
 
     public $vremya = 200; // Секунд
     public $type = "OUT";
-    public $debug = true;
-    public $sleep = 1;
+    public $debug = false;
+    public $sleep = 10;
 
 
     // ТЕХНИЧЕСКИЕ ПЕРЕМЕННЫЕ

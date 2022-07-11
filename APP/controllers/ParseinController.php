@@ -16,8 +16,8 @@ class ParseinController extends AppController {
 
     public $vremya = 200; // Секунд
     public $type = "IN";
-    public $debug = true;
-    public $sleep = 1;
+    public $debug = false;
+    public $sleep = 10;
 
 
     // ТЕХНИЧЕСКИЕ ПЕРЕМЕННЫЕ
