@@ -11,14 +11,12 @@ class ParseinController extends AppController {
     public $BreadcrumbsControllerLabel = "Панель управления";
     public $BreadcrumbsControllerUrl = "/panel";
 
-    public $ApiKey = "U5I2AoIrTk4gBR7XLB";
-    public $SecretKey = "HUfZrWiVqUlLM65Ba8TXvQvC68kn1AabMDgE";
-
     public $TICKERSqiwiIN = [];
-    public $TICKERSvisaOUT = [];
+
+
 
     public $vremya = 200; // Секунд
-
+    public $type = "IN";
 
 
     // ТЕХНИЧЕСКИЕ ПЕРЕМЕННЫЕ
@@ -28,22 +26,6 @@ class ParseinController extends AppController {
         $this->layaout = false;
 
         date_default_timezone_set('UTC');
-        // Браузерная часть
-        $Panel =  new Panel();
-        $META = [
-            'title' => 'Панель BURAN',
-            'description' => 'Панель BURAN',
-            'keywords' => 'Панель BURAN',
-        ];
-        $BREADCRUMBS['HOME'] = ['Label' => $this->BreadcrumbsControllerLabel, 'Url' => $this->BreadcrumbsControllerUrl];
-        $BREADCRUMBS['DATA'][] = ['Label' => "FAQ"];
-        \APP\core\base\View::setBreadcrumbs($BREADCRUMBS);
-        $ASSETS[] = ["js" => "/global_assets/js/plugins/tables/datatables/datatables.min.js"];
-        $ASSETS[] = ["js" => "/assets/js/datatables_basic.js"];
-        \APP\core\base\View::setAssets($ASSETS);
-        \APP\core\base\View::setMeta($META);
-        \APP\core\base\View::setBreadcrumbs($BREADCRUMBS);
-        // Браузерная часть
 
 
         //  show(\ccxt\Exchange::$exchanges); // print a list of all available exchange classes
@@ -100,9 +82,9 @@ class ParseinController extends AppController {
        echo "<h2>PARSE-IN-V2 | ПАРСИНГ BESTCHANGE</h2><br>";
 
 
-
         // БАЗОВАЯ ТАБЛИЦА С ТИКЕРАМИ
-       $basetable =  $this->GetBaseTable("IN"); // Создаем BaseTickers
+       $basetable =  $this->GetBaseTable(); // Создаем BaseTickers
+
         if (empty($basetable))
         {
             $this->WorkTable($basetable); // Если таблица пустая, то создаем
@@ -217,11 +199,23 @@ class ParseinController extends AppController {
             // СОЗДАЕМ ТАБЛИЦУ НА КИВИ ВХОД
             foreach ($this->TICKERSqiwiIN as $url => $ticker)
             {
-                $ZAPIS['global'] = "QIWI";
-                $ZAPIS['type'] = "IN";
+                $ZAPIS['method'] = "QIWI";
                 $ZAPIS['url'] = $url;
                 $ZAPIS['ticker'] = $ticker;
+
+                $ARR['method'] = $ZAPIS['global'];
+                $ARR['url'] = $ZAPIS['url'];
+                $ARR['ticker'] = $ZAPIS['ticker'];
+
+                $this->AddARRinBD($ARR, "basetickers");
+                echo "<b><font color='green'>Добавили запись</font></b>";
+                // Добавление ТРЕКА в БД
+
+
+
                 $this->AddTable($ZAPIS);
+
+
             }
             echo "<hr>";
 
@@ -256,7 +250,7 @@ class ParseinController extends AppController {
 
 
 
-        $TICKERS = $this->GetBaseTable($type);
+        $TICKERS = $this->GetBaseTable($this->type);
 
 
       //  show($MASSIV);
@@ -308,28 +302,10 @@ class ParseinController extends AppController {
 
 
 
-    private function AddTable($ZAPIS)
+
+    private function GetBaseTable()
     {
-
-        $ARR['global'] = $ZAPIS['global'];
-        $ARR['type'] = $ZAPIS['type'];
-        $ARR['url'] = $ZAPIS['url'];
-        $ARR['ticker'] = $ZAPIS['ticker'];
-
-
-        $this->AddARRinBD($ARR, "basetickers");
-        echo "<b><font color='green'>Добавили запись</font></b>";
-        // Добавление ТРЕКА в БД
-
-
-        return true;
-
-    }
-
-
-    private function GetBaseTable($type)
-    {
-        $table = R::findAll("basetickers", "WHERE type=?", [$type]);
+        $table = R::findAll("basetickersin");
         return $table;
     }
 
