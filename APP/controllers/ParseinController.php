@@ -14,7 +14,6 @@ class ParseinController extends AppController {
     public $TICKERSqiwiIN = [];
 
 
-
     public $vremya = 200; // Секунд
     public $type = "IN";
     public $debug = true;
@@ -28,7 +27,7 @@ class ParseinController extends AppController {
         $this->layaout = false;
         $Panel =  new Panel();
 
-        
+
        $this->TICKERSqiwiIN = [
 
            "https://www.bestchange.ru/qiwi-to-bitcoin.html" => "BTC",
@@ -153,12 +152,12 @@ class ParseinController extends AppController {
 
         $ZAPROS = [];
 
-        $obmenin =  $this->GetBaseTable(); // Создаем BaseTickers
-        if (empty($obmenin)) $this->CreateTable(); // Если таблица пустая, то создаем
+        $obmen =  $this->GetBaseTable(); // Создаем BaseTickers
+        if (empty($obmen)) $this->CreateTable(); // Если таблица пустая, то создаем
 
 
         // Проверяем созданную таблицу страниц
-        foreach ($obmenin as $key=>$val)
+        foreach ($obmen as $key=>$val)
         {
 
             $proshlo = time() - $val['time'];
@@ -221,14 +220,14 @@ class ParseinController extends AppController {
 
 
 
-        $obmenin = $this->GetBaseTable();
+        $obmen = $this->GetBaseTable();
 
 
       //  show($MASSIV);
 
 
         // Добавляем в БД данные из спарсенного контента!
-        foreach ($obmenin as $ticker)
+        foreach ($obmen as $ticker)
         {
 
             if (empty($MASSIV[$ticker['url']])) continue;

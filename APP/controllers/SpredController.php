@@ -245,7 +245,7 @@ class SpredController extends AppController {
 
 
     private function GetPriceAct($MONETA){
-        $zapis = R::findOne("basetickers", 'WHERE global =? AND ticker=?', ["QIWI", $MONETA]);
+        $zapis = R::findOne("obmenin", 'WHERE method =? AND ticker=?', ["QIWI", $MONETA]);
         return $zapis['price'];
 
     }
@@ -336,7 +336,7 @@ class SpredController extends AppController {
 
     private function LoadTickersBD($type)
     {
-        $table = R::findAll("basetickers", 'WHERE type =?', [$type]);
+        $table = R::findAll("obmenin");
         return $table;
     }
 

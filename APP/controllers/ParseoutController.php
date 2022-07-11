@@ -11,13 +11,13 @@ class ParseoutController extends AppController {
     public $BreadcrumbsControllerLabel = "Панель управления";
     public $BreadcrumbsControllerUrl = "/panel";
 
-    public $ApiKey = "U5I2AoIrTk4gBR7XLB";
-    public $SecretKey = "HUfZrWiVqUlLM65Ba8TXvQvC68kn1AabMDgE";
-
-    private $BaseKurs = 0;
-
-    public $TICKERSqiwiIN = [];
     public $TICKERSvisaOUT = [];
+
+
+    public $vremya = 200; // Секунд
+    public $type = "OUT";
+    public $debug = true;
+    public $sleep = 1;
 
 
     // ТЕХНИЧЕСКИЕ ПЕРЕМЕННЫЕ
@@ -25,165 +25,109 @@ class ParseoutController extends AppController {
     {
 
         $this->layaout = false;
-
-        date_default_timezone_set('UTC');
-        // Браузерная часть
         $Panel =  new Panel();
-        $META = [
-            'title' => 'Панель BURAN',
-            'description' => 'Панель BURAN',
-            'keywords' => 'Панель BURAN',
-        ];
-        $BREADCRUMBS['HOME'] = ['Label' => $this->BreadcrumbsControllerLabel, 'Url' => $this->BreadcrumbsControllerUrl];
-        $BREADCRUMBS['DATA'][] = ['Label' => "FAQ"];
-        \APP\core\base\View::setBreadcrumbs($BREADCRUMBS);
-        $ASSETS[] = ["js" => "/global_assets/js/plugins/tables/datatables/datatables.min.js"];
-        $ASSETS[] = ["js" => "/assets/js/datatables_basic.js"];
-        \APP\core\base\View::setAssets($ASSETS);
-        \APP\core\base\View::setMeta($META);
-        \APP\core\base\View::setBreadcrumbs($BREADCRUMBS);
-        // Браузерная часть
 
-
-        //  show(\ccxt\Exchange::$exchanges); // print a list of all available exchange classes
-        // ПАРАМЕТРЫ ДЛЯ БАЗОВОЙ ТАБЛИЦЫ!
 
         $this->TICKERSvisaOUT = [
             'https://www.bestchange.ru/bitcoin-to-visa-mastercard-rub.html' => 'BTC',
-'https://www.bestchange.ru/bitcoin-cash-to-visa-mastercard-rub.html' => 'BCH',
-'https://www.bestchange.ru/bitcoin-gold-to-visa-mastercard-rub.html' => 'BTG',
-'https://www.bestchange.ru/ethereum-to-visa-mastercard-rub.html' => 'ETH',
-'https://www.bestchange.ru/ethereum-classic-to-visa-mastercard-rub.html' => 'ETC',
-'https://www.bestchange.ru/litecoin-to-visa-mastercard-rub.html' => 'LTC',
-'https://www.bestchange.ru/ripple-to-visa-mastercard-rub.html' => 'XRP',
-'https://www.bestchange.ru/monero-to-visa-mastercard-rub.html' => 'XMR',
-'https://www.bestchange.ru/dogecoin-to-visa-mastercard-rub.html' => 'DOGE',
-'https://www.bestchange.ru/polygon-to-visa-mastercard-rub.html' => 'MATIC',
-'https://www.bestchange.ru/dash-to-visa-mastercard-rub.html' => 'DASH',
-'https://www.bestchange.ru/zcash-to-visa-mastercard-rub.html' => 'ZEC',
-'https://www.bestchange.ru/nem-to-visa-mastercard-rub.html' => 'XEM',
-'https://www.bestchange.ru/neo-to-visa-mastercard-rub.html' => 'NEO',
-'https://www.bestchange.ru/eos-to-visa-mastercard-rub.html' => 'EOS',
-'https://www.bestchange.ru/cardano-to-visa-mastercard-rub.html' => 'ADA',
-'https://www.bestchange.ru/stellar-to-visa-mastercard-rub.html' => 'XLM',
-'https://www.bestchange.ru/tron-to-visa-mastercard-rub.html' => 'TRX',
-'https://www.bestchange.ru/waves-to-visa-mastercard-rub.html' => 'WAVES',
-'https://www.bestchange.ru/omg-to-visa-mastercard-rub.html' => 'OMG',
-'https://www.bestchange.ru/binance-coin-to-visa-mastercard-rub.html' => 'BNB',
-'https://www.bestchange.ru/bat-to-visa-mastercard-rub.html' => 'BAT',
-'https://www.bestchange.ru/qtum-to-visa-mastercard-rub.html' => 'QTUM',
-'https://www.bestchange.ru/chainlink-to-visa-mastercard-rub.html' => 'LINK',
-'https://www.bestchange.ru/cosmos-to-visa-mastercard-rub.html' => 'ATOM',
-'https://www.bestchange.ru/tezos-to-visa-mastercard-rub.html' => 'XTZ',
-'https://www.bestchange.ru/polkadot-to-visa-mastercard-rub.html' => 'DOT',
-'https://www.bestchange.ru/uniswap-to-visa-mastercard-rub.html' => 'UNI',
-'https://www.bestchange.ru/ravencoin-to-visa-mastercard-rub.html' => 'RVN',
-'https://www.bestchange.ru/solana-to-visa-mastercard-rub.html' => 'SOL',
-'https://www.bestchange.ru/vechain-to-visa-mastercard-rub.html' => 'VET',
-'https://www.bestchange.ru/algorand-to-visa-mastercard-rub.html' => 'ALGO',
-'https://www.bestchange.ru/maker-to-visa-mastercard-rub.html' => 'MKR',
-'https://www.bestchange.ru/avalanche-to-visa-mastercard-rub.html' => 'AVAX',
-'https://www.bestchange.ru/yearn-finance-to-visa-mastercard-rub.html' => 'YFI',
-'https://www.bestchange.ru/terra-to-visa-mastercard-rub.html' => 'LUNA',
+            'https://www.bestchange.ru/bitcoin-cash-to-visa-mastercard-rub.html' => 'BCH',
+            'https://www.bestchange.ru/bitcoin-gold-to-visa-mastercard-rub.html' => 'BTG',
+            'https://www.bestchange.ru/ethereum-to-visa-mastercard-rub.html' => 'ETH',
+            'https://www.bestchange.ru/ethereum-classic-to-visa-mastercard-rub.html' => 'ETC',
+            'https://www.bestchange.ru/litecoin-to-visa-mastercard-rub.html' => 'LTC',
+            'https://www.bestchange.ru/ripple-to-visa-mastercard-rub.html' => 'XRP',
+            'https://www.bestchange.ru/monero-to-visa-mastercard-rub.html' => 'XMR',
+            'https://www.bestchange.ru/dogecoin-to-visa-mastercard-rub.html' => 'DOGE',
+            'https://www.bestchange.ru/polygon-to-visa-mastercard-rub.html' => 'MATIC',
+            'https://www.bestchange.ru/dash-to-visa-mastercard-rub.html' => 'DASH',
+            'https://www.bestchange.ru/zcash-to-visa-mastercard-rub.html' => 'ZEC',
+            'https://www.bestchange.ru/nem-to-visa-mastercard-rub.html' => 'XEM',
+            'https://www.bestchange.ru/neo-to-visa-mastercard-rub.html' => 'NEO',
+            'https://www.bestchange.ru/eos-to-visa-mastercard-rub.html' => 'EOS',
+            'https://www.bestchange.ru/cardano-to-visa-mastercard-rub.html' => 'ADA',
+            'https://www.bestchange.ru/stellar-to-visa-mastercard-rub.html' => 'XLM',
+            'https://www.bestchange.ru/tron-to-visa-mastercard-rub.html' => 'TRX',
+            'https://www.bestchange.ru/waves-to-visa-mastercard-rub.html' => 'WAVES',
+            'https://www.bestchange.ru/omg-to-visa-mastercard-rub.html' => 'OMG',
+            'https://www.bestchange.ru/binance-coin-to-visa-mastercard-rub.html' => 'BNB',
+            'https://www.bestchange.ru/bat-to-visa-mastercard-rub.html' => 'BAT',
+            'https://www.bestchange.ru/qtum-to-visa-mastercard-rub.html' => 'QTUM',
+            'https://www.bestchange.ru/chainlink-to-visa-mastercard-rub.html' => 'LINK',
+            'https://www.bestchange.ru/cosmos-to-visa-mastercard-rub.html' => 'ATOM',
+            'https://www.bestchange.ru/tezos-to-visa-mastercard-rub.html' => 'XTZ',
+            'https://www.bestchange.ru/polkadot-to-visa-mastercard-rub.html' => 'DOT',
+            'https://www.bestchange.ru/uniswap-to-visa-mastercard-rub.html' => 'UNI',
+            'https://www.bestchange.ru/ravencoin-to-visa-mastercard-rub.html' => 'RVN',
+            'https://www.bestchange.ru/solana-to-visa-mastercard-rub.html' => 'SOL',
+            'https://www.bestchange.ru/vechain-to-visa-mastercard-rub.html' => 'VET',
+            'https://www.bestchange.ru/algorand-to-visa-mastercard-rub.html' => 'ALGO',
+            'https://www.bestchange.ru/maker-to-visa-mastercard-rub.html' => 'MKR',
+            'https://www.bestchange.ru/avalanche-to-visa-mastercard-rub.html' => 'AVAX',
+            'https://www.bestchange.ru/yearn-finance-to-visa-mastercard-rub.html' => 'YFI',
+            'https://www.bestchange.ru/terra-to-visa-mastercard-rub.html' => 'LUNA',
 
-            ];
-
-       $this->TICKERSqiwiIN = [
-            "https://www.bestchange.ru/qiwi-to-bitcoin.html" => "BTC",
-"https://www.bestchange.ru/qiwi-to-bitcoin-cash.html" => "BCH",
-"https://www.bestchange.ru/qiwi-to-bitcoin-gold.html" => "BTG",
-"https://www.bestchange.ru/qiwi-to-ethereum.html" => "ETH",
-"https://www.bestchange.ru/qiwi-to-ethereum-classic.html" => "ETC",
-"https://www.bestchange.ru/qiwi-to-litecoin.html" => "LTC",
-"https://www.bestchange.ru/qiwi-to-ripple.html" => "XRP",
-"https://www.bestchange.ru/qiwi-to-monero.html" => "XMR",
-"https://www.bestchange.ru/qiwi-to-dogecoin.html" => "DOGE",
-"https://www.bestchange.ru/qiwi-to-polygon.html" => "MATIC",
-"https://www.bestchange.ru/qiwi-to-dash.html" => "DASH",
-"https://www.bestchange.ru/qiwi-to-zcash.html" => "ZEC",
-"https://www.bestchange.ru/qiwi-to-nem.html" => "XEM",
-"https://www.bestchange.ru/qiwi-to-neo.html" => "NEO",
-"https://www.bestchange.ru/qiwi-to-eos.html" => "EOS",
-"https://www.bestchange.ru/qiwi-to-cardano.html" => "ADA",
-"https://www.bestchange.ru/qiwi-to-stellar.html" => "XLM",
-"https://www.bestchange.ru/qiwi-to-tron.html" => "TRX",
-"https://www.bestchange.ru/qiwi-to-waves.html" => "WAVES",
-"https://www.bestchange.ru/qiwi-to-omg.html" => "OMG",
-"https://www.bestchange.ru/qiwi-to-binance-coin.html" => "BNB",
-"https://www.bestchange.ru/qiwi-to-bat.html" => "BAT",
-"https://www.bestchange.ru/qiwi-to-qtum.html" => "QTUM",
-"https://www.bestchange.ru/qiwi-to-chainlink.html" => "LINK",
-"https://www.bestchange.ru/qiwi-to-cosmos.html" => "ATOM",
-"https://www.bestchange.ru/qiwi-to-tezos.html" => "XTZ",
-"https://www.bestchange.ru/qiwi-to-polkadot.html" => "DOT",
-"https://www.bestchange.ru/qiwi-to-uniswap.html" => "UNI",
-"https://www.bestchange.ru/qiwi-to-ravencoin.html" => "RVN",
-"https://www.bestchange.ru/qiwi-to-solana.html" => "SOL",
-"https://www.bestchange.ru/qiwi-to-vechain.html" => "VET",
-"https://www.bestchange.ru/qiwi-to-algorand.html" => "ALGO",
-"https://www.bestchange.ru/qiwi-to-maker.html" => "MKR",
-"https://www.bestchange.ru/qiwi-to-avalanche.html" => "AVAX",
-"https://www.bestchange.ru/qiwi-to-yearn-finance.html" => "YFI",
-"https://www.bestchange.ru/qiwi-to-terra.html" => "LUNA",
         ];
 
 
-        // БАЗОВАЯ ТАБЛИЦА С ТИКЕРАМИ
-       $basetable =  $this->GetBaseTable("OUT");
-        $this->WorkTable($basetable);
-        // БАЗОВАЯ ТАБЛИЦА С ТИКЕРАМИ
-
-
+        echo "<h2>PARSE-IN-V2 | ПАРСИНГ BESTCHANGE</h2><br>";
 
         // Инициализация парсера
-        $aparser = new \Aparser('http://91.210.171.153:9091/API', '', array('debug'=>'false'));
+        $aparser = new \Aparser('http://91.210.171.153:9091/API', '', array('debug'=>$this->debug));
 
+        // Таблица статуса работы парсера
+        $StatusTable =  $this->GetStatusTable();
 
-        // ОБНОВЛЕНИЕ ПАРСИНГА IN!!!!!
-
-        $Table =  $this->GetStatusTable("OUT");
-
-        // Если таблица статуса парсинга пустая, то запускаем парсинг
-        if (empty($Table))
+        // Парсер не запущен. Формируем запрос;
+        if (empty($StatusTable))
         {
 
-            // ДОБАВЛЯЕМ В СПИСОК УРЛ QIWI_IN
-            foreach ($this->TICKERSvisaOUT as $url => $ticker)
+            $ZAPROS = $this->GetZapros();
+
+            if (empty($ZAPROS))
             {
-                $ZaprosiIN[] = $url;
+                echo "<font color='green'>Информация актуальная. Парсить нет необходимости </font><br>";
+                return true;
             }
-            $taskUid = $aparser->addTask('default', 'BestOUT', 'text', $ZaprosiIN);
-            $this->AddTaskBD($taskUid, "OUT");
+
+            $taskUid = $aparser->addTask('20', 'BestOUT', 'text', $ZAPROS);
+            $this->AddTaskBD($taskUid, $this->type);
             return true;
 
         }
 
 
         // Смотрим СТАТУС!
-        $AparserOUT =   $aparser->getTaskState($Table['taskid']);
-        echo "<font color='#8b0000'>ПАРСИНГ OUT В РАБОТЕ</font><br>";
+        $AparserIN =   $aparser->getTaskState($StatusTable['taskid']);
 
 
-        if ($AparserOUT['status'] == "completed"){
+        if ($AparserIN['status'] == "work")
+        {
+            echo "<font color='#8b0000'>ПАРСИНГ IN В РАБОТЕ</font><br>";
+            sleep($this->sleep);
+        }
 
-            echo "<font color='green'>ПАРСИНГ OUT ЗАКОНЧЕН</font><br>";
 
-            $result = $aparser->getTaskResultsFile($Table['taskid']);
+        if ($AparserIN['status'] == "completed"){
+
+            echo "<font color='green'>ПАРСИНГ IN ЗАКОНЧЕН</font><br>";
+
+            $result = $aparser->getTaskResultsFile($StatusTable['taskid']);
             $content = file_get_contents($result);
             $content = str_replace(" ", "", $content); // Убираем пробелы
             $content = explode("\n", $content);
 
             // ОБНОВЛЯЕМ ТАБЛИЦУ
-           // show($content);
+            // show($content);
 
             // Обновляем в БД цены
-            $this->RenewTickers($content, "OUT");
+            $this->RenewTickers($content, $this->type);
 
             // Очищаем статус таблицу
-            R::trash($Table);
+            R::trash($StatusTable);
 
 
         }
+
 
 
 
@@ -195,39 +139,56 @@ class ParseoutController extends AppController {
 
 
 
-    private function WorkTable($basetable)
-    {
 
-        if (empty($basetable))
+
+
+    private function GetZapros(){
+
+        $ZAPROS = [];
+
+        $obmen =  $this->GetBaseTable(); // Создаем BaseTickers
+        if (empty($obmen)) $this->CreateTable(); // Если таблица пустая, то создаем
+
+
+        // Проверяем созданную таблицу страниц
+        foreach ($obmen as $key=>$val)
         {
-            // СОЗДАЕМ ТАБЛИЦУ НА КИВИ ВХОД
-            foreach ($this->TICKERSqiwiIN as $url => $ticker)
+
+            $proshlo = time() - $val['time'];
+
+            echo "Method: ".$val['method']."<br>";
+            echo "Ticker: ".$val['ticker']."<br>";
+            echo "Прошло: ".$proshlo."<br>";
+
+            if ($proshlo > $this->vremya)
             {
-                $ZAPIS['global'] = "QIWI";
-                $ZAPIS['type'] = "IN";
-                $ZAPIS['url'] = $url;
-                $ZAPIS['ticker'] = $ticker;
-                $this->AddTable($ZAPIS);
+                echo "<i>Цена не актуальная! Пора обновлять</i><br>";
+                $ZAPROS[] = $val['url'];
             }
-            echo "<hr>";
 
-            // СОЗДАЕМ ТАБЛИЦУ НА КАРТУ ВЫХОД
-            foreach ($this->TICKERSvisaOUT as $url => $ticker)
-            {
-                $ZAPIS['global'] = "VISA";
-                $ZAPIS['type'] = "OUT";
-                $ZAPIS['url'] = $url;
-                $ZAPIS['ticker'] = $ticker;
-                $this->AddTable($ZAPIS);
-            }
-            echo "<hr>";
-
-
-
-
-            echo "<font color='green'>Таблица с тикерами создана!</font> <br>";
         }
 
+        return $ZAPROS;
+
+    }
+
+    private function CreateTable()
+    {
+
+
+        // СОЗДАЕМ ТАБЛИЦУ НА КИВИ ВХОД
+        foreach ($this->TICKERSvisaOUT as $url => $ticker)
+        {
+            $ARR['method'] = "VISA";
+            $ARR['url'] = $url;
+            $ARR['ticker'] = $ticker;
+            $this->AddARRinBD($ARR, "obmenout");
+            //echo "<b><font color='green'>Добавили запись</font></b>";
+            // Добавление ТРЕКА в БД
+        }
+
+        echo "<hr>";
+        echo "<font color='green'>Таблица с ценами из обменников создана!!</font> <br>";
 
         return true;
 
@@ -240,28 +201,35 @@ class ParseoutController extends AppController {
 
         echo "МАССИВ ПАРСИНГА<br>";
 
-
         // Преобразовываем массив в примемлемый вид
         $MASSIV = [];
         foreach ($content as $key=>$value)
         {
             if (empty($value)) continue;
             $value = explode(";", $value);
- //           show($value);
+            //           show($value);
             $MASSIV[$value[0]][] = $value[1];
             $MASSIV[$value[0]][] = $value[2];
         }
 
 
 
-        $TICKERS = $this->GetBaseTable($type);
+        $obmen = $this->GetBaseTable();
+
+
+        //  show($MASSIV);
 
 
         // Добавляем в БД данные из спарсенного контента!
-        foreach ($TICKERS as $ticker)
+        foreach ($obmen as $ticker)
         {
-           $ticker->price = $MASSIV[$ticker['url']][0];
-           $ticker->limit = $MASSIV[$ticker['url']][1];
+
+            if (empty($MASSIV[$ticker['url']])) continue;
+            if ($MASSIV[$ticker['url']][0] == "none") continue;
+
+            $ticker->price = $MASSIV[$ticker['url']][0];
+            $ticker->limit = $MASSIV[$ticker['url']][1];
+            $ticker->time = time();
             R::store($ticker);
 
         }
@@ -278,60 +246,27 @@ class ParseoutController extends AppController {
     {
 
         $ARR = [];
-        if ($type == "IN")
-        {
-            $ARR['taskid'] = $taskid;
-            $ARR['type'] = "IN";
-        }
-        if ($type == "OUT"){
-            $ARR['taskid'] = $taskid;
-            $ARR['type'] = "OUT";
+        $ARR['taskid'] = $taskid;
+        $ARR['type'] = $type;
 
-        }
         $this->AddARRinBD($ARR, "statustable");
         echo "<b><font color='green'>Добавили запись</font></b>";
         // Добавление ТРЕКА в БД
 
     }
 
-
-
-
-    private function AddTable($ZAPIS)
+    private function GetBaseTable()
     {
-
-        $ARR['global'] = $ZAPIS['global'];
-        $ARR['type'] = $ZAPIS['type'];
-        $ARR['url'] = $ZAPIS['url'];
-        $ARR['ticker'] = $ZAPIS['ticker'];
-
-
-        $this->AddARRinBD($ARR, "basetickers");
-        echo "<b><font color='green'>Добавили запись</font></b>";
-        // Добавление ТРЕКА в БД
-
-
-        return true;
-
-    }
-
-
-    private function GetBaseTable($type)
-    {
-        $table = R::findAll("basetickers", "WHERE type=?", [$type]);
+        $table = R::findAll("obmenout");
         return $table;
     }
 
-
-    private function GetStatusTable($type)
+    private function GetStatusTable()
     {
-        $table = R::findOne("statustable", "WHERE type=?", [$type]);
+
+        $table = R::findOne("statustable", "WHERE type=?", [$this->type]);
         return $table;
     }
-
-
-
-
 
 
     private function AddARRinBD($ARR, $BD = false)
