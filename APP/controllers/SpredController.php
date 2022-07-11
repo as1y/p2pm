@@ -14,9 +14,6 @@ class SpredController extends AppController {
 //    public $ApiKey = "U5I2AoIrTk4gBR7XLB";
 //    public $SecretKey = "HUfZrWiVqUlLM65Ba8TXvQvC68kn1AabMDgE";
 
-    private $TickerBinance =[];
-
-
 
     // ТЕХНИЧЕСКИЕ ПЕРЕМЕННЫЕ
     public function indexAction()
@@ -50,17 +47,27 @@ class SpredController extends AppController {
             'timeout' => 30000,
         ));
 
+        $exchangeByBit = new \ccxt\bybit (array (
+            //  'verbose' => true,
+            'timeout' => 30000,
+        ));
+
+        $exchangeHuobi = new \ccxt\huobipro (array (
+            //  'verbose' => true,
+            'timeout' => 30000,
+        ));
+
+        $exchangeGate = new \ccxt\gateio (array (
+            //  'verbose' => true,
+            'timeout' => 30000,
+        ));
+
+        $exchangePolonex = new \ccxt\poloniex (array (
+            //  'verbose' => true,
+            'timeout' => 30000,
+        ));
 
 
-
-        $this->TickerBinance = $exchangeBinance->fetch_tickers();
-
-
-
-
-      //  $this->TickerBybit =
-
-        $TickersBDIN = $this->LoadTickersBD("IN");
 
 
         echo "<h2>БАЗОВЫЕ ПАРАМЕТРЫ ЗАХОДА</h2>";
@@ -69,9 +76,84 @@ class SpredController extends AppController {
         $STARTPRICE['USDT'] = $this->GetPriceAct("USDT");
 
 
-         echo "<b>Стартовая цена захода BTC: </b>".$STARTPRICE['BTC']."<br>";
-         echo "<b>Стартовая цена захода ETH: </b>".$STARTPRICE['ETH']."<br>";
-         echo "<b>Стартовая цена захода USDT: </b>".$STARTPRICE['USDT']."<br>";
+        echo "<b>Стартовая цена захода BTC: </b>".$STARTPRICE['BTC']."<br>";
+        echo "<b>Стартовая цена захода ETH: </b>".$STARTPRICE['ETH']."<br>";
+        echo "<b>Стартовая цена захода USDT: </b>".$STARTPRICE['USDT']."<br>";
+
+        echo "<hr>";
+
+        $TickersBDIN = $this->LoadTickersBD("IN");
+
+
+
+        // ЗАГРУЗКА ТИКЕРОВ БИРЖ
+
+       // $this->TickerBinance = $exchangeBinance->fetch_tickers();
+     //   $this->TickerByBit = $exchangeByBit->fetch_tickers();
+      //  show($this->TickerByBit);
+
+           $ALLHuobi = $exchangeHuobi->fetch_tickers();
+
+            $AllGate = $exchangeGate->fetch_tickers();
+
+           $AllPolonex = $exchangePolonex->fetch_tickers();
+
+
+        echo "<h3>ВХОД ЧЕРЕЗ МОНЕТЫ - USDT (POLONEX)</h3>";
+        $RENDER = $this->CheckBestPrice("USDT", $TickersBDIN, $STARTPRICE, $AllPolonex);
+        echo "<b>Самый выгодный символ:</b> ".$RENDER['BestSpredSymbol']." <br>";
+        echo "Лучшая цена ".$RENDER['BestPrice']."<br>";
+
+        echo "<h3>ВХОД ЧЕРЕЗ МОНЕТЫ - ETH (POLONEX)</h3>";
+        $RENDER = $this->CheckBestPrice("ETH", $TickersBDIN, $STARTPRICE, $AllPolonex);
+        echo "<b>Самый выгодный символ:</b> ".$RENDER['BestSpredSymbol']." <br>";
+        echo "Лучшая цена ".$RENDER['BestPrice']."<br>";
+
+
+
+        echo "<h3>ВХОД ЧЕРЕЗ МОНЕТЫ - USDT (GATE.IO)</h3>";
+        $RENDER = $this->CheckBestPrice("USDT", $TickersBDIN, $STARTPRICE, $AllGate);
+        echo "<b>Самый выгодный символ:</b> ".$RENDER['BestSpredSymbol']." <br>";
+        echo "Лучшая цена ".$RENDER['BestPrice']."<br>";
+
+        echo "<h3>ВХОД ЧЕРЕЗ МОНЕТЫ - ETH (GATE.IO)</h3>";
+        $RENDER = $this->CheckBestPrice("ETH", $TickersBDIN, $STARTPRICE, $AllGate);
+        echo "<b>Самый выгодный символ:</b> ".$RENDER['BestSpredSymbol']." <br>";
+        echo "Лучшая цена ".$RENDER['BestPrice']."<br>";
+
+
+
+
+        echo "<h3>ВХОД ЧЕРЕЗ МОНЕТЫ - BTC (HUOBI)</h3>";
+        $RENDER = $this->CheckBestPrice("BTC", $TickersBDIN, $STARTPRICE, $ALLHuobi);
+        echo "<b>Самый выгодный символ:</b> ".$RENDER['BestSpredSymbol']." <br>";
+        echo "Лучшая цена ".$RENDER['BestPrice']."<br>";
+
+
+
+        echo "<h3>ВХОД ЧЕРЕЗ МОНЕТЫ - ETH (HUOBI)</h3>";
+        $RENDER = $this->CheckBestPrice("ETH", $TickersBDIN, $STARTPRICE, $ALLHuobi);
+        echo "<b>Самый выгодный символ:</b> ".$RENDER['BestSpredSymbol']." <br>";
+        echo "Лучшая цена ".$RENDER['BestPrice']."<br>";
+
+
+        echo "<h3>ВХОД ЧЕРЕЗ МОНЕТЫ - USDT (HUOBI)</h3>";
+        $RENDER = $this->CheckBestPrice("USDT", $TickersBDIN, $STARTPRICE, $ALLHuobi);
+        echo "<b>Самый выгодный символ:</b> ".$RENDER['BestSpredSymbol']." <br>";
+        echo "Лучшая цена ".$RENDER['BestPrice']."<br>";
+
+        // ЗАГРУЗКА ТИКЕРОВ
+
+
+
+/*
+        echo "<h3>ВХОД ЧЕРЕЗ МОНЕТЫ - USDT (BYBIT)</h3>";
+        $RENDER = $this->CheckBestPrice("USDT", $TickersBDIN, $STARTPRICE, $this->TickerByBit);
+        echo "<b>Самый выгодный символ:</b> ".$RENDER['BestSpredSymbol']." <br>";
+        echo "Лучшая цена ".$RENDER['BestPrice']."<br>";
+*/
+
+
 
 /*
         // Проверяем лучшую цену через заход в BTC
@@ -105,7 +187,7 @@ class SpredController extends AppController {
 
 
 
-    private function CheckBestPrice($MONETA, $TICKERS, $STARTPRICE){
+    private function CheckBestPrice($MONETA, $TICKERS, $STARTPRICE, $ALLEXCHANGE){
 
         $RENDER['BestPrice'] = 0;
         $RENDER['BestSpredSymbol'] = "";
@@ -128,9 +210,9 @@ class SpredController extends AppController {
             if ($MONETA == "ETH" && $ExchangeTicker == "USDT/ETH") $ExchangeTicker = "ETH/USDT";
 
 
-            if (empty(($this->TickerBinance[$ExchangeTicker]['close']))) continue;
+            if (empty(($ALLEXCHANGE[$ExchangeTicker]['close']))) continue;
 
-            $ExPRICE = $this->TickerBinance[$ExchangeTicker]['close'];
+            $ExPRICE = $ALLEXCHANGE[$ExchangeTicker]['close'];
 
             // Перекрестные тикеры
             if ($MONETA == "BTC" && $ExchangeTicker == "BTC/USDT") $ExPRICE = 1 / $ExPRICE;
