@@ -87,7 +87,13 @@ class ParseinController extends AppController {
 "https://www.bestchange.ru/qiwi-to-avalanche.html" => "AVAX",
 "https://www.bestchange.ru/qiwi-to-yearn-finance.html" => "YFI",
 "https://www.bestchange.ru/qiwi-to-terra.html" => "LUNA",
-"https://www.bestchange.ru/qiwi-to-tether-erc20.html" => "USDT"
+"https://www.bestchange.ru/qiwi-to-tether-erc20.html" => "USDT",
+"https://www.bestchange.ru/qiwi-to-bitcoin-sv.html" => "BSV",
+"https://www.bestchange.ru/qiwi-to-zrx.html" => "ZRX",
+"https://www.bestchange.ru/qiwi-to-icon.html" => "ICX",
+"https://www.bestchange.ru/qiwi-to-ontology.html" => "ONT",
+"https://www.bestchange.ru/qiwi-to-ton.html" => "TON"
+
         ];
 
 

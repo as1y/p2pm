@@ -99,25 +99,25 @@ class SpredController extends AppController {
            $AllPolonex = $exchangePolonex->fetch_tickers();
 
 
-        echo "<h3>ВХОД ЧЕРЕЗ МОНЕТЫ - USDT (POLONEX)</h3>";
-        $RENDER = $this->CheckBestPrice("USDT", $TickersBDIN, $STARTPRICE, $AllPolonex);
+        echo "<h3>ВХОД ЧЕРЕЗ МОНЕТЫ - BTC (Poloniex)</h3>";
+        $RENDER = $this->CheckBestPrice("BTC", "Poloniex", $TickersBDIN, $STARTPRICE, $AllPolonex);
         echo "<b>Самый выгодный символ:</b> ".$RENDER['BestSpredSymbol']." <br>";
         echo "Лучшая цена ".$RENDER['BestPrice']."<br>";
 
-        echo "<h3>ВХОД ЧЕРЕЗ МОНЕТЫ - ETH (POLONEX)</h3>";
-        $RENDER = $this->CheckBestPrice("ETH", $TickersBDIN, $STARTPRICE, $AllPolonex);
+        echo "<h3>ВХОД ЧЕРЕЗ МОНЕТЫ - USDT (Poloniex)</h3>";
+        $RENDER = $this->CheckBestPrice("USDT","Poloniex", $TickersBDIN, $STARTPRICE, $AllPolonex);
         echo "<b>Самый выгодный символ:</b> ".$RENDER['BestSpredSymbol']." <br>";
         echo "Лучшая цена ".$RENDER['BestPrice']."<br>";
 
 
 
         echo "<h3>ВХОД ЧЕРЕЗ МОНЕТЫ - USDT (GATE.IO)</h3>";
-        $RENDER = $this->CheckBestPrice("USDT", $TickersBDIN, $STARTPRICE, $AllGate);
+        $RENDER = $this->CheckBestPrice("USDT","GATE.IO", $TickersBDIN, $STARTPRICE, $AllGate);
         echo "<b>Самый выгодный символ:</b> ".$RENDER['BestSpredSymbol']." <br>";
         echo "Лучшая цена ".$RENDER['BestPrice']."<br>";
 
         echo "<h3>ВХОД ЧЕРЕЗ МОНЕТЫ - ETH (GATE.IO)</h3>";
-        $RENDER = $this->CheckBestPrice("ETH", $TickersBDIN, $STARTPRICE, $AllGate);
+        $RENDER = $this->CheckBestPrice("ETH","GATE.IO", $TickersBDIN, $STARTPRICE, $AllGate);
         echo "<b>Самый выгодный символ:</b> ".$RENDER['BestSpredSymbol']." <br>";
         echo "Лучшая цена ".$RENDER['BestPrice']."<br>";
 
@@ -125,20 +125,19 @@ class SpredController extends AppController {
 
 
         echo "<h3>ВХОД ЧЕРЕЗ МОНЕТЫ - BTC (HUOBI)</h3>";
-        $RENDER = $this->CheckBestPrice("BTC", $TickersBDIN, $STARTPRICE, $ALLHuobi);
+        $RENDER = $this->CheckBestPrice("BTC","HUOBI", $TickersBDIN, $STARTPRICE, $ALLHuobi);
         echo "<b>Самый выгодный символ:</b> ".$RENDER['BestSpredSymbol']." <br>";
         echo "Лучшая цена ".$RENDER['BestPrice']."<br>";
 
 
-
         echo "<h3>ВХОД ЧЕРЕЗ МОНЕТЫ - ETH (HUOBI)</h3>";
-        $RENDER = $this->CheckBestPrice("ETH", $TickersBDIN, $STARTPRICE, $ALLHuobi);
+        $RENDER = $this->CheckBestPrice("ETH", "HUOBI",$TickersBDIN, $STARTPRICE, $ALLHuobi);
         echo "<b>Самый выгодный символ:</b> ".$RENDER['BestSpredSymbol']." <br>";
         echo "Лучшая цена ".$RENDER['BestPrice']."<br>";
 
 
         echo "<h3>ВХОД ЧЕРЕЗ МОНЕТЫ - USDT (HUOBI)</h3>";
-        $RENDER = $this->CheckBestPrice("USDT", $TickersBDIN, $STARTPRICE, $ALLHuobi);
+        $RENDER = $this->CheckBestPrice("USDT", "HUOBI",$TickersBDIN, $STARTPRICE, $ALLHuobi);
         echo "<b>Самый выгодный символ:</b> ".$RENDER['BestSpredSymbol']." <br>";
         echo "Лучшая цена ".$RENDER['BestPrice']."<br>";
 
@@ -187,7 +186,7 @@ class SpredController extends AppController {
 
 
 
-    private function CheckBestPrice($MONETA, $TICKERS, $STARTPRICE, $ALLEXCHANGE){
+    private function CheckBestPrice($MONETA, $ExchangeName , $TICKERS, $STARTPRICE, $ALLEXCHANGE){
 
         $RENDER['BestPrice'] = 0;
         $RENDER['BestSpredSymbol'] = "";
@@ -229,7 +228,7 @@ class SpredController extends AppController {
          //   echo "Цена на монеты :".$ExPRICE."<br>";
          //   echo "Сколько получим BTC :".$BtcConvertPrice."<br>";
 
-            $RENDER =  $this->RenderPercent($RENDER, $TickerWork, $ExchangeTicker, $ExPRICE, $MONETA, $STARTPRICE);
+            $RENDER =  $this->RenderPercent($RENDER, $TickerWork, $ExchangeTicker, $ExPRICE, $MONETA, $STARTPRICE, $ExchangeName);
 
 
 
@@ -254,7 +253,7 @@ class SpredController extends AppController {
 
 
 
-    private function RenderPercent($RENDER, $TickerWork, $ExchangeTicker, $ExPRICE, $MONETA, $STARTPRICE)
+    private function RenderPercent($RENDER, $TickerWork, $ExchangeTicker, $ExPRICE, $MONETA, $STARTPRICE, $ExchangeName)
     {
 
 
@@ -271,7 +270,7 @@ class SpredController extends AppController {
         if ($change <= 0) $change = "<font color='#8b0000'>".$change."</font>";
 
 
-        echo "<b>1.</b> Покупаем в обменнике: <b>".$TickerWork['ticker']."</b> по цене  ".$TickerWork['price']." и зачисляем на кошелек биржи <br>";
+        echo "<b>1.</b> Покупаем в обменнике: <b>".$TickerWork['ticker']."</b> по цене  ".$TickerWork['price']." и зачисляем на кошелек биржи <b>".$ExchangeName."</b> <br>";
         echo "<b>2.</b> На бирже меняем: <b>".$TickerWork['ticker']."</b> &#10144;   <b>".$MONETA."</b>  <br>";
         echo "<b>3.</b> Получаем кол-во  ".$MONETA." | Это кол-во будет равно закупки по курсу  <b>".$MONETA."</b> = ".$BtcConvertPrice." <br> ";
         echo "<b>4.</b> СПРЕД ВХОДА: ".$change." % <br>" ;
