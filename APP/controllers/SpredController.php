@@ -266,17 +266,30 @@ class SpredController extends AppController {
     //    $countMoneta = round($countMoneta,20);
 
         $change = changemet($BtcConvertPrice, $STARTPRICE[$MONETA] );
-        if ($change > 0) $change = "<font color='green'><b>".$change."</b></font>";
-        if ($change <= 0) $change = "<font color='#8b0000'>".$change."</font>";
+        if ($change > 0){
+            $change = "<font color='green'><b>".$change."</b></font>";
 
+            echo "<b>1.</b> Покупаем в обменнике: <b>".$TickerWork['ticker']."</b> по цене  ".$TickerWork['price']." и зачисляем на кошелек биржи <b>".$ExchangeName."</b> <br>";
+            echo "<b>2.</b> На бирже меняем: <b>".$TickerWork['ticker']."</b> &#10144;   <b>".$MONETA."</b>  <br>";
+            echo "<b>3.</b> Получаем кол-во  ".$MONETA." | Это кол-во будет равно закупки по курсу  <b>".$MONETA."</b> = ".$BtcConvertPrice." <br> ";
+            echo "<b>4.</b> СПРЕД ВХОДА: ".$change." % <br>" ;
+            echo "<hr>";
 
-        echo "<b>1.</b> Покупаем в обменнике: <b>".$TickerWork['ticker']."</b> по цене  ".$TickerWork['price']." и зачисляем на кошелек биржи <b>".$ExchangeName."</b> <br>";
-        echo "<b>2.</b> На бирже меняем: <b>".$TickerWork['ticker']."</b> &#10144;   <b>".$MONETA."</b>  <br>";
-        echo "<b>3.</b> Получаем кол-во  ".$MONETA." | Это кол-во будет равно закупки по курсу  <b>".$MONETA."</b> = ".$BtcConvertPrice." <br> ";
-        echo "<b>4.</b> СПРЕД ВХОДА: ".$change." % <br>" ;
+        }
 
+        /*
+        if ($change <= 0) {
+            $change = "<font color='#8b0000'>".$change."</font>";
 
-        echo "<hr>";
+            echo "<b>1.</b> Покупаем в обменнике: <b>".$TickerWork['ticker']."</b> по цене  ".$TickerWork['price']." и зачисляем на кошелек биржи <b>".$ExchangeName."</b> <br>";
+            echo "<b>2.</b> На бирже меняем: <b>".$TickerWork['ticker']."</b> &#10144;   <b>".$MONETA."</b>  <br>";
+            echo "<b>3.</b> Получаем кол-во  ".$MONETA." | Это кол-во будет равно закупки по курсу  <b>".$MONETA."</b> = ".$BtcConvertPrice." <br> ";
+            echo "<b>4.</b> СПРЕД ВХОДА: ".$change." % <br>" ;
+             echo "<hr>";
+
+        }
+        */
+
 
 
       //  echo "Покупаем в обменнике: < b>".$TickerWork['ticker']."</b> по цене  ".$TickerWork['price']."  &#10144; переводим на биржу  ".$ExPRICE." BTC == ".$BtcConvertPrice." <br>";

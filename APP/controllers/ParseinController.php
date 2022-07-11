@@ -92,7 +92,6 @@ class ParseinController extends AppController {
 "https://www.bestchange.ru/qiwi-to-zrx.html" => "ZRX",
 "https://www.bestchange.ru/qiwi-to-icon.html" => "ICX",
 "https://www.bestchange.ru/qiwi-to-ontology.html" => "ONT",
-"https://www.bestchange.ru/qiwi-to-ton.html" => "TON"
 
         ];
 
