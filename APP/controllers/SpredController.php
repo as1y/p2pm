@@ -36,13 +36,6 @@ class SpredController extends AppController {
         \APP\core\base\View::setBreadcrumbs($BREADCRUMBS);
         // Браузерная часть
 
-        //  show(\ccxt\Exchange::$exchanges); // print a list of all available exchange classes
-
-        //Запуск CCXT
-        $exchangeBinance = new \ccxt\binance (array (
-          //  'verbose' => true,
-            'timeout' => 30000,
-        ));
 
 
         $exchangeByBit = new \ccxt\bybit (array (
@@ -87,7 +80,7 @@ class SpredController extends AppController {
 
         // ЗАГРУЗКА ТИКЕРОВ БИРЖ
 
-        $ALLBinance = $exchangeBinance->fetch_tickers();
+
         $ALLBybit = $exchangeBinance->fetch_tickers();
 
         $AllPolonex = $exchangePolonex->fetch_tickers();
