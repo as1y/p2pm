@@ -14,7 +14,7 @@ class ParseoutController extends AppController {
     public $TICKERSvisaOUT = [];
 
 
-    public $vremya = 200; // Секунд
+    public $vremya = 100; // Секунд
     public $type = "OUT";
     public $debug = false;
     public $sleep = 10;

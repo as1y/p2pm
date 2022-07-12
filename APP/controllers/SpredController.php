@@ -100,7 +100,7 @@ class SpredController extends AppController {
 
 
         echo "<h3>ВХОД ЧЕРЕЗ МОНЕТУ - USDT (BINANCE)</h3>";
-        $RENDER = $this->CheckBestPrice("USDT", "HUOBI",$TickersBDIN, $STARTPRICE, $ALLBinance);
+        $RENDER = $this->CheckBestPrice("USDT", "Binance",$TickersBDIN, $STARTPRICE, $ALLBinance);
         echo "<b>Самый выгодный символ:</b> ".$RENDER['BestSpredSymbol']." <br>";
 
         echo "Лучшая цена ".$RENDER['BestPrice']."<br>";
@@ -108,15 +108,28 @@ class SpredController extends AppController {
         echo "<hr>";
 
         echo "<h2>BINANCE</h2>";
-        $this->CalculateExit($TickersBDOUT, $ALLBinance);
-
-        echo "<h2>BYBIT</h2>";
-        $this->CalculateExit($TickersBDOUT, $ALLBybit);
+        $this->CalculateExit("USDT", $TickersBDOUT, $ALLBinance);
 
         echo "<h2>POLONIEX</h2>";
-        $this->CalculateExit($TickersBDOUT, $AllPolonex);
+        $this->CalculateExit("USDT",$TickersBDOUT, $AllPolonex);
 
         echo "<hr>";
+
+
+        echo "<h3>ВХОД ЧЕРЕЗ МОНЕТУ - ETH (BINANCE)</h3>";
+        $RENDER = $this->CheckBestPrice("BTC", "Binance",$TickersBDIN, $STARTPRICE, $ALLBinance);
+        echo "<b>Самый выгодный символ:</b> ".$RENDER['BestSpredSymbol']." <br>";
+
+        echo "Лучшая цена ".$RENDER['BestPrice']."<br>";
+
+        echo "<h2>BINANCE</h2>";
+        $this->CalculateExit("BTC", $TickersBDOUT, $ALLBinance);
+
+        echo "<h2>POLONIEX</h2>";
+        $this->CalculateExit("BTC",$TickersBDOUT, $AllPolonex);
+
+        echo "<hr>";
+
 
 
        /*
@@ -203,46 +216,57 @@ class SpredController extends AppController {
 
 
 
-    private function CalculateExit($TickersBDOUT, $AllExchange){
+    private function CalculateExit($base, $TickersBDOUT, $AllExchange){
 
-            $base = "USDT";
+            // Поиск лучшего выхода по всей биржи
 
-           // echo "Цена выхода напрямую:".."<br>";
+        //    $base = "USDT";
+        //    $baseprice = "64.16";
 
+            $BestPrice = 0;
+            $BestTicker = "";
 
-           // show($ALLBinance);
 
             foreach ($TickersBDOUT as $key=>$val)
             {
 
-                if ($val['ticker'] == $base) continue;
-
 
                 $exticker = $val['ticker']."/".$base;
 
-                $amount = 1/$ALLBinance[$exticker]['close'];
-                $amount = round($amount, 10);
+
+                if ($val['ticker'] == $base) continue;
+                if (empty($AllExchange[$exticker]['close'])) continue;
+
+                    $amount = 1/$AllExchange[$exticker]['close'];
+                    $amount = round($amount, 10);
+
 
                 $final = $amount*$val['price'];
 
-                echo "Монета: ".$val['ticker']."<br>";
-                echo "Цена: ".$val['price']."<br>";
-                echo "Тикер на бирже: ".$exticker."<br>";
-                echo "Цена актива на бирже: ".$ALLBinance[$exticker]['close']."<br>";
+       //         echo "Монета: ".$val['ticker']."<br>";
+      //          echo "Цена: ".$val['price']."<br>";
 
-                echo "Какое кол-во актива получим с обмена: ".$amount."<br>";
+    //            echo "Цена актива на бирже: ".$AllExchange[$exticker]['close']."<br>";
+   //             echo "Какое кол-во актива получим с обмена: ".$amount."<br>";
+  //              echo "Сколько получим после продажи актива в обменниках: ".$final."<br>";
 
-                echo "Сколько получим после продажи актива в обменниках: ".$final."<br>";
+                if ($final > $BestPrice)
+                {
+                    $BestPrice = $final;
+                    $BestTicker = $exticker;
 
+                }
 
-
-                echo "Считаем кол-во монеты, которую мы получим за 1 единицу USDT<br>";
-
-                echo "<hr>";
+           //     echo "<hr>";
 
 
 
             }
+
+
+            echo "<b>Монета выхода: </b>".$BestTicker."<br>";
+            echo "<b>Лучшая цена выхода: </b>".$BestPrice."<br>";
+
 
 
 
