@@ -55,10 +55,10 @@ class SpredController extends AppController {
 
         // Рассчет самого выгодного входа через БИРЖУ
         $MassivBinance =  $this->GetArrEnterExchange($STARTPRICE, "Binance", "QIWI");
+        show($MassivBinance);
 
-        exit("11");
 
-        $MassivPoloniex =  $this->GetArrEnterExchange($STARTPRICE, "Poloniex", "QIWI");
+       // $MassivPoloniex =  $this->GetArrEnterExchange($STARTPRICE, "Poloniex", "QIWI");
 
   //      show($MassivBinance);
 
@@ -218,6 +218,7 @@ class SpredController extends AppController {
 
         $FINALMASSIV = array_merge($ArrBTC, $ArrETH, $ArrUSDT);
 
+        show($FINALMASSIV);
 
         $FINALMASSIV = $this->GetTopSpredsMassiv($FINALMASSIV, 5);
 
@@ -232,7 +233,7 @@ class SpredController extends AppController {
         // Получаем 3 ТОП1 из всех
         $OBRABOTKA = [];
 
-        show($FINALMASSIV);
+      //  show($FINALMASSIV);
 
         // Цикл на ОТБОР 5 ЛУЧШИХ
             for ($i=0; $i<$count; $i++ ){
@@ -264,13 +265,8 @@ class SpredController extends AppController {
                     array_shift($FINALMASSIV['USDT']['spred']);
                 }
 
-
-
             }
 
-
-
-            show($OBRABOTKA);
 
 
         return $OBRABOTKA;
@@ -282,8 +278,8 @@ class SpredController extends AppController {
 
         $Dannie['symbol'] = $symbol;
         $Dannie['moneta'] = array_key_first($FINALMASSIV[$symbol]['spred']);
-        $Dannie['spred'] = array_shift($FINALMASSIV[$symbol]['spred']);
-        $Dannie['final'] = array_shift($FINALMASSIV[$symbol]['final']);
+        $Dannie['spred'] = reset($FINALMASSIV[$symbol]['spred']);
+        $Dannie['final'] = $FINALMASSIV[$symbol]['final'][$Dannie['moneta']];
 
 
         return $Dannie;
@@ -395,68 +391,6 @@ class SpredController extends AppController {
 */
 
 
-    private function RenderPercent($RENDER, $TickerWork, $ExchangeTicker, $ExPRICE, $MONETA, $STARTPRICE)
-    {
-
-
-        $RENDER['Symbol'] = $ExchangeTicker;
-
-        $BtcConvertPrice = $TickerWork['price']/$ExPRICE;
-        $BtcConvertPrice = round($BtcConvertPrice, 2);
-        $change = changemet($BtcConvertPrice, $STARTPRICE[$MONETA] );
-
-
-        if ($change > 0){
-            $change = "<font color='green'><b>".$change."</b></font>";
-
-            echo "<b>1.</b> Покупаем в обменнике: <b>".$TickerWork['ticker']."</b> по цене  ".$TickerWork['price']." и зачисляем на кошелек биржи <br>";
-            echo "<b>2.</b> На бирже меняем: <b>".$TickerWork['ticker']."</b> &#10144;   <b>".$MONETA."</b>  <br>";
-            echo "<b>3.</b> Получаем кол-во  ".$MONETA." | Это кол-во будет равно закупки по курсу  <b>".$MONETA."</b> = ".$BtcConvertPrice." <br> ";
-            echo "<b>4.</b> СПРЕД ВХОДА: ".$change." % <br>" ;
-            echo "<hr>";
-
-        }
-
-        /*
-        if ($change <= 0) {
-            $change = "<font color='#8b0000'>".$change."</font>";
-
-            echo "<b>1.</b> Покупаем в обменнике: <b>".$TickerWork['ticker']."</b> по цене  ".$TickerWork['price']." и зачисляем на кошелек биржи <b>".$ExchangeName."</b> <br>";
-            echo "<b>2.</b> На бирже меняем: <b>".$TickerWork['ticker']."</b> &#10144;   <b>".$MONETA."</b>  <br>";
-            echo "<b>3.</b> Получаем кол-во  ".$MONETA." | Это кол-во будет равно закупки по курсу  <b>".$MONETA."</b> = ".$BtcConvertPrice." <br> ";
-            echo "<b>4.</b> СПРЕД ВХОДА: ".$change." % <br>" ;
-             echo "<hr>";
-
-        }
-        */
-
-
-
-        //  echo "Покупаем в обменнике: < b>".$TickerWork['ticker']."</b> по цене  ".$TickerWork['price']."  &#10144; переводим на биржу  ".$ExPRICE." BTC == ".$BtcConvertPrice." <br>";
-
-
-        if ($RENDER['BestPrice'] == 0)
-        {
-            $RENDER['BestPrice'] = $BtcConvertPrice;
-            $RENDER['BestSpredSymbol'] = $ExchangeTicker;
-            //    return $RENDER;
-        }
-
-
-        if ($RENDER['BestPrice'] > $BtcConvertPrice) {
-            //     echo "Меняем".$RENDER['BestPrice']." на ".$BtcConvertPrice."<br>";
-            $RENDER['BestPrice'] = $BtcConvertPrice;
-            $RENDER['BestSpredSymbol'] = $ExchangeTicker;
-
-        }
-
-
-
-
-        return $RENDER;
-
-
-    }
 
 
 
