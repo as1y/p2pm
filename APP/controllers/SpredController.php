@@ -56,13 +56,15 @@ class SpredController extends AppController {
         // Рассчет самого выгодного входа через БИРЖУ
         $MassivBinance =  $this->GetArrEnterExchange($STARTPRICE, "Binance", "QIWI");
 
+        exit("11");
+
         $MassivPoloniex =  $this->GetArrEnterExchange($STARTPRICE, "Poloniex", "QIWI");
 
-        show($MassivBinance);
+  //      show($MassivBinance);
 
         echo "<hr>";
 
-        show($MassivPoloniex);
+  //      show($MassivPoloniex);
 
 
 
@@ -79,8 +81,6 @@ class SpredController extends AppController {
 
 
 
-
-       // show($Binance);
 
         exit("11");
 
@@ -207,9 +207,9 @@ class SpredController extends AppController {
 
     private function GetArrEnterExchange($STARTPRICE, $Exchange, $Method){
 
+        $FINALMASSIV = [];
 
         $TickersBDIN = $this->LoadTickersBD("IN", $Method);
-
         $ExchangeTickers = $this->GetTickerText($Exchange);
 
         $ArrBTC = $this->GetArrEnterBase($TickersBDIN, $ExchangeTickers, $STARTPRICE, "BTC");
@@ -219,10 +219,75 @@ class SpredController extends AppController {
         $FINALMASSIV = array_merge($ArrBTC, $ArrETH, $ArrUSDT);
 
 
+        $FINALMASSIV = $this->GetTopSpredsMassiv($FINALMASSIV, 5);
+
         return $FINALMASSIV;
 
     }
 
+
+
+    private function GetTopSpredsMassiv($FINALMASSIV, $count){
+
+        // Получаем 3 ТОП1 из всех
+        $OBRABOTKA = [];
+
+        show($FINALMASSIV);
+
+        // Цикл на ОТБОР 5 ЛУЧШИХ
+            for ($i=0; $i<$count; $i++ ){
+
+                $firstBTC = reset($FINALMASSIV['BTC']['spred']);
+                $firstETH = reset($FINALMASSIV['ETH']['spred']);
+                $firstUSDT = reset($FINALMASSIV['USDT']['spred']);
+
+                /*
+                echo "Первый элемент БТЦ ".$firstBTC."<br>";
+                echo "Первый элемент ETH ".$firstETH."<br>";
+                echo "Первый элемент USDt ".$firstUSDT."<br>";
+                */
+
+                if ($firstBTC > $firstETH && $firstBTC > $firstUSDT)
+                {
+                    $OBRABOTKA[] = $this->LoadObrabotka("BTC", $FINALMASSIV);
+                    array_shift($FINALMASSIV['BTC']['spred']);
+
+                }
+                if ($firstETH > $firstBTC && $firstETH > $firstUSDT)
+                {
+                    $OBRABOTKA[] = $this->LoadObrabotka("ETH", $FINALMASSIV);
+                    array_shift($FINALMASSIV['ETH']['spred']);
+                }
+                if ($firstUSDT > $firstETH && $firstUSDT > $firstBTC)
+                {
+                    $OBRABOTKA[] = $this->LoadObrabotka("USDT", $FINALMASSIV);
+                    array_shift($FINALMASSIV['USDT']['spred']);
+                }
+
+
+
+            }
+
+
+
+            show($OBRABOTKA);
+
+
+        return $OBRABOTKA;
+
+    }
+
+
+    private function LoadObrabotka($symbol, $FINALMASSIV){
+
+        $Dannie['symbol'] = $symbol;
+        $Dannie['moneta'] = array_key_first($FINALMASSIV[$symbol]['spred']);
+        $Dannie['spred'] = array_shift($FINALMASSIV[$symbol]['spred']);
+        $Dannie['final'] = array_shift($FINALMASSIV[$symbol]['final']);
+
+
+        return $Dannie;
+    }
 
 
     private function GetArrEnterBase($TickersBDIN, $ExchangeTickers, $STARTPRICE, $MONETA){
@@ -264,7 +329,7 @@ class SpredController extends AppController {
             $MASSIV[$MONETA]['final'][$TickerWork['ticker']] = $FinalPrice;
 
             arsort($MASSIV[$MONETA]['spred']);
-  
+
 
           //  $MASSIV[$MONETA][$TickerWork['ticker']]['finalprice'] = $FinalPrice;
             // $RENDER =  $this->RenderPercent($RENDER, $TickerWork, $TickerBirga, $ExPRICE, $MONETA, $STARTPRICE);
