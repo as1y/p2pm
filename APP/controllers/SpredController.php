@@ -54,7 +54,16 @@ class SpredController extends AppController {
 
 
         // Рассчет самого выгодного входа через БИРЖУ
-        $this->GetArrEnterExchange($STARTPRICE, "Binance", "QIWI");
+        $MassivBinance =  $this->GetArrEnterExchange($STARTPRICE, "Binance", "QIWI");
+
+        $MassivPoloniex =  $this->GetArrEnterExchange($STARTPRICE, "Poloniex", "QIWI");
+
+        show($MassivBinance);
+
+        echo "<hr>";
+
+        show($MassivPoloniex);
+
 
 
         // Отранжированный массив
@@ -203,27 +212,14 @@ class SpredController extends AppController {
 
         $ExchangeTickers = $this->GetTickerText($Exchange);
 
-        echo "Генерация массива лучшего захода на биржу с этим методом <br>";
+        $ArrBTC = $this->GetArrEnterBase($TickersBDIN, $ExchangeTickers, $STARTPRICE, "BTC");
+        $ArrETH = $this->GetArrEnterBase($TickersBDIN, $ExchangeTickers, $STARTPRICE, "ETH");
+        $ArrUSDT = $this->GetArrEnterBase($TickersBDIN, $ExchangeTickers, $STARTPRICE, "USDT");
 
-        $this->GetArrEnterBase($TickersBDIN, $ExchangeTickers, $STARTPRICE, "USDT");
-
-
-
-
-        exit("111");
+        $FINALMASSIV = array_merge($ArrBTC, $ArrETH, $ArrUSDT);
 
 
-
-        $RENDER = $this->CheckBestPrice("USDT", "Binance",$TickersBDIN, $STARTPRICE, $ExchangeTickers);
-
-
-        echo "<b>Самый выгодный символ:</b> ".$RENDER['BestSpredSymbol']." <br>";
-        echo "Лучшая цена ".$RENDER['BestPrice']."<br>";
-
-
-
-
-        return true;
+        return $FINALMASSIV;
 
     }
 
@@ -231,38 +227,55 @@ class SpredController extends AppController {
 
     private function GetArrEnterBase($TickersBDIN, $ExchangeTickers, $STARTPRICE, $MONETA){
 
-        $RENDER['BestPrice'] = 0;
-        $RENDER['BestSymbol'] = "";
-        $RENDER['BestSpred'] = 0;
-
+        $MASSIV[$MONETA] = [];
 
         foreach ($TickersBDIN as $TickerWork)
         {
+            if ($TickerWork['price'] == "none") continue;
+            if ($TickerWork['ticker'] == $MONETA) continue;
 
+            //
+            $TickerBirga = $TickerWork['ticker']."/".$MONETA."";
+            if ($MONETA == "BTC" && $TickerBirga == "USDT/BTC") $TickerBirga = "BTC/USDT";
+            if ($MONETA == "ETH" && $TickerBirga == "BTC/ETH") $TickerBirga = "ETH/BTC";
+            if ($MONETA == "ETH" && $TickerBirga == "USDT/ETH") $TickerBirga = "ETH/USDT";
 
+            if (empty(($ExchangeTickers[$TickerBirga]['close']))) continue;
 
+            $ExPRICE = $ExchangeTickers[$TickerBirga]['close'];
+
+            // Перекрестные тикеры
+            if ($MONETA == "BTC" && $TickerBirga == "BTC/USDT") $ExPRICE = 1 / $ExPRICE;
+            if ($MONETA == "ETH" && $TickerBirga == "ETH/BTC") $ExPRICE = 1 / $ExPRICE;
+            if ($MONETA == "ETH" && $TickerBirga == "ETH/USDT") $ExPRICE = 1 / $ExPRICE;
+
+            if (empty($ExPRICE)) continue;
+
+            $FinalPrice = $TickerWork['price']/$ExPRICE;
+            $FinalPrice = round($FinalPrice, 2);
+            $change = changemet($FinalPrice, $STARTPRICE[$MONETA] );
+
+          //  echo "Обрабатываем тикер: ".$TickerWork['ticker']."<br>";
+          //  echo "Финальная сумма захода: ".$FinalPrice."<br>";
+          //  echo "Спред: ".$change."<br>";
+
+            // СПРЕД
+            $MASSIV[$MONETA]['spred'][$TickerWork['ticker']] = $change;
+            $MASSIV[$MONETA]['final'][$TickerWork['ticker']] = $FinalPrice;
+
+            arsort($MASSIV[$MONETA]['spred']);
+  
+
+          //  $MASSIV[$MONETA][$TickerWork['ticker']]['finalprice'] = $FinalPrice;
+            // $RENDER =  $this->RenderPercent($RENDER, $TickerWork, $TickerBirga, $ExPRICE, $MONETA, $STARTPRICE);
 
         }
 
-
-
-
-
-
-    }
-
-
-
-    private function GetTickerText($exchange){
-
-        $file = file_get_contents(WWW."/Ticker".$exchange.".txt");     // Открыть файл data.json
-        $MASSIV = json_decode($file,TRUE);              // Декодировать в массив
         return $MASSIV;
 
     }
 
-
-
+/*
     private function CheckBestPrice($MONETA, $ExchangeName , $TICKERS, $STARTPRICE, $ALLEXCHANGE){
 
 
@@ -300,10 +313,6 @@ class SpredController extends AppController {
 
             if (empty($ExPRICE)) continue;
 
-        //    echo "Монета :".$MONETA."<br>";
-         //   echo "Тикер на бирже :".$ExchangeTicker."<br>";
-         //   echo "Цена на монеты :".$ExPRICE."<br>";
-         //   echo "Сколько получим BTC :".$BtcConvertPrice."<br>";
 
             $RENDER =  $this->RenderPercent($RENDER, $TickerWork, $ExchangeTicker, $ExPRICE, $MONETA, $STARTPRICE, $ExchangeName);
 
@@ -318,6 +327,72 @@ class SpredController extends AppController {
 
 
     }
+*/
+
+
+    private function RenderPercent($RENDER, $TickerWork, $ExchangeTicker, $ExPRICE, $MONETA, $STARTPRICE)
+    {
+
+
+        $RENDER['Symbol'] = $ExchangeTicker;
+
+        $BtcConvertPrice = $TickerWork['price']/$ExPRICE;
+        $BtcConvertPrice = round($BtcConvertPrice, 2);
+        $change = changemet($BtcConvertPrice, $STARTPRICE[$MONETA] );
+
+
+        if ($change > 0){
+            $change = "<font color='green'><b>".$change."</b></font>";
+
+            echo "<b>1.</b> Покупаем в обменнике: <b>".$TickerWork['ticker']."</b> по цене  ".$TickerWork['price']." и зачисляем на кошелек биржи <br>";
+            echo "<b>2.</b> На бирже меняем: <b>".$TickerWork['ticker']."</b> &#10144;   <b>".$MONETA."</b>  <br>";
+            echo "<b>3.</b> Получаем кол-во  ".$MONETA." | Это кол-во будет равно закупки по курсу  <b>".$MONETA."</b> = ".$BtcConvertPrice." <br> ";
+            echo "<b>4.</b> СПРЕД ВХОДА: ".$change." % <br>" ;
+            echo "<hr>";
+
+        }
+
+        /*
+        if ($change <= 0) {
+            $change = "<font color='#8b0000'>".$change."</font>";
+
+            echo "<b>1.</b> Покупаем в обменнике: <b>".$TickerWork['ticker']."</b> по цене  ".$TickerWork['price']." и зачисляем на кошелек биржи <b>".$ExchangeName."</b> <br>";
+            echo "<b>2.</b> На бирже меняем: <b>".$TickerWork['ticker']."</b> &#10144;   <b>".$MONETA."</b>  <br>";
+            echo "<b>3.</b> Получаем кол-во  ".$MONETA." | Это кол-во будет равно закупки по курсу  <b>".$MONETA."</b> = ".$BtcConvertPrice." <br> ";
+            echo "<b>4.</b> СПРЕД ВХОДА: ".$change." % <br>" ;
+             echo "<hr>";
+
+        }
+        */
+
+
+
+        //  echo "Покупаем в обменнике: < b>".$TickerWork['ticker']."</b> по цене  ".$TickerWork['price']."  &#10144; переводим на биржу  ".$ExPRICE." BTC == ".$BtcConvertPrice." <br>";
+
+
+        if ($RENDER['BestPrice'] == 0)
+        {
+            $RENDER['BestPrice'] = $BtcConvertPrice;
+            $RENDER['BestSpredSymbol'] = $ExchangeTicker;
+            //    return $RENDER;
+        }
+
+
+        if ($RENDER['BestPrice'] > $BtcConvertPrice) {
+            //     echo "Меняем".$RENDER['BestPrice']." на ".$BtcConvertPrice."<br>";
+            $RENDER['BestPrice'] = $BtcConvertPrice;
+            $RENDER['BestSpredSymbol'] = $ExchangeTicker;
+
+        }
+
+
+
+
+        return $RENDER;
+
+
+    }
+
 
 
 
@@ -379,90 +454,6 @@ class SpredController extends AppController {
     }
 
 
-    
-
-    private function GetPriceAct($MONETA){
-        $zapis = R::findOne("obmenin", 'WHERE method =? AND ticker=?', ["QIWI", $MONETA]);
-        return $zapis['price'];
-
-    }
-
-
-
-
-    private function RenderPercent($RENDER, $TickerWork, $ExchangeTicker, $ExPRICE, $MONETA, $STARTPRICE, $ExchangeName)
-    {
-
-
-        $RENDER['Symbol'] = $ExchangeTicker;
-
-        $BtcConvertPrice = $TickerWork['price']/$ExPRICE;
-        $BtcConvertPrice = round($BtcConvertPrice, 2);
-
-     //   $countMoneta = $ExPRICE;
-    //    $countMoneta = round($countMoneta,20);
-
-        $change = changemet($BtcConvertPrice, $STARTPRICE[$MONETA] );
-        if ($change > 0){
-            $change = "<font color='green'><b>".$change."</b></font>";
-
-            echo "<b>1.</b> Покупаем в обменнике: <b>".$TickerWork['ticker']."</b> по цене  ".$TickerWork['price']." и зачисляем на кошелек биржи <b>".$ExchangeName."</b> <br>";
-            echo "<b>2.</b> На бирже меняем: <b>".$TickerWork['ticker']."</b> &#10144;   <b>".$MONETA."</b>  <br>";
-            echo "<b>3.</b> Получаем кол-во  ".$MONETA." | Это кол-во будет равно закупки по курсу  <b>".$MONETA."</b> = ".$BtcConvertPrice." <br> ";
-            echo "<b>4.</b> СПРЕД ВХОДА: ".$change." % <br>" ;
-            echo "<hr>";
-
-        }
-
-        /*
-        if ($change <= 0) {
-            $change = "<font color='#8b0000'>".$change."</font>";
-
-            echo "<b>1.</b> Покупаем в обменнике: <b>".$TickerWork['ticker']."</b> по цене  ".$TickerWork['price']." и зачисляем на кошелек биржи <b>".$ExchangeName."</b> <br>";
-            echo "<b>2.</b> На бирже меняем: <b>".$TickerWork['ticker']."</b> &#10144;   <b>".$MONETA."</b>  <br>";
-            echo "<b>3.</b> Получаем кол-во  ".$MONETA." | Это кол-во будет равно закупки по курсу  <b>".$MONETA."</b> = ".$BtcConvertPrice." <br> ";
-            echo "<b>4.</b> СПРЕД ВХОДА: ".$change." % <br>" ;
-             echo "<hr>";
-
-        }
-        */
-
-
-
-      //  echo "Покупаем в обменнике: < b>".$TickerWork['ticker']."</b> по цене  ".$TickerWork['price']."  &#10144; переводим на биржу  ".$ExPRICE." BTC == ".$BtcConvertPrice." <br>";
-
-
-        if ($RENDER['BestPrice'] == 0)
-        {
-            $RENDER['BestPrice'] = $BtcConvertPrice;
-            $RENDER['BestSpredSymbol'] = $ExchangeTicker;
-        //    return $RENDER;
-        }
-
-
-        if ($RENDER['BestPrice'] > $BtcConvertPrice) {
-       //     echo "Меняем".$RENDER['BestPrice']." на ".$BtcConvertPrice."<br>";
-            $RENDER['BestPrice'] = $BtcConvertPrice;
-            $RENDER['BestSpredSymbol'] = $ExchangeTicker;
-
-        }
-
-
-
-
-        return $RENDER;
-
-
-    }
-
-
-
-    private function GetTreksBD($side)
-    {
-        $terk = R::findAll($this->namebdex, 'WHERE emailex =? AND workside=?', [$this->emailex, $side]);
-        return $terk;
-    }
-
 
     private function LoadTickersBD($type, $method)
     {
@@ -472,7 +463,18 @@ class SpredController extends AppController {
 
         return $table;
     }
+    private function GetPriceAct($MONETA){
+        $zapis = R::findOne("obmenin", 'WHERE method =? AND ticker=?', ["QIWI", $MONETA]);
+        return $zapis['price'];
 
+    }
+    private function GetTickerText($exchange){
+
+        $file = file_get_contents(WWW."/Ticker".$exchange.".txt");     // Открыть файл data.json
+        $MASSIV = json_decode($file,TRUE);              // Декодировать в массив
+        return $MASSIV;
+
+    }
 
 
 
