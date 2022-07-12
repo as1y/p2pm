@@ -75,6 +75,11 @@ class ParseinController extends AppController {
         ];
 
 
+        $this->ControlTrek();
+
+
+        $this->StartTrek();
+
        echo "<h2>PARSE-IN-V2 | ПАРСИНГ BESTCHANGE</h2><br>";
 
         // Инициализация парсера
@@ -101,10 +106,8 @@ class ParseinController extends AppController {
 
         }
 
-
         // Смотрим СТАТУС!
         $AparserIN =   $aparser->getTaskState($StatusTable['taskid']);
-
 
       if ($AparserIN['status'] == "work")
       {
@@ -113,7 +116,6 @@ class ParseinController extends AppController {
           sleep($sleep);
 
       }
-
 
       if ($AparserIN['status'] == "completed"){
 
@@ -137,6 +139,7 @@ class ParseinController extends AppController {
         }
 
 
+        $this->StopTrek();
 
 
 
@@ -144,6 +147,42 @@ class ParseinController extends AppController {
 //        $this->set(compact(''));
 
     }
+
+
+    private function ControlTrek(){
+        $tbl = R::findOne("trekcontrol", "WHERE type =?", [$this->type]);
+        if (empty($tbl)) return true;
+        if ($tbl['work'] == 1)
+        {
+            echo "Процесс в работе. Новый не запускаем<br>";
+            exit();
+        }
+        return true;
+    }
+
+    private function StartTrek(){
+        $tbl = R::findOne("trekcontrol", "WHERE type =?", [$this->type]);
+        if (empty($tbl)){
+
+            $ARR['type'] = $this->type;
+            $ARR['work'] = 1;
+            $this->AddARRinBD($ARR, "trekcontrol");
+            return true;
+        }
+
+        $tbl->work = 1;
+        R::store($tbl);
+        return true;
+    }
+
+
+    private function StopTrek(){
+        $tbl = R::findOne("trekcontrol", "WHERE type =?", [$this->type]);
+        $tbl->work = 0;
+        R::store($tbl);
+        return true;
+    }
+
 
 
 
@@ -180,6 +219,8 @@ class ParseinController extends AppController {
 
     }
 
+
+
     private function CreateTable()
     {
 
@@ -201,7 +242,6 @@ class ParseinController extends AppController {
         return true;
 
     }
-
 
     private function RenewTickers($content, $type)
     {
@@ -248,8 +288,6 @@ class ParseinController extends AppController {
 
     }
 
-
-
     private function AddTaskBD($taskid, $type)
     {
 
@@ -262,21 +300,17 @@ class ParseinController extends AppController {
         // Добавление ТРЕКА в БД
 
     }
-
     private function GetBaseTable()
     {
         $table = R::findAll("obmenin");
         return $table;
     }
-
     private function GetStatusTable()
     {
 
         $table = R::findOne("statustable", "WHERE type=?", [$this->type]);
         return $table;
     }
-
-
     private function AddARRinBD($ARR, $BD = false)
     {
 
