@@ -34,34 +34,15 @@ class SpredController extends AppController {
         \APP\core\base\View::setAssets($ASSETS);
         \APP\core\base\View::setMeta($META);
         \APP\core\base\View::setBreadcrumbs($BREADCRUMBS);
-        // Браузерная часть
 
 
+        // Входные данные
 
-        $exchangeByBit = new \ccxt\bybit (array (
-            //  'verbose' => true,
-            'timeout' => 30000,
-        ));
+        $ENTER[] = "QIWI";
+        $EXCHANGES[] = "Binance";
+        $EXCHANGES[] = "Poloniex";
+        $EXIT[] = "VISA";
 
-        $exchangeHuobi = new \ccxt\huobipro (array (
-            //  'verbose' => true,
-            'timeout' => 30000,
-        ));
-
-        $exchangeGate = new \ccxt\gateio (array (
-            //  'verbose' => true,
-            'timeout' => 30000,
-        ));
-
-        $exchangePolonex = new \ccxt\poloniex (array (
-            //  'verbose' => true,
-            'timeout' => 30000,
-        ));
-
-
-
-
-        echo "<h2>БАЗОВЫЕ ПАРАМЕТРЫ ЗАХОДА</h2>";
         $STARTPRICE['BTC'] = $this->GetPriceAct("BTC");
         $STARTPRICE['ETH'] = $this->GetPriceAct("ETH");
         $STARTPRICE['USDT'] = $this->GetPriceAct("USDT");
@@ -71,32 +52,38 @@ class SpredController extends AppController {
         echo "<b>Стартовая цена захода ETH: </b>".$STARTPRICE['ETH']."<br>";
         echo "<b>Стартовая цена захода USDT: </b>".$STARTPRICE['USDT']."<br>";
 
-        echo "<hr>";
 
-        $TickersBDIN = $this->LoadTickersBD("IN");
+        // Рассчет самого выгодного входа через БИРЖУ
+        $this->GetArrEnterExchange($STARTPRICE, "Binance", "QIWI");
+
+
+        // Отранжированный массив
+
+        // Монета покупаемая в обменнике
+        // Монета получаемая на бирже
+        // Цена покупки
+        // Выгода в процентах от основной цены
+
+
+        // Данные на вход
+
+
+
+
+
+       // show($Binance);
+
+        exit("11");
+
+
+
+        $TickersBDIN = $this->LoadTickersBD("IN", "QIWI");
 
         $TickersBDOUT = $this->LoadTickersBD("OUT");
 
 
         // ЗАГРУЗКА ТИКЕРОВ БИРЖ
 
-
-        $ALLBybit = $exchangeBinance->fetch_tickers();
-
-        $AllPolonex = $exchangePolonex->fetch_tickers();
-
-
-         //  $ALLHuobi = $exchangeHuobi->fetch_tickers();
-        //    $AllGate = $exchangeGate->fetch_tickers();
-        //   $AllPolonex = $exchangePolonex->fetch_tickers();
-
-
-
-        echo "<h3>ВХОД ЧЕРЕЗ МОНЕТУ - USDT (BINANCE)</h3>";
-        $RENDER = $this->CheckBestPrice("USDT", "Binance",$TickersBDIN, $STARTPRICE, $ALLBinance);
-        echo "<b>Самый выгодный символ:</b> ".$RENDER['BestSpredSymbol']." <br>";
-
-        echo "Лучшая цена ".$RENDER['BestPrice']."<br>";
 
         echo "<hr>";
 
@@ -209,69 +196,79 @@ class SpredController extends AppController {
 
 
 
-    private function CalculateExit($base, $TickersBDOUT, $AllExchange){
-
-            // Поиск лучшего выхода по всей биржи
-
-        //    $base = "USDT";
-        //    $baseprice = "64.16";
-
-            $BestPrice = 0;
-            $BestTicker = "";
+    private function GetArrEnterExchange($STARTPRICE, $Exchange, $Method){
 
 
-            foreach ($TickersBDOUT as $key=>$val)
-            {
+        $TickersBDIN = $this->LoadTickersBD("IN", $Method);
 
+        $ExchangeTickers = $this->GetTickerText($Exchange);
 
-                $exticker = $val['ticker']."/".$base;
+        echo "Генерация массива лучшего захода на биржу с этим методом <br>";
 
-
-                if ($val['ticker'] == $base) continue;
-                if (empty($AllExchange[$exticker]['close'])) continue;
-
-                    $amount = 1/$AllExchange[$exticker]['close'];
-                    $amount = round($amount, 10);
-
-
-                $final = $amount*$val['price'];
-
-       //         echo "Монета: ".$val['ticker']."<br>";
-      //          echo "Цена: ".$val['price']."<br>";
-
-    //            echo "Цена актива на бирже: ".$AllExchange[$exticker]['close']."<br>";
-   //             echo "Какое кол-во актива получим с обмена: ".$amount."<br>";
-  //              echo "Сколько получим после продажи актива в обменниках: ".$final."<br>";
-
-                if ($final > $BestPrice)
-                {
-                    $BestPrice = $final;
-                    $BestTicker = $exticker;
-
-                }
-
-           //     echo "<hr>";
+        $this->GetArrEnterBase($TickersBDIN, $ExchangeTickers, $STARTPRICE, "USDT");
 
 
 
-            }
+
+        exit("111");
 
 
-            echo "<b>Монета выхода: </b>".$BestTicker."<br>";
-            echo "<b>Лучшая цена выхода: </b>".$BestPrice."<br>";
+
+        $RENDER = $this->CheckBestPrice("USDT", "Binance",$TickersBDIN, $STARTPRICE, $ExchangeTickers);
+
+
+        echo "<b>Самый выгодный символ:</b> ".$RENDER['BestSpredSymbol']." <br>";
+        echo "Лучшая цена ".$RENDER['BestPrice']."<br>";
 
 
 
 
         return true;
+
+    }
+
+
+
+    private function GetArrEnterBase($TickersBDIN, $ExchangeTickers, $STARTPRICE, $MONETA){
+
+        $RENDER['BestPrice'] = 0;
+        $RENDER['BestSymbol'] = "";
+        $RENDER['BestSpred'] = 0;
+
+
+        foreach ($TickersBDIN as $TickerWork)
+        {
+
+
+
+
+        }
+
+
+
+
+
+
+    }
+
+
+
+    private function GetTickerText($exchange){
+
+        $file = file_get_contents(WWW."/Ticker".$exchange.".txt");     // Открыть файл data.json
+        $MASSIV = json_decode($file,TRUE);              // Декодировать в массив
+        return $MASSIV;
+
     }
 
 
 
     private function CheckBestPrice($MONETA, $ExchangeName , $TICKERS, $STARTPRICE, $ALLEXCHANGE){
 
+
         $RENDER['BestPrice'] = 0;
         $RENDER['BestSpredSymbol'] = "";
+
 
         foreach ($TICKERS as $TickerWork)
         {
@@ -301,8 +298,6 @@ class SpredController extends AppController {
             if ($MONETA == "ETH" && $ExchangeTicker == "ETH/USDT") $ExPRICE = 1 / $ExPRICE;
 
 
-
-
             if (empty($ExPRICE)) continue;
 
         //    echo "Монета :".$MONETA."<br>";
@@ -325,6 +320,66 @@ class SpredController extends AppController {
     }
 
 
+
+    private function CalculateExit($base, $TickersBDOUT, $AllExchange){
+
+        // Поиск лучшего выхода по всей биржи
+
+        //    $base = "USDT";
+        //    $baseprice = "64.16";
+
+        $BestPrice = 0;
+        $BestTicker = "";
+
+
+        foreach ($TickersBDOUT as $key=>$val)
+        {
+
+
+            $exticker = $val['ticker']."/".$base;
+
+
+            if ($val['ticker'] == $base) continue;
+            if (empty($AllExchange[$exticker]['close'])) continue;
+
+            $amount = 1/$AllExchange[$exticker]['close'];
+            $amount = round($amount, 10);
+
+
+            $final = $amount*$val['price'];
+
+            //         echo "Монета: ".$val['ticker']."<br>";
+            //          echo "Цена: ".$val['price']."<br>";
+
+            //            echo "Цена актива на бирже: ".$AllExchange[$exticker]['close']."<br>";
+            //             echo "Какое кол-во актива получим с обмена: ".$amount."<br>";
+            //              echo "Сколько получим после продажи актива в обменниках: ".$final."<br>";
+
+            if ($final > $BestPrice)
+            {
+                $BestPrice = $final;
+                $BestTicker = $exticker;
+
+            }
+
+            //     echo "<hr>";
+
+
+
+        }
+
+
+        echo "<b>Монета выхода: </b>".$BestTicker."<br>";
+        echo "<b>Лучшая цена выхода: </b>".$BestPrice."<br>";
+
+
+
+
+        return true;
+    }
+
+
+    
 
     private function GetPriceAct($MONETA){
         $zapis = R::findOne("obmenin", 'WHERE method =? AND ticker=?', ["QIWI", $MONETA]);
@@ -402,13 +457,6 @@ class SpredController extends AppController {
 
 
 
-
-    public function GetBal(){
-        $balance = $this->EXCHANGECCXT->fetch_balance();
-        return $balance;
-    }
-
-
     private function GetTreksBD($side)
     {
         $terk = R::findAll($this->namebdex, 'WHERE emailex =? AND workside=?', [$this->emailex, $side]);
@@ -416,11 +464,11 @@ class SpredController extends AppController {
     }
 
 
-    private function LoadTickersBD($type)
+    private function LoadTickersBD($type, $method)
     {
         $table = [];
-        if ($type == "IN") $table = R::findAll("obmenin");
-        if ($type == "OUT") $table = R::findAll("obmenout");
+        if ($type == "IN") $table = R::findAll("obmenin", 'WHERE method=?', [$method]);
+        if ($type == "OUT") $table = R::findAll("obmenout",'WHERE method=?', [$method]);
 
         return $table;
     }

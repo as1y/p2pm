@@ -31,8 +31,14 @@ class ParsetickersController extends AppController {
 
         //БИНАНС
         $exchangeBinance = new \ccxt\binance (array ('timeout' => 30000));
-        $Binance = $exchangeBinance->fetch_tickers();
-        $this->WriteTickers("Binance", $Binance);
+        $DATA = $exchangeBinance->fetch_tickers();
+        $this->WriteTickers("Binance", $DATA);
+
+
+        $exchangePoloniex = new \ccxt\poloniex (array ('timeout' => 30000));
+        $DATA = $exchangePoloniex->fetch_tickers();
+        $this->WriteTickers("Poloniex", $DATA);
+
 
         // Проверка наличие файла
 
