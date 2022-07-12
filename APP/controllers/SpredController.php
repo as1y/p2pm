@@ -11,9 +11,6 @@ class SpredController extends AppController {
     public $BreadcrumbsControllerLabel = "Панель управления";
     public $BreadcrumbsControllerUrl = "/panel";
 
-//    public $ApiKey = "U5I2AoIrTk4gBR7XLB";
-//    public $SecretKey = "HUfZrWiVqUlLM65Ba8TXvQvC68kn1AabMDgE";
-
 
     // ТЕХНИЧЕСКИЕ ПЕРЕМЕННЫЕ
     public function indexAction()
@@ -46,6 +43,7 @@ class SpredController extends AppController {
           //  'verbose' => true,
             'timeout' => 30000,
         ));
+
 
         $exchangeByBit = new \ccxt\bybit (array (
             //  'verbose' => true,
@@ -84,20 +82,44 @@ class SpredController extends AppController {
 
         $TickersBDIN = $this->LoadTickersBD("IN");
 
+        $TickersBDOUT = $this->LoadTickersBD("OUT");
 
 
         // ЗАГРУЗКА ТИКЕРОВ БИРЖ
 
-       // $this->TickerBinance = $exchangeBinance->fetch_tickers();
-     //   $this->TickerByBit = $exchangeByBit->fetch_tickers();
-      //  show($this->TickerByBit);
+        $ALLBinance = $exchangeBinance->fetch_tickers();
+        $ALLBybit = $exchangeBinance->fetch_tickers();
 
-           $ALLHuobi = $exchangeHuobi->fetch_tickers();
+        $AllPolonex = $exchangePolonex->fetch_tickers();
 
-            $AllGate = $exchangeGate->fetch_tickers();
 
-           $AllPolonex = $exchangePolonex->fetch_tickers();
+         //  $ALLHuobi = $exchangeHuobi->fetch_tickers();
+        //    $AllGate = $exchangeGate->fetch_tickers();
+        //   $AllPolonex = $exchangePolonex->fetch_tickers();
 
+
+
+        echo "<h3>ВХОД ЧЕРЕЗ МОНЕТУ - USDT (BINANCE)</h3>";
+        $RENDER = $this->CheckBestPrice("USDT", "HUOBI",$TickersBDIN, $STARTPRICE, $ALLBinance);
+        echo "<b>Самый выгодный символ:</b> ".$RENDER['BestSpredSymbol']." <br>";
+
+        echo "Лучшая цена ".$RENDER['BestPrice']."<br>";
+
+        echo "<hr>";
+
+        echo "<h2>BINANCE</h2>";
+        $this->CalculateExit($TickersBDOUT, $ALLBinance);
+
+        echo "<h2>BYBIT</h2>";
+        $this->CalculateExit($TickersBDOUT, $ALLBybit);
+
+        echo "<h2>POLONIEX</h2>";
+        $this->CalculateExit($TickersBDOUT, $AllPolonex);
+
+        echo "<hr>";
+
+
+       /*
 
         echo "<h3>ВХОД ЧЕРЕЗ МОНЕТЫ - BTC (Poloniex)</h3>";
         $RENDER = $this->CheckBestPrice("BTC", "Poloniex", $TickersBDIN, $STARTPRICE, $AllPolonex);
@@ -121,20 +143,15 @@ class SpredController extends AppController {
         echo "<b>Самый выгодный символ:</b> ".$RENDER['BestSpredSymbol']." <br>";
         echo "Лучшая цена ".$RENDER['BestPrice']."<br>";
 
-
-
-
         echo "<h3>ВХОД ЧЕРЕЗ МОНЕТЫ - BTC (HUOBI)</h3>";
         $RENDER = $this->CheckBestPrice("BTC","HUOBI", $TickersBDIN, $STARTPRICE, $ALLHuobi);
         echo "<b>Самый выгодный символ:</b> ".$RENDER['BestSpredSymbol']." <br>";
         echo "Лучшая цена ".$RENDER['BestPrice']."<br>";
 
-
         echo "<h3>ВХОД ЧЕРЕЗ МОНЕТЫ - ETH (HUOBI)</h3>";
         $RENDER = $this->CheckBestPrice("ETH", "HUOBI",$TickersBDIN, $STARTPRICE, $ALLHuobi);
         echo "<b>Самый выгодный символ:</b> ".$RENDER['BestSpredSymbol']." <br>";
         echo "Лучшая цена ".$RENDER['BestPrice']."<br>";
-
 
         echo "<h3>ВХОД ЧЕРЕЗ МОНЕТЫ - USDT (HUOBI)</h3>";
         $RENDER = $this->CheckBestPrice("USDT", "HUOBI",$TickersBDIN, $STARTPRICE, $ALLHuobi);
@@ -142,6 +159,8 @@ class SpredController extends AppController {
         echo "Лучшая цена ".$RENDER['BestPrice']."<br>";
 
         // ЗАГРУЗКА ТИКЕРОВ
+
+    */
 
 
 
@@ -183,6 +202,52 @@ class SpredController extends AppController {
     }
 
 
+
+    private function CalculateExit($TickersBDOUT, $AllExchange){
+
+            $base = "USDT";
+
+           // echo "Цена выхода напрямую:".."<br>";
+
+
+           // show($ALLBinance);
+
+            foreach ($TickersBDOUT as $key=>$val)
+            {
+
+                if ($val['ticker'] == $base) continue;
+
+
+                $exticker = $val['ticker']."/".$base;
+
+                $amount = 1/$ALLBinance[$exticker]['close'];
+                $amount = round($amount, 10);
+
+                $final = $amount*$val['price'];
+
+                echo "Монета: ".$val['ticker']."<br>";
+                echo "Цена: ".$val['price']."<br>";
+                echo "Тикер на бирже: ".$exticker."<br>";
+                echo "Цена актива на бирже: ".$ALLBinance[$exticker]['close']."<br>";
+
+                echo "Какое кол-во актива получим с обмена: ".$amount."<br>";
+
+                echo "Сколько получим после продажи актива в обменниках: ".$final."<br>";
+
+
+
+                echo "Считаем кол-во монеты, которую мы получим за 1 единицу USDT<br>";
+
+                echo "<hr>";
+
+
+
+            }
+
+
+
+        return true;
+    }
 
 
 
@@ -336,7 +401,10 @@ class SpredController extends AppController {
 
     private function LoadTickersBD($type)
     {
-        $table = R::findAll("obmenin");
+        $table = [];
+        if ($type == "IN") $table = R::findAll("obmenin");
+        if ($type == "OUT") $table = R::findAll("obmenout");
+
         return $table;
     }
 

@@ -69,6 +69,9 @@ class ParseoutController extends AppController {
 
         ];
 
+        $this->ControlTrek();
+        $this->StartTrek();
+
 
         echo "<h2>PARSE-IN-V2 | ПАРСИНГ BESTCHANGE</h2><br>";
 
@@ -87,12 +90,12 @@ class ParseoutController extends AppController {
             if (empty($ZAPROS))
             {
                 echo "<font color='green'>Информация актуальная. Парсить нет необходимости </font><br>";
-                return true;
+                $this->StopTrek();
             }
 
             $taskUid = $aparser->addTask('20', 'BestOUT', 'text', $ZAPROS);
             $this->AddTaskBD($taskUid, $this->type);
-            return true;
+            $this->StopTrek();
 
         }
 
@@ -131,7 +134,7 @@ class ParseoutController extends AppController {
 
         }
 
-
+        $this->StopTrek();
 
 
 
@@ -141,6 +144,37 @@ class ParseoutController extends AppController {
     }
 
 
+
+    private function ControlTrek(){
+        $tbl = R::findOne("trekcontrol", "WHERE type =?", [$this->type]);
+        if (empty($tbl)) return true;
+        if ($tbl['work'] == 1)
+        {
+            echo "Процесс в работе. Новый не запускаем<br>";
+            exit();
+        }
+        return true;
+    }
+    private function StartTrek(){
+        $tbl = R::findOne("trekcontrol", "WHERE type =?", [$this->type]);
+        if (empty($tbl)){
+
+            $ARR['type'] = $this->type;
+            $ARR['work'] = 1;
+            $this->AddARRinBD($ARR, "trekcontrol");
+            return true;
+        }
+
+        $tbl->work = 1;
+        R::store($tbl);
+        return true;
+    }
+    private function StopTrek(){
+        $tbl = R::findOne("trekcontrol", "WHERE type =?", [$this->type]);
+        $tbl->work = 0;
+        R::store($tbl);
+        exit();
+    }
 
 
 

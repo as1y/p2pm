@@ -76,8 +76,6 @@ class ParseinController extends AppController {
 
 
         $this->ControlTrek();
-
-
         $this->StartTrek();
 
        echo "<h2>PARSE-IN-V2 | ПАРСИНГ BESTCHANGE</h2><br>";
@@ -97,12 +95,12 @@ class ParseinController extends AppController {
             if (empty($ZAPROS))
             {
                 echo "<font color='green'>Информация актуальная. Парсить нет необходимости </font><br>";
-                return true;
+                $this->StopTrek();
             }
 
             $taskUid = $aparser->addTask('20', 'BestIN', 'text', $ZAPROS);
             $this->AddTaskBD($taskUid, $this->type);
-            return true;
+            $this->StopTrek();
 
         }
 
@@ -159,7 +157,6 @@ class ParseinController extends AppController {
         }
         return true;
     }
-
     private function StartTrek(){
         $tbl = R::findOne("trekcontrol", "WHERE type =?", [$this->type]);
         if (empty($tbl)){
@@ -174,13 +171,11 @@ class ParseinController extends AppController {
         R::store($tbl);
         return true;
     }
-
-
     private function StopTrek(){
         $tbl = R::findOne("trekcontrol", "WHERE type =?", [$this->type]);
         $tbl->work = 0;
         R::store($tbl);
-        return true;
+        exit();
     }
 
 
