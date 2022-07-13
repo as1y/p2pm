@@ -6,7 +6,7 @@ use APP\models\Panel;
 use APP\core\base\Model;
 use RedBeanPHP\R;
 
-class Parsetickers2Controller extends AppController {
+class ParsetickerstwoController extends AppController {
     public $layaout = 'PANEL';
     public $BreadcrumbsControllerLabel = "Панель управления";
     public $BreadcrumbsControllerUrl = "/panel";
@@ -29,21 +29,21 @@ class Parsetickers2Controller extends AppController {
         // Перезаписывать на диск???
 
         //БИНАНС
-        $exchange = new \ccxt\exmo (array ('timeout' => 30000));
-        $DATA = $exchange->fetch_tickers();
-        $this->WriteTickers("Exmo", $DATA);
-
-
         $exchange = new \ccxt\ftx (array ('timeout' => 30000));
         $DATA = $exchange->fetch_tickers();
         $this->WriteTickers("Ftx", $DATA);
+
+
+        $exchange = new \ccxt\exmo (array ('timeout' => 30000));
+        $DATA = $exchange->fetch_tickers();
+        $this->WriteTickers("Exmo", $DATA);
 
 
         $exchange = new \ccxt\kucoin (array ('timeout' => 30000));
         $DATA = $exchange->fetch_tickers();
         $this->WriteTickers("Kucoin", $DATA);
 
-        $exchange = new \ccxt\okex (array ('timeout' => 30000));
+        $exchange = new \ccxt\okex5 (array ('timeout' => 30000));
         $DATA = $exchange->fetch_tickers();
         $this->WriteTickers("Okex", $DATA);
 
