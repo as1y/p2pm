@@ -66,8 +66,14 @@ class SpredController extends AppController {
 
         $MassivBinanceENTER =  $this->GetArrEnterExchange($STARTPRICE, "Binance", "QIWI", "VISA");
 
+
+      //  show($MassivBinanceENTER);
+
+
         $this->RenderFinalExchange($MassivBinanceENTER, "Binance");
-        //show($MassivBinanceENTER);
+        show($MassivBinanceENTER);
+
+        // лучший выход через другие биржи
 
         echo "<hr>";
 
@@ -75,8 +81,13 @@ class SpredController extends AppController {
 
         $this->RenderFinalExchange($MassivGateioENTER, "Gateio");
 
+        $MassivKrakenENTER =  $this->GetArrEnterExchange($STARTPRICE, "Huobi", "QIWI", "VISA");
+        $this->RenderFinalExchange($MassivKrakenENTER, "Huobi");
 
-      //  show($MassivGateioENTER);
+
+
+
+       // show($MassivKrakenENTER);
 
 
 
@@ -105,7 +116,7 @@ class SpredController extends AppController {
 
         foreach ($MassivEX as $key=>$val)
         {
-            if ($val['finalspred'] < 0) continue;
+            if ($val['finalspred'] < 0.1) continue;
 
             echo "<b>1.</b> Покупаем монету <b>".$val['moneta']."</b> по лучшем курсу в BestChange. Указываем кошелек пополнения биржи <b>".$exname."</b> <br>";
 
@@ -131,7 +142,6 @@ class SpredController extends AppController {
 
     private function GetArrEnterExchange($STARTPRICE, $Exchange, $MethodENTER, $MethodEXIT){
 
-        $FINALMASSIV = [];
 
         $TickersBDIN = $this->LoadTickersBD("IN", $MethodENTER);
         $ExchangeTickers = $this->GetTickerText($Exchange);
@@ -144,9 +154,9 @@ class SpredController extends AppController {
 
       //  show($FINALMASSIV);
 
-        $FINALMASSIV = $this->GetTopSpredsMassiv($FINALMASSIV, 5, $Exchange, $MethodENTER, $MethodEXIT);
+        $OBRABOTKA = $this->GetTopSpredsMassiv($FINALMASSIV, 5, $Exchange, $MethodENTER, $MethodEXIT);
 
-        return $FINALMASSIV;
+        return $OBRABOTKA;
 
     }
 

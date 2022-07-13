@@ -6,14 +6,13 @@ use APP\models\Panel;
 use APP\core\base\Model;
 use RedBeanPHP\R;
 
-class ParsetickersController extends AppController {
+class Parsetickers1Controller extends AppController {
     public $layaout = 'PANEL';
     public $BreadcrumbsControllerLabel = "Панель управления";
     public $BreadcrumbsControllerUrl = "/panel";
 
 
-    public $sleep = 5;
-    public $type = "TICKERS";
+    public $type = "TICKERS1";
 
     // ТЕХНИЧЕСКИЕ ПЕРЕМЕННЫЕ
     public function indexAction()
@@ -29,28 +28,30 @@ class ParsetickersController extends AppController {
 
         // Перезаписывать на диск???
 
-        //БИНАНС
-        $exchangeBinance = new \ccxt\binance (array ('timeout' => 30000));
-        $DATA = $exchangeBinance->fetch_tickers();
+
+        $exchange = new \ccxt\binance (array ('timeout' => 30000));
+        $DATA = $exchange->fetch_tickers();
         $this->WriteTickers("Binance", $DATA);
 
 
-        $exchangePoloniex = new \ccxt\poloniex (array ('timeout' => 30000));
-        $DATA = $exchangePoloniex->fetch_tickers();
+        $exchange = new \ccxt\poloniex (array ('timeout' => 30000));
+        $DATA = $exchange->fetch_tickers();
         $this->WriteTickers("Poloniex", $DATA);
 
 
-        $exchangeGateio = new \ccxt\gateio (array ('timeout' => 30000));
-        $DATA = $exchangeGateio->fetch_tickers();
+        $exchange = new \ccxt\gateio (array ('timeout' => 30000));
+        $DATA = $exchange->fetch_tickers();
         $this->WriteTickers("Gateio", $DATA);
+
+        $exchange = new \ccxt\huobipro (array ('timeout' => 30000));
+        $DATA = $exchange->fetch_tickers();
+        $this->WriteTickers("Huobi", $DATA);
 
 
         // Проверка наличие файла
 
 
         //БИНАНС
-        $sleep = rand($this->sleep, $this->sleep*2);
-        sleep($sleep);
 
 
         // Обновление
