@@ -16,6 +16,9 @@ class ParseinController extends AppController {
 
     public $vremya = 100; // Секунд
     public $type = "IN";
+
+    public $Methods = [];
+
     public $debug = false;
     public $sleep = 10;
 
@@ -27,52 +30,10 @@ class ParseinController extends AppController {
         $this->layaout = false;
         $Panel =  new Panel();
 
+        $this->Methods[] = "VISA";
+        $this->Methods[] = "USDT";
+        $this->Methods[] = "ADVRUB";
 
-       $this->TICKERSqiwiIN = [
-
-           "https://www.bestchange.ru/qiwi-to-bitcoin.html" => "BTC",
-"https://www.bestchange.ru/qiwi-to-bitcoin-cash.html" => "BCH",
-"https://www.bestchange.ru/qiwi-to-bitcoin-gold.html" => "BTG",
-"https://www.bestchange.ru/qiwi-to-ethereum.html" => "ETH",
-"https://www.bestchange.ru/qiwi-to-ethereum-classic.html" => "ETC",
-"https://www.bestchange.ru/qiwi-to-litecoin.html" => "LTC",
-"https://www.bestchange.ru/qiwi-to-ripple.html" => "XRP",
-"https://www.bestchange.ru/qiwi-to-monero.html" => "XMR",
-"https://www.bestchange.ru/qiwi-to-dogecoin.html" => "DOGE",
-"https://www.bestchange.ru/qiwi-to-polygon.html" => "MATIC",
-"https://www.bestchange.ru/qiwi-to-dash.html" => "DASH",
-"https://www.bestchange.ru/qiwi-to-zcash.html" => "ZEC",
-"https://www.bestchange.ru/qiwi-to-nem.html" => "XEM",
-"https://www.bestchange.ru/qiwi-to-neo.html" => "NEO",
-"https://www.bestchange.ru/qiwi-to-eos.html" => "EOS",
-"https://www.bestchange.ru/qiwi-to-cardano.html" => "ADA",
-"https://www.bestchange.ru/qiwi-to-stellar.html" => "XLM",
-"https://www.bestchange.ru/qiwi-to-tron.html" => "TRX",
-"https://www.bestchange.ru/qiwi-to-waves.html" => "WAVES",
-"https://www.bestchange.ru/qiwi-to-omg.html" => "OMG",
-"https://www.bestchange.ru/qiwi-to-binance-coin.html" => "BNB",
-"https://www.bestchange.ru/qiwi-to-bat.html" => "BAT",
-"https://www.bestchange.ru/qiwi-to-qtum.html" => "QTUM",
-"https://www.bestchange.ru/qiwi-to-chainlink.html" => "LINK",
-"https://www.bestchange.ru/qiwi-to-cosmos.html" => "ATOM",
-"https://www.bestchange.ru/qiwi-to-tezos.html" => "XTZ",
-"https://www.bestchange.ru/qiwi-to-polkadot.html" => "DOT",
-"https://www.bestchange.ru/qiwi-to-uniswap.html" => "UNI",
-"https://www.bestchange.ru/qiwi-to-ravencoin.html" => "RVN",
-"https://www.bestchange.ru/qiwi-to-solana.html" => "SOL",
-"https://www.bestchange.ru/qiwi-to-vechain.html" => "VET",
-"https://www.bestchange.ru/qiwi-to-algorand.html" => "ALGO",
-"https://www.bestchange.ru/qiwi-to-maker.html" => "MKR",
-"https://www.bestchange.ru/qiwi-to-avalanche.html" => "AVAX",
-"https://www.bestchange.ru/qiwi-to-yearn-finance.html" => "YFI",
-"https://www.bestchange.ru/qiwi-to-terra.html" => "LUNA",
-"https://www.bestchange.ru/qiwi-to-tether-erc20.html" => "USDT",
-"https://www.bestchange.ru/qiwi-to-bitcoin-sv.html" => "BSV",
-"https://www.bestchange.ru/qiwi-to-zrx.html" => "ZRX",
-"https://www.bestchange.ru/qiwi-to-icon.html" => "ICX",
-"https://www.bestchange.ru/qiwi-to-ontology.html" => "ONT",
-
-        ];
 
 
         $this->ControlTrek();
@@ -80,17 +41,21 @@ class ParseinController extends AppController {
 
        echo "<h2>PARSE-IN-V2 | ПАРСИНГ BESTCHANGE</h2><br>";
 
+       // Генерация УРЛ
+
+        $Method = "VISA";
+
         // Инициализация парсера
         $aparser = new \Aparser('http://91.210.171.153:9091/API', '', array('debug'=>$this->debug));
 
         // Таблица статуса работы парсера
-        $StatusTable =  $this->GetStatusTable();
+        $StatusTable =  $this->GetStatusTable($Method);
 
         // Парсер не запущен. Формируем запрос;
         if (empty($StatusTable))
         {
 
-            $ZAPROS = $this->GetZapros();
+            $ZAPROS = $this->GetZapros($Method);
 
             if (empty($ZAPROS))
             {
@@ -99,7 +64,7 @@ class ParseinController extends AppController {
             }
 
             $taskUid = $aparser->addTask('20', 'BestIN', 'text', $ZAPROS);
-            $this->AddTaskBD($taskUid, $this->type);
+            $this->AddTaskBD($taskUid, $this->type, $Method);
             $this->StopTrek();
 
         }
@@ -114,7 +79,6 @@ class ParseinController extends AppController {
           sleep($sleep);
 
       }
-
       if ($AparserIN['status'] == "completed"){
 
             echo "<font color='green'>ПАРСИНГ IN ЗАКОНЧЕН</font><br>";
@@ -128,7 +92,7 @@ class ParseinController extends AppController {
            // show($content);
 
             // Обновляем в БД цены
-            $this->RenewTickers($content, $this->type);
+            $this->RenewTickers($content, $this->type, $Method);
 
             // Очищаем статус таблицу
             R::trash($StatusTable);
@@ -145,6 +109,194 @@ class ParseinController extends AppController {
 //        $this->set(compact(''));
 
     }
+
+
+
+    private function GenerateURL($Method)
+    {
+
+        $arr['symbol'] = "BTC";
+        $arr['uri'] = "bitcoin";
+        $SYMBOLS[] = $arr;
+
+        $arr['symbol'] = "BCH";
+        $arr['uri'] = "bitcoin-cash";
+        $SYMBOLS[] = $arr;
+
+        $arr['symbol'] = "BTG";
+        $arr['uri'] = "bitcoin-gold";
+        $SYMBOLS[] = $arr;
+
+        $arr['symbol'] = "ETH";
+        $arr['uri'] = "ethereum";
+        $SYMBOLS[] = $arr;
+
+        $arr['symbol'] = "ETC";
+        $arr['uri'] = "ethereum-classic";
+        $SYMBOLS[] = $arr;
+
+        $arr['symbol'] = "LTC";
+        $arr['uri'] = "litecoin";
+        $SYMBOLS[] = $arr;
+
+        $arr['symbol'] = "XRP";
+        $arr['uri'] = "ripple";
+        $SYMBOLS[] = $arr;
+
+        $arr['symbol'] = "XMR";
+        $arr['uri'] = "monero";
+        $SYMBOLS[] = $arr;
+
+        $arr['symbol'] = "DOGE";
+        $arr['uri'] = "dogecoin";
+        $SYMBOLS[] = $arr;
+
+        $arr['symbol'] = "MATIC";
+        $arr['uri'] = "polygon";
+        $SYMBOLS[] = $arr;
+
+        $arr['symbol'] = "DASH";
+        $arr['uri'] = "dash";
+        $SYMBOLS[] = $arr;
+
+        $arr['symbol'] = "ZEC";
+        $arr['uri'] = "zcash";
+        $SYMBOLS[] = $arr;
+
+        $arr['symbol'] = "XEM";
+        $arr['uri'] = "nem";
+        $SYMBOLS[] = $arr;
+
+        $arr['symbol'] = "NEO";
+        $arr['uri'] = "neo";
+        $SYMBOLS[] = $arr;
+
+        $arr['symbol'] = "EOS";
+        $arr['uri'] = "eos";
+        $SYMBOLS[] = $arr;
+
+        $arr['symbol'] = "ADA";
+        $arr['uri'] = "cardano";
+        $SYMBOLS[] = $arr;
+
+        $arr['symbol'] = "XLM";
+        $arr['uri'] = "stellar";
+        $SYMBOLS[] = $arr;
+
+        $arr['symbol'] = "TRX";
+        $arr['uri'] = "tron";
+        $SYMBOLS[] = $arr;
+
+        $arr['symbol'] = "WAVES";
+        $arr['uri'] = "waves";
+        $SYMBOLS[] = $arr;
+
+        $arr['symbol'] = "OMG";
+        $arr['uri'] = "omg";
+        $SYMBOLS[] = $arr;
+
+        $arr['symbol'] = "BNB";
+        $arr['uri'] = "binance-coin";
+        $SYMBOLS[] = $arr;
+
+        $arr['symbol'] = "BAT";
+        $arr['uri'] = "bat";
+        $SYMBOLS[] = $arr;
+
+        $arr['symbol'] = "QTUM";
+        $arr['uri'] = "qtum";
+        $SYMBOLS[] = $arr;
+
+        $arr['symbol'] = "LINK";
+        $arr['uri'] = "chainlink";
+        $SYMBOLS[] = $arr;
+
+        $arr['symbol'] = "ATOM";
+        $arr['uri'] = "cosmos";
+        $SYMBOLS[] = $arr;
+
+        $arr['symbol'] = "XTZ";
+        $arr['uri'] = "tezos";
+        $SYMBOLS[] = $arr;
+
+        $arr['symbol'] = "DOT";
+        $arr['uri'] = "polkadot";
+        $SYMBOLS[] = $arr;
+
+        $arr['symbol'] = "UNI";
+        $arr['uri'] = "uniswap";
+        $SYMBOLS[] = $arr;
+
+        $arr['symbol'] = "RVN";
+        $arr['uri'] = "ravencoin";
+        $SYMBOLS[] = $arr;
+
+        $arr['symbol'] = "SOL";
+        $arr['uri'] = "solana";
+        $SYMBOLS[] = $arr;
+
+        $arr['symbol'] = "VET";
+        $arr['uri'] = "vechain";
+        $SYMBOLS[] = $arr;
+
+        $arr['symbol'] = "ALGO";
+        $arr['uri'] = "algorand";
+        $SYMBOLS[] = $arr;
+
+        $arr['symbol'] = "MKR";
+        $arr['uri'] = "maker";
+        $SYMBOLS[] = $arr;
+
+        $arr['symbol'] = "AVAX";
+        $arr['uri'] = "avalanche";
+        $SYMBOLS[] = $arr;
+
+        $arr['symbol'] = "YFI";
+        $arr['uri'] = "yearn-finance";
+        $SYMBOLS[] = $arr;
+
+        $arr['symbol'] = "USDT";
+        $arr['uri'] = "tether-erc20";
+        $SYMBOLS[] = $arr;
+
+        $arr['symbol'] = "BSV";
+        $arr['uri'] = "bitcoin-sv";
+        $SYMBOLS[] = $arr;
+
+        $arr['symbol'] = "ZRX";
+        $arr['uri'] = "zrx";
+        $SYMBOLS[] = $arr;
+
+        $arr['symbol'] = "ICX";
+        $arr['uri'] = "icon";
+        $SYMBOLS[] = $arr;
+
+        $arr['symbol'] = "ONT";
+        $arr['uri'] = "ontology";
+        $SYMBOLS[] = $arr;
+
+
+        $first = "";
+        if ($Method == "VISA") $first = "visa-mastercard-rub";
+        if ($Method == "USDT") $first = "tether-trc20";
+        if ($Method == "ADVRUB") $first = "advanced-cash-rub";
+
+       // show($SYMBOLS);
+
+        $URL = [];
+        foreach ($SYMBOLS as $key=>$value)
+        {
+            $uri = "https://www.bestchange.ru/".$first."-to-".$value['uri'].".html";
+            $URL[$uri] = $value['symbol'];
+         //   $headers = @get_headers($uri);
+         //   echo  $headers[0]."<br>";
+        }
+
+
+        return $URL;
+
+    }
+
 
 
     private function ControlTrek(){
@@ -184,12 +336,12 @@ class ParseinController extends AppController {
 
 
 
-    private function GetZapros(){
+    private function GetZapros($Method){
 
         $ZAPROS = [];
 
-        $obmen =  $this->GetBaseTable(); // Создаем BaseTickers
-        if (empty($obmen)) $this->CreateTable(); // Если таблица пустая, то создаем
+        $obmen =  $this->GetBaseTable($Method); // Создаем BaseTickers
+        if (empty($obmen)) $this->CreateTable($Method); // Если таблица пустая, то создаем
 
 
         // Проверяем созданную таблицу страниц
@@ -216,20 +368,23 @@ class ParseinController extends AppController {
 
 
 
-    private function CreateTable()
+    private function CreateTable($Method)
     {
 
+        $MassivTicker = $this->GenerateURL($Method);
 
         // СОЗДАЕМ ТАБЛИЦУ НА КИВИ ВХОД
-        foreach ($this->TICKERSqiwiIN as $url => $ticker)
+        foreach ($MassivTicker as $url => $ticker)
         {
-            $ARR['method'] = "QIWI";
+            $ARR['method'] = $Method;
             $ARR['url'] = $url;
             $ARR['ticker'] = $ticker;
             $this->AddARRinBD($ARR, "obmenin");
             //echo "<b><font color='green'>Добавили запись</font></b>";
             // Добавление ТРЕКА в БД
         }
+
+
 
         echo "<hr>";
         echo "<font color='green'>Таблица с ценами из обменников создана!!</font> <br>";
@@ -238,7 +393,7 @@ class ParseinController extends AppController {
 
     }
 
-    private function RenewTickers($content, $type)
+    private function RenewTickers($content, $type, $Method)
     {
 
 
@@ -256,8 +411,7 @@ class ParseinController extends AppController {
         }
 
 
-
-        $obmen = $this->GetBaseTable();
+        $obmen = $this->GetBaseTable($Method);
 
 
       //  show($MASSIV);
@@ -283,27 +437,28 @@ class ParseinController extends AppController {
 
     }
 
-    private function AddTaskBD($taskid, $type)
+    private function AddTaskBD($taskid, $type, $Method)
     {
 
         $ARR = [];
         $ARR['taskid'] = $taskid;
         $ARR['type'] = $type;
+        $ARR['method'] = $Method;
 
         $this->AddARRinBD($ARR, "statustable");
         echo "<b><font color='green'>Добавили запись</font></b>";
         // Добавление ТРЕКА в БД
 
     }
-    private function GetBaseTable()
+    private function GetBaseTable($Method)
     {
-        $table = R::findAll("obmenin");
+        $table = R::findAll("obmenin", "WHERE method=?", [$Method]);
         return $table;
     }
-    private function GetStatusTable()
+    private function GetStatusTable($Method)
     {
 
-        $table = R::findOne("statustable", "WHERE type=?", [$this->type]);
+        $table = R::findOne("statustable", "WHERE type=? AND method=?", [$this->type, $Method]);
         return $table;
     }
     private function AddARRinBD($ARR, $BD = false)

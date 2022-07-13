@@ -64,6 +64,8 @@ class SpredController extends AppController {
         $STARTPRICE['USDT'] = $this->GetPriceAct("USDT");
 
 
+        exit("тех работы");
+
      //   echo "<b>Стартовая цена захода BTC: </b>".$STARTPRICE['BTC']."<br>";
      //   echo "<b>Стартовая цена захода ETH: </b>".$STARTPRICE['ETH']."<br>";
      //   echo "<b>Стартовая цена захода USDT: </b>".$STARTPRICE['USDT']."<br>";

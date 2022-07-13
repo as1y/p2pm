@@ -3,11 +3,8 @@
   <component name="ChangeListManager">
     <list default="true" id="660fb730-6725-4866-851d-b5f1a7801e6d" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/APP/controllers/Parsetickers1Controller.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/APP/controllers/Parsetickers2Controller.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/APP/controllers/ParseinController.php" beforeDir="false" afterPath="$PROJECT_DIR$/APP/controllers/ParseinController.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/APP/controllers/SpredController.php" beforeDir="false" afterPath="$PROJECT_DIR$/APP/controllers/SpredController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tickers1.php" beforeDir="false" afterPath="$PROJECT_DIR$/tickers1.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tickers2.php" beforeDir="false" afterPath="$PROJECT_DIR$/tickers2.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -219,7 +216,7 @@
       <workItem from="1655242614774" duration="2522000" />
       <workItem from="1656443370806" duration="18955000" />
       <workItem from="1657474638966" duration="19196000" />
-      <workItem from="1657576131212" duration="47569000" />
+      <workItem from="1657576131212" duration="52534000" />
     </task>
     <servers />
   </component>
@@ -235,6 +232,10 @@
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state x="277" y="56" key="SettingsEditor/0.0.1536.824@0.0.1536.824" timestamp="1655242387593" />
+    <state x="463" y="144" width="609" height="536" key="find.popup" timestamp="1657745445300">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="463" y="144" width="609" height="536" key="find.popup/0.0.1536.824@0.0.1536.824" timestamp="1657745445300" />
     <state x="654" y="144" key="ftp.server.browser" timestamp="1655242366253">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
@@ -243,9 +244,9 @@
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state x="425" y="187" key="run.anything.popup/0.0.1536.824@0.0.1536.824" timestamp="1657651181153" />
-    <state x="431" y="145" width="672" height="678" key="search.everywhere.popup" timestamp="1657648696247">
+    <state x="431" y="145" width="672" height="678" key="search.everywhere.popup" timestamp="1657748691266">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state x="431" y="145" width="672" height="678" key="search.everywhere.popup/0.0.1536.824@0.0.1536.824" timestamp="1657648696247" />
+    <state x="431" y="145" width="672" height="678" key="search.everywhere.popup/0.0.1536.824@0.0.1536.824" timestamp="1657748691266" />
   </component>
 </project>
