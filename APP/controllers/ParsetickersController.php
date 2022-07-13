@@ -39,7 +39,8 @@ class ParsetickersController extends AppController {
         $DATA = $exchangePoloniex->fetch_tickers();
         $this->WriteTickers("Poloniex", $DATA);
 
-        $exchangeGateio = new \ccxt\poloniex (array ('timeout' => 30000));
+
+        $exchangeGateio = new \ccxt\gateio (array ('timeout' => 30000));
         $DATA = $exchangeGateio->fetch_tickers();
         $this->WriteTickers("Gateio", $DATA);
 
@@ -118,7 +119,24 @@ class ParsetickersController extends AppController {
 
 
 
+    private function AddARRinBD($ARR, $BD = false)
+    {
 
+        $tbl = R::dispense($BD);
+        //ДОБАВЛЯЕМ В ТАБЛИЦУ
+
+        foreach ($ARR as $name => $value) {
+            $tbl->$name = $value;
+        }
+
+        $id = R::store($tbl);
+
+        echo "<font color='green'><b>ДОБАВИЛИ ЗАПИСЬ В БД!</b></font><br>";
+
+        return $id;
+
+
+    }
 
 
 

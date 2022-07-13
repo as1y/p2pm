@@ -51,23 +51,32 @@ class SpredController extends AppController {
         $STARTPRICE['USDT'] = $this->GetPriceAct("USDT");
 
 
-        echo "<b>Стартовая цена захода BTC: </b>".$STARTPRICE['BTC']."<br>";
-        echo "<b>Стартовая цена захода ETH: </b>".$STARTPRICE['ETH']."<br>";
-        echo "<b>Стартовая цена захода USDT: </b>".$STARTPRICE['USDT']."<br>";
+     //   echo "<b>Стартовая цена захода BTC: </b>".$STARTPRICE['BTC']."<br>";
+     //   echo "<b>Стартовая цена захода ETH: </b>".$STARTPRICE['ETH']."<br>";
+     //   echo "<b>Стартовая цена захода USDT: </b>".$STARTPRICE['USDT']."<br>";
 
 
         // Рассчет самого выгодного входа через БИРЖУ
 
 
         $MassivPoloniexENTER =  $this->GetArrEnterExchange($STARTPRICE, "Poloniex", "QIWI", "VISA");
-        show($MassivPoloniexENTER);
+
+        $this->RenderFinalExchange($MassivPoloniexENTER, "Poloniex");
 
 
         $MassivBinanceENTER =  $this->GetArrEnterExchange($STARTPRICE, "Binance", "QIWI", "VISA");
-        show($MassivBinanceENTER);
 
-        $MassivGateENTER =  $this->GetArrEnterExchange($STARTPRICE, "Binance", "QIWI", "VISA");
-        show($MassivGateENTER);
+        $this->RenderFinalExchange($MassivBinanceENTER, "Binance");
+        //show($MassivBinanceENTER);
+
+        echo "<hr>";
+
+        $MassivGateioENTER =  $this->GetArrEnterExchange($STARTPRICE, "Gateio", "QIWI", "VISA");
+
+        $this->RenderFinalExchange($MassivGateioENTER, "Gateio");
+
+
+      //  show($MassivGateioENTER);
 
 
 
@@ -90,9 +99,33 @@ class SpredController extends AppController {
 
 
 
-    private function GetArrExitExchange(){
+    private function RenderFinalExchange($MassivEX, $exname){
+
+        echo "<h4>РАБОЧИЕ СВЯЗКИ ".$exname."</h4>";
+
+        foreach ($MassivEX as $key=>$val)
+        {
+            if ($val['finalspred'] < 0) continue;
+
+            echo "<b>1.</b> Покупаем монету <b>".$val['moneta']."</b> по лучшем курсу в BestChange. Указываем кошелек пополнения биржи <b>".$exname."</b> <br>";
+
+            echo "<b>2.</b> На бирже <b>".$exname."</b> монету <b>".$val['moneta']."</b>  меняем на <b>".$val['symbol']."</b> <br>";
+
+            echo "<b>3.</b> Меняем <b>".$val['symbol']."</b>  на <b>".$val['exitmoneta']."</b> <br>";
+
+            echo "<b>4.</b> Продаем монету <b> ".$val['exitmoneta']."</b>  через лучший обменник BestChange <br>";
 
 
+            echo "<b>5.</b> Зарабатываем <b> <font color='green'>".$val['finalspred']."% </font></b> с круга <br>";
+            echo "<hr>";
+
+        }
+
+
+
+
+
+        return true;
     }
 
 
@@ -167,8 +200,11 @@ class SpredController extends AppController {
 
         $MASS = $this->CalculateExit($symbol, $exname, $methodname);
 
-        $Dannie['symbol'] = $symbol;
         $Dannie['moneta'] = array_key_first($FINALMASSIV[$symbol]['spred']);
+
+        $Dannie['exname'] = $exname;
+        $Dannie['symbol'] = $symbol;
+
         $Dannie['spred'] = reset($FINALMASSIV[$symbol]['spred']);
         $Dannie['final'] = $FINALMASSIV[$symbol]['final'][$Dannie['moneta']];
 
