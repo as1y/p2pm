@@ -59,20 +59,22 @@ class SpredController extends AppController {
         // Рассчет самого выгодного входа через БИРЖУ
 
 
-        $MassivPoloniexENTER =  $this->GetArrEnterExchange($STARTPRICE, "Poloniex", "QIWI");
+        $MassivPoloniexENTER =  $this->GetArrEnterExchange($STARTPRICE, "Poloniex", "QIWI", "VISA");
         show($MassivPoloniexENTER);
 
 
-        $MassivBinanceENTER =  $this->GetArrEnterExchange($STARTPRICE, "Binance", "QIWI");
+        $MassivBinanceENTER =  $this->GetArrEnterExchange($STARTPRICE, "Binance", "QIWI", "VISA");
         show($MassivBinanceENTER);
 
+        $MassivGateENTER =  $this->GetArrEnterExchange($STARTPRICE, "Binance", "QIWI", "VISA");
+        show($MassivGateENTER);
 
-        $this->GetArrExitExchange();
+
+
 
         echo "<hr>";
 
 
-        $this->CalculateExit("USDT", "Binance", "VISA");
 
         // Данные на вход
 
@@ -94,11 +96,11 @@ class SpredController extends AppController {
     }
 
 
-    private function GetArrEnterExchange($STARTPRICE, $Exchange, $Method){
+    private function GetArrEnterExchange($STARTPRICE, $Exchange, $MethodENTER, $MethodEXIT){
 
         $FINALMASSIV = [];
 
-        $TickersBDIN = $this->LoadTickersBD("IN", $Method);
+        $TickersBDIN = $this->LoadTickersBD("IN", $MethodENTER);
         $ExchangeTickers = $this->GetTickerText($Exchange);
 
         $ArrBTC = $this->GetArrEnterBase($TickersBDIN, $ExchangeTickers, $STARTPRICE, "BTC");
@@ -109,13 +111,13 @@ class SpredController extends AppController {
 
       //  show($FINALMASSIV);
 
-        $FINALMASSIV = $this->GetTopSpredsMassiv($FINALMASSIV, 5, $Exchange, $Method);
+        $FINALMASSIV = $this->GetTopSpredsMassiv($FINALMASSIV, 5, $Exchange, $MethodENTER, $MethodEXIT);
 
         return $FINALMASSIV;
 
     }
 
-    private function GetTopSpredsMassiv($FINALMASSIV, $count, $exname, $methodname){
+    private function GetTopSpredsMassiv($FINALMASSIV, $count, $exname, $MethodENTER, $MethodEXIT){
 
         // Получаем 3 ТОП1 из всех
         $OBRABOTKA = [];
@@ -137,18 +139,18 @@ class SpredController extends AppController {
 
                 if ($firstBTC > $firstETH && $firstBTC > $firstUSDT)
                 {
-                    $OBRABOTKA[] = $this->LoadObrabotka("BTC", $FINALMASSIV, $exname, $methodname);
+                    $OBRABOTKA[] = $this->LoadObrabotka("BTC", $FINALMASSIV, $exname, $MethodEXIT);
                     array_shift($FINALMASSIV['BTC']['spred']);
 
                 }
                 if ($firstETH > $firstBTC && $firstETH > $firstUSDT)
                 {
-                    $OBRABOTKA[] = $this->LoadObrabotka("ETH", $FINALMASSIV, $exname, $methodname);
+                    $OBRABOTKA[] = $this->LoadObrabotka("ETH", $FINALMASSIV, $exname, $MethodEXIT);
                     array_shift($FINALMASSIV['ETH']['spred']);
                 }
                 if ($firstUSDT > $firstETH && $firstUSDT > $firstBTC)
                 {
-                    $OBRABOTKA[] = $this->LoadObrabotka("USDT", $FINALMASSIV, $exname, $methodname);
+                    $OBRABOTKA[] = $this->LoadObrabotka("USDT", $FINALMASSIV, $exname, $MethodEXIT);
                     array_shift($FINALMASSIV['USDT']['spred']);
                 }
 
@@ -163,13 +165,18 @@ class SpredController extends AppController {
 
     private function LoadObrabotka($symbol, $FINALMASSIV, $exname, $methodname){
 
+        $MASS = $this->CalculateExit($symbol, $exname, $methodname);
+
         $Dannie['symbol'] = $symbol;
         $Dannie['moneta'] = array_key_first($FINALMASSIV[$symbol]['spred']);
         $Dannie['spred'] = reset($FINALMASSIV[$symbol]['spred']);
         $Dannie['final'] = $FINALMASSIV[$symbol]['final'][$Dannie['moneta']];
 
+        $Dannie['exitmoneta'] = $MASS['exitmoneta'];
+        $Dannie['exitprice'] = $MASS['exitprice'];
 
-        $this->CalculateExit($symbol, $exname, $methodname);
+        $Dannie['finalspred'] = changemet($Dannie['final'], $Dannie['exitprice']);
+
 
         return $Dannie;
     }
@@ -277,8 +284,7 @@ class SpredController extends AppController {
 
 
 
-
-        return true;
+        return $MASS;
     }
 
 

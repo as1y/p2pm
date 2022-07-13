@@ -39,6 +39,10 @@ class ParsetickersController extends AppController {
         $DATA = $exchangePoloniex->fetch_tickers();
         $this->WriteTickers("Poloniex", $DATA);
 
+        $exchangeGateio = new \ccxt\poloniex (array ('timeout' => 30000));
+        $DATA = $exchangeGateio->fetch_tickers();
+        $this->WriteTickers("Gateio", $DATA);
+
 
         // Проверка наличие файла
 
