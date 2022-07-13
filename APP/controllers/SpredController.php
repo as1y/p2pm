@@ -54,26 +54,21 @@ class SpredController extends AppController {
 
 
         // Рассчет самого выгодного входа через БИРЖУ
-        $MassivBinance =  $this->GetArrEnterExchange($STARTPRICE, "Binance", "QIWI");
-        show($MassivBinance);
+
+        $MassivPoloniexENTER =  $this->GetArrEnterExchange($STARTPRICE, "Poloniex", "QIWI");
+        show($MassivPoloniexENTER);
 
 
-       // $MassivPoloniex =  $this->GetArrEnterExchange($STARTPRICE, "Poloniex", "QIWI");
 
-  //      show($MassivBinance);
+
+
+        $MassivBinanceENTER =  $this->GetArrEnterExchange($STARTPRICE, "Binance", "QIWI");
+        show($MassivBinanceENTER);
+
+
+        $this->GetArrExitExchange();
 
         echo "<hr>";
-
-  //      show($MassivPoloniex);
-
-
-
-        // Отранжированный массив
-
-        // Монета покупаемая в обменнике
-        // Монета получаемая на бирже
-        // Цена покупки
-        // Выгода в процентах от основной цены
 
 
         // Данные на вход
@@ -121,80 +116,6 @@ class SpredController extends AppController {
 
 
 
-       /*
-
-        echo "<h3>ВХОД ЧЕРЕЗ МОНЕТЫ - BTC (Poloniex)</h3>";
-        $RENDER = $this->CheckBestPrice("BTC", "Poloniex", $TickersBDIN, $STARTPRICE, $AllPolonex);
-        echo "<b>Самый выгодный символ:</b> ".$RENDER['BestSpredSymbol']." <br>";
-        echo "Лучшая цена ".$RENDER['BestPrice']."<br>";
-
-        echo "<h3>ВХОД ЧЕРЕЗ МОНЕТЫ - USDT (Poloniex)</h3>";
-        $RENDER = $this->CheckBestPrice("USDT","Poloniex", $TickersBDIN, $STARTPRICE, $AllPolonex);
-        echo "<b>Самый выгодный символ:</b> ".$RENDER['BestSpredSymbol']." <br>";
-        echo "Лучшая цена ".$RENDER['BestPrice']."<br>";
-
-
-
-        echo "<h3>ВХОД ЧЕРЕЗ МОНЕТЫ - USDT (GATE.IO)</h3>";
-        $RENDER = $this->CheckBestPrice("USDT","GATE.IO", $TickersBDIN, $STARTPRICE, $AllGate);
-        echo "<b>Самый выгодный символ:</b> ".$RENDER['BestSpredSymbol']." <br>";
-        echo "Лучшая цена ".$RENDER['BestPrice']."<br>";
-
-        echo "<h3>ВХОД ЧЕРЕЗ МОНЕТЫ - ETH (GATE.IO)</h3>";
-        $RENDER = $this->CheckBestPrice("ETH","GATE.IO", $TickersBDIN, $STARTPRICE, $AllGate);
-        echo "<b>Самый выгодный символ:</b> ".$RENDER['BestSpredSymbol']." <br>";
-        echo "Лучшая цена ".$RENDER['BestPrice']."<br>";
-
-        echo "<h3>ВХОД ЧЕРЕЗ МОНЕТЫ - BTC (HUOBI)</h3>";
-        $RENDER = $this->CheckBestPrice("BTC","HUOBI", $TickersBDIN, $STARTPRICE, $ALLHuobi);
-        echo "<b>Самый выгодный символ:</b> ".$RENDER['BestSpredSymbol']." <br>";
-        echo "Лучшая цена ".$RENDER['BestPrice']."<br>";
-
-        echo "<h3>ВХОД ЧЕРЕЗ МОНЕТЫ - ETH (HUOBI)</h3>";
-        $RENDER = $this->CheckBestPrice("ETH", "HUOBI",$TickersBDIN, $STARTPRICE, $ALLHuobi);
-        echo "<b>Самый выгодный символ:</b> ".$RENDER['BestSpredSymbol']." <br>";
-        echo "Лучшая цена ".$RENDER['BestPrice']."<br>";
-
-        echo "<h3>ВХОД ЧЕРЕЗ МОНЕТЫ - USDT (HUOBI)</h3>";
-        $RENDER = $this->CheckBestPrice("USDT", "HUOBI",$TickersBDIN, $STARTPRICE, $ALLHuobi);
-        echo "<b>Самый выгодный символ:</b> ".$RENDER['BestSpredSymbol']." <br>";
-        echo "Лучшая цена ".$RENDER['BestPrice']."<br>";
-
-        // ЗАГРУЗКА ТИКЕРОВ
-
-    */
-
-
-
-/*
-        echo "<h3>ВХОД ЧЕРЕЗ МОНЕТЫ - USDT (BYBIT)</h3>";
-        $RENDER = $this->CheckBestPrice("USDT", $TickersBDIN, $STARTPRICE, $this->TickerByBit);
-        echo "<b>Самый выгодный символ:</b> ".$RENDER['BestSpredSymbol']." <br>";
-        echo "Лучшая цена ".$RENDER['BestPrice']."<br>";
-*/
-
-
-
-/*
-        // Проверяем лучшую цену через заход в BTC
-        echo "<h3>ВХОД ЧЕРЕЗ МОНЕТЫ - BTC</h3>";
-        $RENDER = $this->CheckBestPrice("BTC", $TickersBDIN, $STARTPRICE);
-        echo "<b>Самый выгодный символ:</b> ".$RENDER['BestSpredSymbol']." <br>";
-        echo "Лучшая цена ".$RENDER['BestPrice']."<br>";
-
-        echo "<h3>ВХОД ЧЕРЕЗ МОНЕТЫ - ETH</h3>";
-        $RENDER = $this->CheckBestPrice("ETH", $TickersBDIN, $STARTPRICE);
-        echo "<b>Самый выгодный символ:</b> ".$RENDER['BestSpredSymbol']." <br>";
-        echo "Лучшая цена ".$RENDER['BestPrice']."<br>";
-
-
-        echo "<h3>ВХОД ЧЕРЕЗ МОНЕТЫ - USDT</h3>";
-        $RENDER = $this->CheckBestPrice("USDT", $TickersBDIN, $STARTPRICE);
-        echo "<b>Самый выгодный символ:</b> ".$RENDER['BestSpredSymbol']." <br>";
-        echo "Лучшая цена ".$RENDER['BestPrice']."<br>";
-*/
-
-
 
 
 
@@ -203,6 +124,12 @@ class SpredController extends AppController {
 
     }
 
+
+
+    private function GetArrExitExchange(){
+
+
+    }
 
 
     private function GetArrEnterExchange($STARTPRICE, $Exchange, $Method){
@@ -218,7 +145,7 @@ class SpredController extends AppController {
 
         $FINALMASSIV = array_merge($ArrBTC, $ArrETH, $ArrUSDT);
 
-        show($FINALMASSIV);
+      //  show($FINALMASSIV);
 
         $FINALMASSIV = $this->GetTopSpredsMassiv($FINALMASSIV, 5);
 
@@ -226,14 +153,12 @@ class SpredController extends AppController {
 
     }
 
-
-
     private function GetTopSpredsMassiv($FINALMASSIV, $count){
 
         // Получаем 3 ТОП1 из всех
         $OBRABOTKA = [];
 
-      //  show($FINALMASSIV);
+       // show($FINALMASSIV);
 
         // Цикл на ОТБОР 5 ЛУЧШИХ
             for ($i=0; $i<$count; $i++ ){
@@ -242,11 +167,11 @@ class SpredController extends AppController {
                 $firstETH = reset($FINALMASSIV['ETH']['spred']);
                 $firstUSDT = reset($FINALMASSIV['USDT']['spred']);
 
-                /*
-                echo "Первый элемент БТЦ ".$firstBTC."<br>";
-                echo "Первый элемент ETH ".$firstETH."<br>";
-                echo "Первый элемент USDt ".$firstUSDT."<br>";
-                */
+
+             //   echo "Первый элемент БТЦ ".$firstBTC."<br>";
+            //    echo "Первый элемент ETH ".$firstETH."<br>";
+            //    echo "Первый элемент USDt ".$firstUSDT."<br>";
+
 
                 if ($firstBTC > $firstETH && $firstBTC > $firstUSDT)
                 {
@@ -284,7 +209,6 @@ class SpredController extends AppController {
 
         return $Dannie;
     }
-
 
     private function GetArrEnterBase($TickersBDIN, $ExchangeTickers, $STARTPRICE, $MONETA){
 
@@ -335,62 +259,6 @@ class SpredController extends AppController {
         return $MASSIV;
 
     }
-
-/*
-    private function CheckBestPrice($MONETA, $ExchangeName , $TICKERS, $STARTPRICE, $ALLEXCHANGE){
-
-
-        $RENDER['BestPrice'] = 0;
-        $RENDER['BestSpredSymbol'] = "";
-
-
-        foreach ($TICKERS as $TickerWork)
-        {
-
-            if ($TickerWork['price'] == "none") continue;
-            if ($TickerWork['ticker'] == $MONETA) continue;
-
-
-            // Проверяемый тикер
-            $ExchangeTicker = $TickerWork['ticker']."/".$MONETA."";
-            // Цена на бирже ЭТОЙ монеты
-
-
-            // Перекрестные тикеры
-            if ($MONETA == "BTC" && $ExchangeTicker == "USDT/BTC") $ExchangeTicker = "BTC/USDT";
-            if ($MONETA == "ETH" && $ExchangeTicker == "BTC/ETH") $ExchangeTicker = "ETH/BTC";
-            if ($MONETA == "ETH" && $ExchangeTicker == "USDT/ETH") $ExchangeTicker = "ETH/USDT";
-
-
-            if (empty(($ALLEXCHANGE[$ExchangeTicker]['close']))) continue;
-
-            $ExPRICE = $ALLEXCHANGE[$ExchangeTicker]['close'];
-
-            // Перекрестные тикеры
-            if ($MONETA == "BTC" && $ExchangeTicker == "BTC/USDT") $ExPRICE = 1 / $ExPRICE;
-            if ($MONETA == "ETH" && $ExchangeTicker == "ETH/BTC") $ExPRICE = 1 / $ExPRICE;
-            if ($MONETA == "ETH" && $ExchangeTicker == "ETH/USDT") $ExPRICE = 1 / $ExPRICE;
-
-
-            if (empty($ExPRICE)) continue;
-
-
-            $RENDER =  $this->RenderPercent($RENDER, $TickerWork, $ExchangeTicker, $ExPRICE, $MONETA, $STARTPRICE, $ExchangeName);
-
-
-
-        }
-
-
-        echo "<hr>";
-
-        return $RENDER;
-
-
-    }
-*/
-
-
 
 
 
