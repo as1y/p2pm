@@ -11,16 +11,12 @@ class ParseinController extends AppController {
     public $BreadcrumbsControllerLabel = "Панель управления";
     public $BreadcrumbsControllerUrl = "/panel";
 
-    public $TICKERSqiwiIN = [];
 
-
-    public $vremya = 100; // Секунд
+    public $vremya = 200; // Секунд
     public $type = "IN";
-
     public $Methods = [];
-
     public $debug = false;
-    public $sleep = 10;
+    public $sleep = 2;
 
 
     // ТЕХНИЧЕСКИЕ ПЕРЕМЕННЫЕ
@@ -31,24 +27,17 @@ class ParseinController extends AppController {
         $Panel =  new Panel();
 
         $this->Methods[] = "VISA";
-//        $this->Methods[] = "USDT";
- //       $this->Methods[] = "ADVRUB";
-
-
+        $this->Methods[] = "USDT";
+   //     $this->Methods[] = "ADVRUB";
 
         $this->ControlTrek();
         $this->StartTrek();
-
-       echo "<h2>PARSE-IN-V2 | ПАРСИНГ BESTCHANGE</h2><br>";
-
-       // Генерация УРЛ
-
 
 
         // Инициализация парсера
         $aparser = new \Aparser('http://91.210.171.153:9091/API', '', array('debug'=>$this->debug));
 
-foreach ($this->Methods as $key=>$Method){
+foreach ($this->Methods as $Method){
 
         echo "<h1>РАБОТА С МЕТОДОМ ".$Method."</h1>";
 
@@ -64,12 +53,13 @@ foreach ($this->Methods as $key=>$Method){
             if (empty($ZAPROS))
             {
                 echo "<font color='green'>Информация актуальная. Парсить нет необходимости </font><br>";
-                $this->StopTrek();
+               // $this->StopTrek();
+                continue;
             }
 
             $taskUid = $aparser->addTask('20', 'BestIN', 'text', $ZAPROS);
             $this->AddTaskBD($taskUid, $this->type, $Method);
-            $this->StopTrek();
+           continue;
 
         }
 
@@ -103,7 +93,7 @@ foreach ($this->Methods as $key=>$Method){
         }
 
       echo "<hr>";
- 
+
 }
 
         $sleep = rand($this->sleep, $this->sleep*2);
@@ -305,9 +295,6 @@ foreach ($this->Methods as $key=>$Method){
         return $URL;
 
     }
-
-
-
     private function ControlTrek(){
         $tbl = R::findOne("trekcontrol", "WHERE type =?", [$this->type]);
         if (empty($tbl)) return true;
@@ -338,13 +325,6 @@ foreach ($this->Methods as $key=>$Method){
         R::store($tbl);
         exit();
     }
-
-
-
-
-
-
-
     private function GetZapros($Method){
 
         $ZAPROS = [];
@@ -374,9 +354,6 @@ foreach ($this->Methods as $key=>$Method){
         return $ZAPROS;
 
     }
-
-
-
     private function CreateTable($Method)
     {
 
@@ -401,7 +378,6 @@ foreach ($this->Methods as $key=>$Method){
         return true;
 
     }
-
     private function RenewTickers($content, $type, $Method)
     {
 
@@ -435,6 +411,12 @@ foreach ($this->Methods as $key=>$Method){
 
            $ticker->price = $MASSIV[$ticker['url']][0];
            $ticker->limit = $MASSIV[$ticker['url']][1];
+
+           if ($MASSIV[$ticker['url']][0] == 1)
+           {
+               $ticker->price = 1/$MASSIV[$ticker['url']][2];
+           }
+           
            $ticker->time = time();
             R::store($ticker);
 
@@ -445,7 +427,6 @@ foreach ($this->Methods as $key=>$Method){
 
 
     }
-
     private function AddTaskBD($taskid, $type, $Method)
     {
 
