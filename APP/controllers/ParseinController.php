@@ -31,8 +31,8 @@ class ParseinController extends AppController {
         $Panel =  new Panel();
 
         $this->Methods[] = "VISA";
-        $this->Methods[] = "USDT";
-        $this->Methods[] = "ADVRUB";
+//        $this->Methods[] = "USDT";
+ //       $this->Methods[] = "ADVRUB";
 
 
 
@@ -43,10 +43,14 @@ class ParseinController extends AppController {
 
        // Генерация УРЛ
 
-        $Method = "VISA";
+
 
         // Инициализация парсера
         $aparser = new \Aparser('http://91.210.171.153:9091/API', '', array('debug'=>$this->debug));
+
+foreach ($this->Methods as $key=>$Method){
+
+        echo "<h1>РАБОТА С МЕТОДОМ ".$Method."</h1>";
 
         // Таблица статуса работы парсера
         $StatusTable =  $this->GetStatusTable($Method);
@@ -75,8 +79,6 @@ class ParseinController extends AppController {
       if ($AparserIN['status'] == "work")
       {
           echo "<font color='#8b0000'>ПАРСИНГ IN В РАБОТЕ</font><br>";
-          $sleep = rand($this->sleep, $this->sleep*2);
-          sleep($sleep);
 
       }
       if ($AparserIN['status'] == "completed"){
@@ -99,6 +101,13 @@ class ParseinController extends AppController {
 
 
         }
+
+      echo "<hr>";
+ 
+}
+
+        $sleep = rand($this->sleep, $this->sleep*2);
+        sleep($sleep);
 
 
         $this->StopTrek();
@@ -350,9 +359,9 @@ class ParseinController extends AppController {
 
             $proshlo = time() - $val['time'];
 
-            echo "Method: ".$val['method']."<br>";
-            echo "Ticker: ".$val['ticker']."<br>";
-            echo "Прошло: ".$proshlo."<br>";
+        //    echo "Method: ".$val['method']."<br>";
+        //    echo "Ticker: ".$val['ticker']."<br>";
+        //    echo "Прошло: ".$proshlo."<br>";
 
             if ($proshlo > $this->vremya)
             {
