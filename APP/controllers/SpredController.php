@@ -11,6 +11,9 @@ class SpredController extends AppController {
     public $BreadcrumbsControllerLabel = "Панель управления";
     public $BreadcrumbsControllerUrl = "/panel";
 
+    public $TickersBDIN = [];
+    public $TickersBDOUT = [];
+
 
     // ТЕХНИЧЕСКИЕ ПЕРЕМЕННЫЕ
     public function indexAction()
@@ -55,11 +58,9 @@ class SpredController extends AppController {
 
         // Рассчет самого выгодного входа через БИРЖУ
 
+
         $MassivPoloniexENTER =  $this->GetArrEnterExchange($STARTPRICE, "Poloniex", "QIWI");
         show($MassivPoloniexENTER);
-
-
-
 
 
         $MassivBinanceENTER =  $this->GetArrEnterExchange($STARTPRICE, "Binance", "QIWI");
@@ -71,48 +72,9 @@ class SpredController extends AppController {
         echo "<hr>";
 
 
+        $this->CalculateExit("USDT", "Binance", "VISA");
+
         // Данные на вход
-
-
-
-
-
-        exit("11");
-
-
-
-        $TickersBDIN = $this->LoadTickersBD("IN", "QIWI");
-
-        $TickersBDOUT = $this->LoadTickersBD("OUT");
-
-
-        // ЗАГРУЗКА ТИКЕРОВ БИРЖ
-
-
-        echo "<hr>";
-
-        echo "<h2>BINANCE</h2>";
-        $this->CalculateExit("USDT", $TickersBDOUT, $ALLBinance);
-
-        echo "<h2>POLONIEX</h2>";
-        $this->CalculateExit("USDT",$TickersBDOUT, $AllPolonex);
-
-        echo "<hr>";
-
-
-        echo "<h3>ВХОД ЧЕРЕЗ МОНЕТУ - ETH (BINANCE)</h3>";
-        $RENDER = $this->CheckBestPrice("BTC", "Binance",$TickersBDIN, $STARTPRICE, $ALLBinance);
-        echo "<b>Самый выгодный символ:</b> ".$RENDER['BestSpredSymbol']." <br>";
-
-        echo "Лучшая цена ".$RENDER['BestPrice']."<br>";
-
-        echo "<h2>BINANCE</h2>";
-        $this->CalculateExit("BTC", $TickersBDOUT, $ALLBinance);
-
-        echo "<h2>POLONIEX</h2>";
-        $this->CalculateExit("BTC",$TickersBDOUT, $AllPolonex);
-
-        echo "<hr>";
 
 
 
@@ -147,13 +109,13 @@ class SpredController extends AppController {
 
       //  show($FINALMASSIV);
 
-        $FINALMASSIV = $this->GetTopSpredsMassiv($FINALMASSIV, 5);
+        $FINALMASSIV = $this->GetTopSpredsMassiv($FINALMASSIV, 5, $Exchange, $Method);
 
         return $FINALMASSIV;
 
     }
 
-    private function GetTopSpredsMassiv($FINALMASSIV, $count){
+    private function GetTopSpredsMassiv($FINALMASSIV, $count, $exname, $methodname){
 
         // Получаем 3 ТОП1 из всех
         $OBRABOTKA = [];
@@ -175,18 +137,18 @@ class SpredController extends AppController {
 
                 if ($firstBTC > $firstETH && $firstBTC > $firstUSDT)
                 {
-                    $OBRABOTKA[] = $this->LoadObrabotka("BTC", $FINALMASSIV);
+                    $OBRABOTKA[] = $this->LoadObrabotka("BTC", $FINALMASSIV, $exname, $methodname);
                     array_shift($FINALMASSIV['BTC']['spred']);
 
                 }
                 if ($firstETH > $firstBTC && $firstETH > $firstUSDT)
                 {
-                    $OBRABOTKA[] = $this->LoadObrabotka("ETH", $FINALMASSIV);
+                    $OBRABOTKA[] = $this->LoadObrabotka("ETH", $FINALMASSIV, $exname, $methodname);
                     array_shift($FINALMASSIV['ETH']['spred']);
                 }
                 if ($firstUSDT > $firstETH && $firstUSDT > $firstBTC)
                 {
-                    $OBRABOTKA[] = $this->LoadObrabotka("USDT", $FINALMASSIV);
+                    $OBRABOTKA[] = $this->LoadObrabotka("USDT", $FINALMASSIV, $exname, $methodname);
                     array_shift($FINALMASSIV['USDT']['spred']);
                 }
 
@@ -199,13 +161,15 @@ class SpredController extends AppController {
     }
 
 
-    private function LoadObrabotka($symbol, $FINALMASSIV){
+    private function LoadObrabotka($symbol, $FINALMASSIV, $exname, $methodname){
 
         $Dannie['symbol'] = $symbol;
         $Dannie['moneta'] = array_key_first($FINALMASSIV[$symbol]['spred']);
         $Dannie['spred'] = reset($FINALMASSIV[$symbol]['spred']);
         $Dannie['final'] = $FINALMASSIV[$symbol]['final'][$Dannie['moneta']];
 
+
+        $this->CalculateExit($symbol, $exname, $methodname);
 
         return $Dannie;
     }
@@ -263,15 +227,15 @@ class SpredController extends AppController {
 
 
 
-    private function CalculateExit($base, $TickersBDOUT, $AllExchange){
+    private function CalculateExit($base, $Exchange, $method){
 
-        // Поиск лучшего выхода по всей биржи
+        $ExchangeTickers = $this->GetTickerText($Exchange);
+        $TickersBDOUT = $this->LoadTickersBD("OUT", $method);
 
-        //    $base = "USDT";
-        //    $baseprice = "64.16";
 
         $BestPrice = 0;
         $BestTicker = "";
+
 
 
         foreach ($TickersBDOUT as $key=>$val)
@@ -282,9 +246,9 @@ class SpredController extends AppController {
 
 
             if ($val['ticker'] == $base) continue;
-            if (empty($AllExchange[$exticker]['close'])) continue;
+            if (empty($ExchangeTickers[$exticker]['close'])) continue;
 
-            $amount = 1/$AllExchange[$exticker]['close'];
+            $amount = 1/$ExchangeTickers[$exticker]['close'];
             $amount = round($amount, 10);
 
 
@@ -300,19 +264,16 @@ class SpredController extends AppController {
             if ($final > $BestPrice)
             {
                 $BestPrice = $final;
-                $BestTicker = $exticker;
+                $BestTicker = $val['ticker'];
 
             }
-
-            //     echo "<hr>";
 
 
 
         }
 
-
-        echo "<b>Монета выхода: </b>".$BestTicker."<br>";
-        echo "<b>Лучшая цена выхода: </b>".$BestPrice."<br>";
+        $MASS['exitmoneta'] = $BestTicker;
+        $MASS['exitprice'] = $BestPrice;
 
 
 
