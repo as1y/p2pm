@@ -284,10 +284,13 @@ class ParseoutController extends AppController {
         $URL = [];
         foreach ($SYMBOLS as $key=>$value)
         {
-            if ($value['uri'] == $first) continue;
 
 
             $uri = "https://www.bestchange.ru/".$value['uri']."-to-".$first.".html";
+
+            if ($value['uri'] == $first) continue;
+
+
             $URL[$uri] = $value['symbol'];
             //   $headers = @get_headers($uri);
             //   echo  $headers[0]."<br>";
@@ -394,6 +397,7 @@ class ParseoutController extends AppController {
             //           show($value);
             $MASSIV[$value[0]][] = $value[1];
             $MASSIV[$value[0]][] = $value[2];
+            $MASSIV[$value[0]][] = $value[3];
         }
 
 
@@ -412,6 +416,13 @@ class ParseoutController extends AppController {
 
             $ticker->price = $MASSIV[$ticker['url']][0];
             $ticker->limit = $MASSIV[$ticker['url']][1];
+
+            if ($MASSIV[$ticker['url']][0] == 1)
+            {
+                $ticker->price = 1/$MASSIV[$ticker['url']][2];
+            }
+
+
             $ticker->time = time();
             R::store($ticker);
 

@@ -57,31 +57,41 @@ class SpredController extends AppController {
 
 
         $ENTER[] = "QIWI";
+
+
         $EXIT[] = "VISA";
 
-        $STARTPRICE['BTC'] = $this->GetPriceAct("BTC");
-        $STARTPRICE['ETH'] = $this->GetPriceAct("ETH");
-        $STARTPRICE['USDT'] = $this->GetPriceAct("USDT");
-
-
-        exit("тех работы");
-
-     //   echo "<b>Стартовая цена захода BTC: </b>".$STARTPRICE['BTC']."<br>";
-     //   echo "<b>Стартовая цена захода ETH: </b>".$STARTPRICE['ETH']."<br>";
-     //   echo "<b>Стартовая цена захода USDT: </b>".$STARTPRICE['USDT']."<br>";
 
 
         // Рассчет самого выгодного входа через БИРЖУ
 
+        echo "<h2><font color='#8b0000'>VISA-EXCHANGE-VISA</font></h2>";
         foreach ($this->EXCHANGES as $key=>$exchange){
 
-            $MassivEnter =  $this->GetArrEnterExchange($STARTPRICE, $exchange, "QIWI", "VISA");
-            $this->RenderFinalExchange($MassivEnter, $exchange);
+            $STARTPRICE['BTC'] = $this->GetPriceAct("BTC", "VISA");
+            $STARTPRICE['ETH'] = $this->GetPriceAct("ETH", "VISA");
+            $STARTPRICE['USDT'] = $this->GetPriceAct("USDT", "VISA");
+
+            $MassivEnter =  $this->GetArrEnterExchange($STARTPRICE, $exchange, "VISA", "VISA");
+           // show($MassivEnter);
+            $this->RenderFinalExchange($MassivEnter, $exchange, "VISA");
 
         }
 
 
+        echo "<h2><font color='#8b0000'>USDT-EXCHANGE-USDT</font></h2>";
+        foreach ($this->EXCHANGES as $key=>$exchange){
 
+            $STARTPRICE['BTC'] = $this->GetPriceAct("BTC", "USDT");
+            $STARTPRICE['ETH'] = $this->GetPriceAct("ETH", "USDT");
+            $STARTPRICE['USDT'] = $this->GetPriceAct("USDT", "USDT");
+
+
+            $MassivEnter =  $this->GetArrEnterExchange($STARTPRICE, $exchange, "USDT", "USDT");
+          //  show($MassivEnter);
+            $this->RenderFinalExchange($MassivEnter, $exchange, "USDT");
+
+        }
 
 
 
@@ -108,7 +118,7 @@ class SpredController extends AppController {
 
 
 
-    private function RenderFinalExchange($MassivEX, $exname){
+    private function RenderFinalExchange($MassivEX, $exname, $Method){
 
 
      echo "<h2>".$exname."</h2>";
@@ -118,7 +128,7 @@ class SpredController extends AppController {
           {
               if ($val['finalspred'] < 0.1) continue;
 
-              echo "<b>1.</b> Покупаем монету <b>".$val['moneta']."</b> по лучшем курсу в BestChange. Указываем кошелек пополнения биржи <b>".$exname."</b> <br>";
+              echo "<b>1.</b> Покупаем монету <b>".$val['moneta']."</b> по лучшем курсу в BestChange за <b>".$Method."</b> Указываем кошелек пополнения биржи <b>".$exname."</b> <br>";
 
               echo "<b>2.</b> На бирже <b>".$exname."</b> монету <b>".$val['moneta']."</b>  меняем на <b>".$val['symbol']."</b> <br>";
 
@@ -177,6 +187,7 @@ class SpredController extends AppController {
 
         $TickersBDIN = $this->LoadTickersBD("IN", $MethodENTER);
         $ExchangeTickers = $this->GetTickerText($Exchange);
+
 
         $ArrBTC = $this->GetArrEnterBase($TickersBDIN, $ExchangeTickers, $STARTPRICE, "BTC");
         $ArrETH = $this->GetArrEnterBase($TickersBDIN, $ExchangeTickers, $STARTPRICE, "ETH");
@@ -311,6 +322,7 @@ class SpredController extends AppController {
 
         $MASSIV[$MONETA] = [];
 
+
         foreach ($TickersBDIN as $TickerWork)
         {
             if ($TickerWork['price'] == "none") continue;
@@ -337,9 +349,11 @@ class SpredController extends AppController {
             $FinalPrice = round($FinalPrice, 2);
             $change = changemet($FinalPrice, $STARTPRICE[$MONETA] );
 
-          //  echo "Обрабатываем тикер: ".$TickerWork['ticker']."<br>";
-          //  echo "Финальная сумма захода: ".$FinalPrice."<br>";
-          //  echo "Спред: ".$change."<br>";
+
+         //   echo "Обрабатываем тикер: ".$TickerWork['ticker']."<br>";
+         //   echo "Финальная сумма захода: ".$FinalPrice."<br>";
+       //     echo "Базовая сумма захода".$STARTPRICE[$MONETA]."";
+         //   echo "Спред: ".$change."<br>";
 
             // СПРЕД
             $MASSIV[$MONETA]['spred'][$TickerWork['ticker']] = $change;
@@ -417,14 +431,15 @@ class SpredController extends AppController {
 
     private function LoadTickersBD($type, $method)
     {
+
         $table = [];
         if ($type == "IN") $table = R::findAll("obmenin", 'WHERE method=?', [$method]);
         if ($type == "OUT") $table = R::findAll("obmenout",'WHERE method=?', [$method]);
 
         return $table;
     }
-    private function GetPriceAct($MONETA){
-        $zapis = R::findOne("obmenin", 'WHERE method =? AND ticker=?', ["QIWI", $MONETA]);
+    private function GetPriceAct($MONETA, $method){
+        $zapis = R::findOne("obmenin", 'WHERE method =? AND ticker=?', [$method, $MONETA]);
         return $zapis['price'];
 
     }

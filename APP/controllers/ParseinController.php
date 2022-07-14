@@ -25,7 +25,6 @@ class ParseinController extends AppController {
 
         $this->layaout = false;
         $Panel =  new Panel();
-
         $this->Methods[] = "VISA";
         $this->Methods[] = "USDT";
    //     $this->Methods[] = "ADVRUB";
@@ -285,7 +284,12 @@ foreach ($this->Methods as $Method){
         $URL = [];
         foreach ($SYMBOLS as $key=>$value)
         {
+
+
             $uri = "https://www.bestchange.ru/".$first."-to-".$value['uri'].".html";
+
+            if ($value['uri'] == $first) continue;
+
             $URL[$uri] = $value['symbol'];
          //   $headers = @get_headers($uri);
          //   echo  $headers[0]."<br>";
@@ -393,6 +397,7 @@ foreach ($this->Methods as $Method){
  //           show($value);
             $MASSIV[$value[0]][] = $value[1];
             $MASSIV[$value[0]][] = $value[2];
+            $MASSIV[$value[0]][] = $value[3];
         }
 
 
@@ -416,7 +421,7 @@ foreach ($this->Methods as $Method){
            {
                $ticker->price = 1/$MASSIV[$ticker['url']][2];
            }
-           
+
            $ticker->time = time();
             R::store($ticker);
 
