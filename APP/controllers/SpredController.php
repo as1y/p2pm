@@ -65,7 +65,7 @@ class SpredController extends AppController {
 
         // Рассчет самого выгодного входа через БИРЖУ
 
-        echo "<h2><font color='#8b0000'>VISA-EXCHANGE-VISA</font></h2>";
+        echo "<h2><font color='#8b0000'>СВЯЗКИ VISA-EXCHANGE-VISA</font></h2>";
         foreach ($this->EXCHANGES as $key=>$exchange){
 
             $STARTPRICE['BTC'] = $this->GetPriceAct("BTC", "VISA");
@@ -79,7 +79,7 @@ class SpredController extends AppController {
         }
 
 
-        echo "<h2><font color='#8b0000'>USDT-EXCHANGE-USDT</font></h2>";
+        echo "<h2><font color='#8b0000'>СВЯЗКИ USDT-EXCHANGE-USDT</font></h2>";
         foreach ($this->EXCHANGES as $key=>$exchange){
 
             $STARTPRICE['BTC'] = $this->GetPriceAct("BTC", "USDT");
@@ -121,20 +121,30 @@ class SpredController extends AppController {
     private function RenderFinalExchange($MassivEX, $exname, $Method){
 
 
-     echo "<h2>".$exname."</h2>";
+
+
+       // show($MassivEX);
+
+//        if (empty($MassivEX))
+//        {
+//            echo "Связок через биржу <b>".$exname."</b> и точку входа ".$Method." на данный момент нет :( ";
+//            return true;
+//        }
+
+        //echo "<h2>".$exname."</h2>";
 
 
           foreach ($MassivEX as $key=>$val)
           {
               if ($val['finalspred'] < 0.1) continue;
 
-              echo "<b>1.</b> Покупаем монету <b>".$val['moneta']."</b> по лучшем курсу в BestChange за <b>".$Method."</b> Указываем кошелек пополнения биржи <b>".$exname."</b> <br>";
+              echo "<b>1.</b> На BestChange отдаем <b>".$Method."</b> получаем <b>".$val['moneta']."</b> . Вводим кошелек для зачисления биржи <b>".$exname."</b> <br>";
 
               echo "<b>2.</b> На бирже <b>".$exname."</b> монету <b>".$val['moneta']."</b>  меняем на <b>".$val['symbol']."</b> <br>";
 
-              echo "<b>3.</b> Меняем <b>".$val['symbol']."</b>  на <b>".$val['exitmoneta']."</b> <br>";
+              echo "<b>3.</b> На бирже <b>".$exname."</b> меняем <b>".$val['symbol']."</b>  на <b>".$val['exitmoneta']."</b> <br>";
 
-              echo "<b>4.</b> Продаем монету <b> ".$val['exitmoneta']."</b>  через лучший обменник BestChange <br>";
+              echo "<b>4.</b> Отдаем монету <b> ".$val['exitmoneta']."</b>  получаем <b>".$Method."</b> по лучшему курсу через BestChange <br>";
 
 
               echo "<b>5.</b> Зарабатываем <b> <font color='green'>".$val['finalspred']."% </font></b> с круга <br>";
