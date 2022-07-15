@@ -64,7 +64,7 @@ class SpredController extends AppController {
 
 
         // Рассчет самого выгодного входа через БИРЖУ
-
+ /*
         echo "<h2><font color='#8b0000'>СВЯЗКИ VISA-EXCHANGE-VISA</font></h2>";
         foreach ($this->EXCHANGES as $key=>$exchange){
 
@@ -74,17 +74,29 @@ class SpredController extends AppController {
 
             $MassivEnter =  $this->GetArrEnterExchange($STARTPRICE, $exchange, "VISA", "VISA");
            // show($MassivEnter);
+
             $this->RenderFinalExchange($MassivEnter, $exchange, "VISA");
 
         }
-
+*/
 
         echo "<h2><font color='#8b0000'>СВЯЗКИ USDT-EXCHANGE-USDT</font></h2>";
-        foreach ($this->EXCHANGES as $key=>$exchange){
 
-            $STARTPRICE['BTC'] = $this->GetPriceAct("BTC", "USDT");
-            $STARTPRICE['ETH'] = $this->GetPriceAct("ETH", "USDT");
-            $STARTPRICE['USDT'] = $this->GetPriceAct("USDT", "USDT");
+        $STARTPRICE['BTC'] = $this->GetPriceAct("BTC", "USDT");
+        $STARTPRICE['ETH'] = $this->GetPriceAct("ETH", "USDT");
+        $STARTPRICE['USDT'] = $this->GetPriceAct("USDT", "USDT");
+
+        $startdeposit = 100;
+        $exchange = "Binance";
+
+        $MassivEnter =  $this->GetArrEnterExchange($STARTPRICE, $exchange, "USDT", "USDT", $startdeposit);
+
+     //   show($MassivEnter);
+        $this->RenderFinalExchange($MassivEnter, $exchange, "USDT");
+
+
+    /*
+        foreach ($this->EXCHANGES as $key=>$exchange){
 
 
             $MassivEnter =  $this->GetArrEnterExchange($STARTPRICE, $exchange, "USDT", "USDT");
@@ -92,7 +104,7 @@ class SpredController extends AppController {
             $this->RenderFinalExchange($MassivEnter, $exchange, "USDT");
 
         }
-
+        */
 
 
 
@@ -192,20 +204,64 @@ class SpredController extends AppController {
 */
 
 
-    private function GetArrEnterExchange($STARTPRICE, $Exchange, $MethodENTER, $MethodEXIT){
+    private function GetArrEnterExchange($STARTPRICE, $Exchange, $MethodENTER, $MethodEXIT, $startdeposit = ""){
 
 
         $TickersBDIN = $this->LoadTickersBD("IN", $MethodENTER);
         $ExchangeTickers = $this->GetTickerText($Exchange);
 
 
-        $ArrBTC = $this->GetArrEnterBase($TickersBDIN, $ExchangeTickers, $STARTPRICE, "BTC");
-        $ArrETH = $this->GetArrEnterBase($TickersBDIN, $ExchangeTickers, $STARTPRICE, "ETH");
-        $ArrUSDT = $this->GetArrEnterBase($TickersBDIN, $ExchangeTickers, $STARTPRICE, "USDT");
+        echo "Стартовый депозит: ".$startdeposit." <br>";
+        echo "Биржа с которой работаем: ".$Exchange." <br>";
+        echo "Точка входа:".$MethodENTER."<br>";
+        // Сравним тикеры по заходу
+        foreach ($TickersBDIN as $ket=>$TickerWork)
+        {
+
+            if ($TickerWork['price'] == "none") continue;
+            if ($TickerWork['ticker'] == $MethodENTER) continue;
+            if ($TickerWork['price'] == 0) continue;
+
+
+            $TickerBirga = $TickerWork['ticker']."/".$MethodENTER."";
+            $ExPRICE = $ExchangeTickers[$TickerBirga]['close'];
+
+            $change = changemet($TickerWork['price'], $ExPRICE );
+
+
+
+            echo "Работаем с ".$TickerWork['ticker']." <br>";
+            echo "Цена входа по обменникам: ".$TickerWork['price']."<br>";
+            echo "Цена продажи тикера: ".$ExPRICE."<br>";
+
+            echo "Спред захода: ".$change."<br>";
+
+
+
+            $pricesale = "";
+
+            echo "";
+
+
+        }
+
+
+
+
+       // show($TickersBDIN);
+
+        exit("11");
+
+
+
+
+        $ArrBTC = $this->GetArrEnterBase($TickersBDIN, $ExchangeTickers, $STARTPRICE, "BTC", $MethodENTER);
+        $ArrETH = $this->GetArrEnterBase($TickersBDIN, $ExchangeTickers, $STARTPRICE, "ETH", $MethodENTER);
+        $ArrUSDT = $this->GetArrEnterBase($TickersBDIN, $ExchangeTickers, $STARTPRICE, "USDT", $MethodENTER);
 
         $FINALMASSIV = array_merge($ArrBTC, $ArrETH, $ArrUSDT);
 
-      //  show($FINALMASSIV);
+       // show($FINALMASSIV);
 
         $OBRABOTKA = $this->GetTopSpredsMassiv($FINALMASSIV, 5, $Exchange, $MethodENTER, $MethodEXIT);
 
@@ -328,7 +384,7 @@ class SpredController extends AppController {
         return $MASSIV;
     }
 */
-    private function GetArrEnterBase($TickersBDIN, $ExchangeTickers, $STARTPRICE, $MONETA){
+    private function GetArrEnterBase($TickersBDIN, $ExchangeTickers, $STARTPRICE, $MONETA, $Method = ""){
 
         $MASSIV[$MONETA] = [];
 
@@ -337,6 +393,8 @@ class SpredController extends AppController {
         {
             if ($TickerWork['price'] == "none") continue;
             if ($TickerWork['ticker'] == $MONETA) continue;
+            if ($TickerWork['price'] == 0) continue;
+
 
             //
             $TickerBirga = $TickerWork['ticker']."/".$MONETA."";
