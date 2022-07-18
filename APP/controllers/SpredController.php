@@ -20,6 +20,9 @@ class SpredController extends AppController {
     public $EXIT = [];
 
 
+    public $minumumspred = 0.1;
+
+
     // ТЕХНИЧЕСКИЕ ПЕРЕМЕННЫЕ
     public function indexAction()
     {
@@ -50,10 +53,10 @@ class SpredController extends AppController {
         $this->EXCHANGES[] = "Poloniex";
         $this->EXCHANGES[] = "Gateio";
         $this->EXCHANGES[] = "Huobi";
-        $this->EXCHANGES[] = "Ftx";
-        $this->EXCHANGES[] = "Exmo";
-        $this->EXCHANGES[] = "Kucoin";
-        $this->EXCHANGES[] = "Okex";
+   //     $this->EXCHANGES[] = "Ftx";
+   //     $this->EXCHANGES[] = "Exmo";
+  //      $this->EXCHANGES[] = "Kucoin";
+  //      $this->EXCHANGES[] = "Okex";
 
 
         $ENTER[] = "QIWI";
@@ -63,59 +66,27 @@ class SpredController extends AppController {
 
 
 
-        // Рассчет самого выгодного входа через БИРЖУ
- /*
-        echo "<h2><font color='#8b0000'>СВЯЗКИ VISA-EXCHANGE-VISA</font></h2>";
-        foreach ($this->EXCHANGES as $key=>$exchange){
-
-            $STARTPRICE['BTC'] = $this->GetPriceAct("BTC", "VISA");
-            $STARTPRICE['ETH'] = $this->GetPriceAct("ETH", "VISA");
-            $STARTPRICE['USDT'] = $this->GetPriceAct("USDT", "VISA");
-
-            $MassivEnter =  $this->GetArrEnterExchange($STARTPRICE, $exchange, "VISA", "VISA");
-           // show($MassivEnter);
-
-            $this->RenderFinalExchange($MassivEnter, $exchange, "VISA");
-
-        }
-*/
 
         echo "<h2><font color='#8b0000'>СВЯЗКИ USDT-EXCHANGE-USDT</font></h2>";
+        $Base = "USDT";
 
-        $STARTPRICE['BTC'] = $this->GetPriceAct("BTC", "USDT");
-        $STARTPRICE['ETH'] = $this->GetPriceAct("ETH", "USDT");
-        $STARTPRICE['USDT'] = $this->GetPriceAct("USDT", "USDT");
+        foreach ($this->EXCHANGES as $key=>$exchange)
+        {
 
-        $startdeposit = 100;
-        $exchange = "Binance";
-
-        $MassivEnter =  $this->GetArrEnterExchange($STARTPRICE, $exchange, "USDT", "USDT", $startdeposit);
-
-     //   show($MassivEnter);
-        $this->RenderFinalExchange($MassivEnter, $exchange, "USDT");
+            echo "<h2>СКАН ".$exchange." </h2>";
+            $MassivWork =  $this->GetArrWorkExchange($exchange, $Base);
 
 
-    /*
-        foreach ($this->EXCHANGES as $key=>$exchange){
+            show($MassivWork);
 
 
-            $MassivEnter =  $this->GetArrEnterExchange($STARTPRICE, $exchange, "USDT", "USDT");
-          //  show($MassivEnter);
-            $this->RenderFinalExchange($MassivEnter, $exchange, "USDT");
+
+           //  $this->RenderFinalExchange($MassivEnter, $exchange, "USDT");
 
         }
-        */
-
-
-
 
 
         echo "<hr>";
-
-
-
-        // Данные на вход
-
 
 
 
@@ -128,372 +99,193 @@ class SpredController extends AppController {
 
 
 
+    private function GetArrWorkExchange($exchange, $base){
+
+        $TickersBDIN = $this->LoadTickersBD("IN", $base);
+        $TickersBDOUT = $this->LoadTickersBD("OUT", $base);
+
+        $ExchangeTickers = $this->GetTickerText($exchange);
+
+        $ArrEnter =  $this->GetArrEnter($TickersBDIN, $ExchangeTickers, $base);
+        $Obrabotka['enter'] = $this->LoadObrabotka($ArrEnter, "enter", $exchange);
+
+       // echo "<b>ТОЧКИ ВХОДА</b><br>";
+      //  show($Obrabotka);
+
+
+        $ArrExit =  $this->GetArrExit($TickersBDOUT, $ExchangeTickers, $base);
+        $Obrabotka['exit'] = $this->LoadObrabotka($ArrExit, "exit", $exchange);
+
+
+
+
+
+        return $Obrabotka;
+
+    }
 
 
     private function RenderFinalExchange($MassivEX, $exname, $Method){
 
 
 
-
-       // show($MassivEX);
-
-//        if (empty($MassivEX))
-//        {
-//            echo "Связок через биржу <b>".$exname."</b> и точку входа ".$Method." на данный момент нет :( ";
-//            return true;
-//        }
-
         //echo "<h2>".$exname."</h2>";
 
 
-          foreach ($MassivEX as $key=>$val)
-          {
-              if ($val['finalspred'] < 0.1) continue;
-
-              echo "<b>1.</b> На BestChange отдаем <b>".$Method."</b> получаем <b>".$val['moneta']."</b> . Вводим кошелек для зачисления биржи <b>".$exname."</b> <br>";
-
-              echo "<b>2.</b> На бирже <b>".$exname."</b> монету <b>".$val['moneta']."</b>  меняем на <b>".$val['symbol']."</b> <br>";
-
-              echo "<b>3.</b> На бирже <b>".$exname."</b> меняем <b>".$val['symbol']."</b>  на <b>".$val['exitmoneta']."</b> <br>";
-
-              echo "<b>4.</b> Отдаем монету <b> ".$val['exitmoneta']."</b>  получаем <b>".$Method."</b> по лучшему курсу через BestChange <br>";
-
-
-              echo "<b>5.</b> Зарабатываем <b> <font color='green'>".$val['finalspred']."% </font></b> с круга <br>";
-              echo "<hr>";
-
-          }
-
-
-
-
-
-        return true;
-    }
-
-
-/*
-    private function RenderFinalExchangePerebros($MassivEX, $MethodEXIT){
-
-
-        show($MassivEX);
-
-        $TickersBDOUT = $this->LoadTickersBD("OUT", $MethodEXIT);
-        $ExchangeTickers = $this->GetTickerText("Poloniex");
-
-
-        foreach ($MassivEX as $key=>$value)
+        foreach ($MassivEX as $key=>$val)
         {
+            if ($val['finalspred'] < 0.1) continue;
 
-            $STARTPRICE = $value['final'];
-            $SYMBOL = $value['symbol'];
-            $this->GetArrExitBase($TickersBDOUT, $ExchangeTickers, $STARTPRICE, $SYMBOL);
+            echo "<b>1.</b> На BestChange отдаем <b>".$Method."</b> получаем <b>".$val['moneta']."</b> . Вводим кошелек для зачисления биржи <b>".$exname."</b> <br>";
+
+            echo "<b>2.</b> На бирже <b>".$exname."</b> монету <b>".$val['moneta']."</b>  меняем на <b>".$val['symbol']."</b> <br>";
+
+            echo "<b>3.</b> На бирже <b>".$exname."</b> меняем <b>".$val['symbol']."</b>  на <b>".$val['exitmoneta']."</b> <br>";
+
+            echo "<b>4.</b> Отдаем монету <b> ".$val['exitmoneta']."</b>  получаем <b>".$Method."</b> по лучшему курсу через BestChange <br>";
+
+
+            echo "<b>5.</b> Зарабатываем <b> <font color='green'>".$val['finalspred']."% </font></b> с круга <br>";
             echo "<hr>";
 
         }
 
 
-        // Забор лучшего выхода с биржи (со спредами)
-
-
 
 
 
         return true;
     }
-*/
 
 
-    private function GetArrEnterExchange($STARTPRICE, $Exchange, $MethodENTER, $MethodEXIT, $startdeposit = ""){
+
+    private function GetArrExit($TickersBDOUT,$ExchangeTickers, $base ){
+
+        $MASSIV = [];
+
+        foreach ($TickersBDOUT as $ket=>$TickerWork)
+        {
+
+            if ($TickerWork['price'] == "none") continue;
+            if ($TickerWork['ticker'] == $base) continue;
+            if ($TickerWork['price'] == 0) continue;
 
 
-        $TickersBDIN = $this->LoadTickersBD("IN", $MethodENTER);
-        $ExchangeTickers = $this->GetTickerText($Exchange);
+            $TickerBirga = $TickerWork['ticker']."/".$base."";
+
+            // ПРИ ДЕБАГЕ И РЕФАКТОРИНГЕ ТЕСТИТЬ И ПРОВЕРЯТЬ!!!!!
+            if (empty(($ExchangeTickers[$TickerBirga]['close']))) continue;
+
+            $ExPRICE = $ExchangeTickers[$TickerBirga]['close'];
+            $change = changemet($ExPRICE, $TickerWork['price'] );
 
 
-        echo "Стартовый депозит: ".$startdeposit." <br>";
-        echo "Биржа с которой работаем: ".$Exchange." <br>";
-        echo "Точка входа:".$MethodENTER."<br>";
-        // Сравним тикеры по заходу
+           //   echo "Работаем с <b> ".$TickerWork['ticker']."</b> <br>";
+          //    echo "На бирже покупаем ".$TickerWork['ticker']." за ".$base." получаем  ".$TickerWork['ticker']." <br> ";
+         //    echo "Цена покупки на бирже: ".$ExPRICE."<br>";
+         //    echo "Цена продажи по обменникам: ".$TickerWork['price']."<br>";
+         //    echo "Спред выхода: ".$change."<br>";
+
+            $MASSIV['spred'][$TickerWork['ticker']] = $change;
+
+            $MASSIV['enterprice'][$TickerWork['ticker']] = $ExPRICE;
+            $MASSIV['exitprice'][$TickerWork['ticker']] = $TickerWork['price'];
+
+            $MASSIV['url'][$TickerWork['ticker']] = $TickerWork['url'];
+            $MASSIV['limit'][$TickerWork['ticker']] = $TickerWork['limit']*$TickerWork['price'];
+
+
+
+
+        }
+
+        arsort($MASSIV['spred']);
+
+
+        return $MASSIV;
+
+
+    }
+
+    private function GetArrEnter($TickersBDIN,$ExchangeTickers, $base ){
+
+        $MASSIV = [];
+
         foreach ($TickersBDIN as $ket=>$TickerWork)
         {
 
             if ($TickerWork['price'] == "none") continue;
-            if ($TickerWork['ticker'] == $MethodENTER) continue;
+            if ($TickerWork['ticker'] == $base) continue;
             if ($TickerWork['price'] == 0) continue;
 
 
-            $TickerBirga = $TickerWork['ticker']."/".$MethodENTER."";
-            $ExPRICE = $ExchangeTickers[$TickerBirga]['close'];
+            $TickerBirga = $TickerWork['ticker']."/".$base."";
 
+            // ПРИ ДЕБАГЕ И РЕФАКТОРИНГЕ ТЕСТИТЬ И ПРОВЕРЯТЬ!!!!!
+            if (empty(($ExchangeTickers[$TickerBirga]['close']))) continue;
+
+            $ExPRICE = $ExchangeTickers[$TickerBirga]['close'];
             $change = changemet($TickerWork['price'], $ExPRICE );
+ 
 
+            //  echo "Работаем с <b> ".$TickerWork['ticker']."</b> <br>";
+            //  echo "За ".$startdeposit." ".$MethodENTER." покупаем ".$amountbuy." <b> ".$TickerWork['ticker']." </b> <br> ";
+            //  echo "На бирже продаем ".$TickerWork['ticker']." за ".$MethodENTER." получаем  ".$amountsell." <br> ";
+            // echo "Цена входа по обменникам: ".$TickerWork['price']."<br>";
+            // echo "Цена продажи тикера: ".$ExPRICE."<br>";
+            // echo "Спред захода: ".$change."<br>";
 
+            $MASSIV['spred'][$TickerWork['ticker']] = $change;
 
-            echo "Работаем с ".$TickerWork['ticker']." <br>";
-            echo "Цена входа по обменникам: ".$TickerWork['price']."<br>";
-            echo "Цена продажи тикера: ".$ExPRICE."<br>";
+            $MASSIV['enterprice'][$TickerWork['ticker']] = $TickerWork['price'];
+            $MASSIV['exitprice'][$TickerWork['ticker']] = $ExPRICE;
 
-            echo "Спред захода: ".$change."<br>";
-
-
-
-            $pricesale = "";
-
-            echo "";
+            $MASSIV['url'][$TickerWork['ticker']] = $TickerWork['url'];
+            $MASSIV['limit'][$TickerWork['ticker']] = $TickerWork['limit'];
 
 
         }
 
+        arsort($MASSIV['spred']);
 
-
-
-       // show($TickersBDIN);
-
-        exit("11");
-
-
-
-
-        $ArrBTC = $this->GetArrEnterBase($TickersBDIN, $ExchangeTickers, $STARTPRICE, "BTC", $MethodENTER);
-        $ArrETH = $this->GetArrEnterBase($TickersBDIN, $ExchangeTickers, $STARTPRICE, "ETH", $MethodENTER);
-        $ArrUSDT = $this->GetArrEnterBase($TickersBDIN, $ExchangeTickers, $STARTPRICE, "USDT", $MethodENTER);
-
-        $FINALMASSIV = array_merge($ArrBTC, $ArrETH, $ArrUSDT);
-
-       // show($FINALMASSIV);
-
-        $OBRABOTKA = $this->GetTopSpredsMassiv($FINALMASSIV, 5, $Exchange, $MethodENTER, $MethodEXIT);
-
-        return $OBRABOTKA;
-
-    }
-
-    private function GetTopSpredsMassiv($FINALMASSIV, $count, $exname, $MethodENTER, $MethodEXIT){
-
-        $OBRABOTKA = [];
-
-       // show($FINALMASSIV);
-
-        // Цикл на ОТБОР 5 ЛУЧШИХ
-            for ($i=0; $i<$count; $i++ ){
-
-                $firstBTC = reset($FINALMASSIV['BTC']['spred']);
-                $firstETH = reset($FINALMASSIV['ETH']['spred']);
-                $firstUSDT = reset($FINALMASSIV['USDT']['spred']);
-
-
-             //   echo "Первый элемент БТЦ ".$firstBTC."<br>";
-            //    echo "Первый элемент ETH ".$firstETH."<br>";
-            //    echo "Первый элемент USDt ".$firstUSDT."<br>";
-
-
-                if ($firstBTC > $firstETH && $firstBTC > $firstUSDT)
-                {
-                    $OBRABOTKA[] = $this->LoadObrabotka("BTC", $FINALMASSIV, $exname, $MethodEXIT);
-                    array_shift($FINALMASSIV['BTC']['spred']);
-
-                }
-                if ($firstETH > $firstBTC && $firstETH > $firstUSDT)
-                {
-                    $OBRABOTKA[] = $this->LoadObrabotka("ETH", $FINALMASSIV, $exname, $MethodEXIT);
-                    array_shift($FINALMASSIV['ETH']['spred']);
-                }
-                if ($firstUSDT > $firstETH && $firstUSDT > $firstBTC)
-                {
-                    $OBRABOTKA[] = $this->LoadObrabotka("USDT", $FINALMASSIV, $exname, $MethodEXIT);
-                    array_shift($FINALMASSIV['USDT']['spred']);
-                }
-
-            }
-
-
-
-        return $OBRABOTKA;
-
-    }
-
-
-    private function LoadObrabotka($symbol, $FINALMASSIV, $exname, $methodname){
-
-        $MASS = $this->CalculateExit($symbol, $exname, $methodname);
-
-        $Dannie['moneta'] = array_key_first($FINALMASSIV[$symbol]['spred']);
-
-        $Dannie['exname'] = $exname;
-        $Dannie['symbol'] = $symbol;
-
-        $Dannie['spred'] = reset($FINALMASSIV[$symbol]['spred']);
-        $Dannie['final'] = $FINALMASSIV[$symbol]['final'][$Dannie['moneta']];
-
-        $Dannie['exitmoneta'] = $MASS['exitmoneta'];
-        $Dannie['exitprice'] = $MASS['exitprice'];
-
-        $Dannie['finalspred'] = changemet($Dannie['final'], $Dannie['exitprice']);
-
-
-        return $Dannie;
-    }
-
-
-    /*
-    private function GetArrExitBase($TickersBDOUT, $ExchangeTickers, $STARTPRICE, $MONETA){
-
-        $MASSIV[$MONETA] = [];
-
-        echo "<b>Работаем с монетой</b> ".$MONETA." <br>";
-
-        echo "<b>Цена покупки</b> ".$STARTPRICE." <br>";
-
-
-        foreach ($TickersBDOUT as $TickerWork){
-
-            if ($TickerWork['price'] == "none") continue;
-            if ($TickerWork['ticker'] == $MONETA) continue;
-
-            $TickerBirga = $TickerWork['ticker']."/".$MONETA."";
-
-           // if ($MONETA == "BTC" && $TickerBirga == "USDT/BTC") $TickerBirga = "BTC/USDT";
-          //  if ($MONETA == "ETH" && $TickerBirga == "BTC/ETH") $TickerBirga = "ETH/BTC";
-          //  if ($MONETA == "ETH" && $TickerBirga == "USDT/ETH") $TickerBirga = "ETH/USDT";
-
-            if (empty(($ExchangeTickers[$TickerBirga]['close']))) continue;
-
-            $ExPRICE = $ExchangeTickers[$TickerBirga]['close'];
-
-            if (empty($ExPRICE)) continue;
-
-            $FinalPrice = $TickerWork['price']/$ExPRICE;
-            $FinalPrice = round($FinalPrice, 2);
-            $change = changemet($STARTPRICE, $FinalPrice );
-
-
-
-            echo "Обрабатываем тикер: ".$TickerWork['ticker']."<br>";
-            echo "Тикер на бирже: ".$TickerBirga."<br>";
-            echo "Цена на бирже: ".$ExPRICE."<br>";
-
-            echo "Цена продажи: ".$FinalPrice."<br>";
-            echo "Спред: ".$change."<br>";
-
-
-
-
-        }
-
-        return $MASSIV;
-    }
-*/
-    private function GetArrEnterBase($TickersBDIN, $ExchangeTickers, $STARTPRICE, $MONETA, $Method = ""){
-
-        $MASSIV[$MONETA] = [];
-
-
-        foreach ($TickersBDIN as $TickerWork)
-        {
-            if ($TickerWork['price'] == "none") continue;
-            if ($TickerWork['ticker'] == $MONETA) continue;
-            if ($TickerWork['price'] == 0) continue;
-
-
-            //
-            $TickerBirga = $TickerWork['ticker']."/".$MONETA."";
-            if ($MONETA == "BTC" && $TickerBirga == "USDT/BTC") $TickerBirga = "BTC/USDT";
-            if ($MONETA == "ETH" && $TickerBirga == "BTC/ETH") $TickerBirga = "ETH/BTC";
-            if ($MONETA == "ETH" && $TickerBirga == "USDT/ETH") $TickerBirga = "ETH/USDT";
-
-            if (empty(($ExchangeTickers[$TickerBirga]['close']))) continue;
-
-            $ExPRICE = $ExchangeTickers[$TickerBirga]['close'];
-
-            // Перекрестные тикеры
-            if ($MONETA == "BTC" && $TickerBirga == "BTC/USDT") $ExPRICE = 1 / $ExPRICE;
-            if ($MONETA == "ETH" && $TickerBirga == "ETH/BTC") $ExPRICE = 1 / $ExPRICE;
-            if ($MONETA == "ETH" && $TickerBirga == "ETH/USDT") $ExPRICE = 1 / $ExPRICE;
-
-            if (empty($ExPRICE)) continue;
-
-            $FinalPrice = $TickerWork['price']/$ExPRICE;
-            $FinalPrice = round($FinalPrice, 2);
-            $change = changemet($FinalPrice, $STARTPRICE[$MONETA] );
-
-
-         //   echo "Обрабатываем тикер: ".$TickerWork['ticker']."<br>";
-         //   echo "Финальная сумма захода: ".$FinalPrice."<br>";
-       //     echo "Базовая сумма захода".$STARTPRICE[$MONETA]."";
-         //   echo "Спред: ".$change."<br>";
-
-            // СПРЕД
-            $MASSIV[$MONETA]['spred'][$TickerWork['ticker']] = $change;
-            $MASSIV[$MONETA]['final'][$TickerWork['ticker']] = $FinalPrice;
-
-            arsort($MASSIV[$MONETA]['spred']);
-
-
-          //  $MASSIV[$MONETA][$TickerWork['ticker']]['finalprice'] = $FinalPrice;
-            // $RENDER =  $this->RenderPercent($RENDER, $TickerWork, $TickerBirga, $ExPRICE, $MONETA, $STARTPRICE);
-
-        }
 
         return $MASSIV;
 
+
     }
 
+    private function LoadObrabotka($ARR, $type, $exchange){
+        $DATA = [];
+
+        // echo "КАУНТ: ".count($ARR['spred'])."<br>";
+
+        for ($i=0; $i<=count($ARR['spred']); $i++ ) {
+
+            if (reset($ARR['spred']) < $this->minumumspred) continue;
+
+            $MASS['exchange'] = $exchange;
+            $MASS['type'] = $type;
+            $MASS['symbol'] = array_key_first($ARR['spred']);
+            $MASS['spred'] = reset($ARR['spred']);
+            $MASS['enterprice'] = $ARR['enterprice'][$MASS['symbol']];
+            $MASS['exitprice'] = $ARR['exitprice'][$MASS['symbol']];
+            $MASS['url'] = $ARR['url'][$MASS['symbol']];
+            $MASS['limit'] = $ARR['limit'][$MASS['symbol']];
 
 
+            array_shift($ARR['spred']);
 
-    private function CalculateExit($base, $Exchange, $method){
-
-        $ExchangeTickers = $this->GetTickerText($Exchange);
-        $TickersBDOUT = $this->LoadTickersBD("OUT", $method);
-
-
-        $BestPrice = 0;
-        $BestTicker = "";
-
-
-
-        foreach ($TickersBDOUT as $key=>$val)
-        {
-
-
-            $exticker = $val['ticker']."/".$base;
-
-
-            if ($val['ticker'] == $base) continue;
-            if (empty($ExchangeTickers[$exticker]['close'])) continue;
-
-            $amount = 1/$ExchangeTickers[$exticker]['close'];
-            $amount = round($amount, 10);
-
-
-            $final = $amount*$val['price'];
-
-            //         echo "Монета: ".$val['ticker']."<br>";
-            //          echo "Цена: ".$val['price']."<br>";
-
-            //            echo "Цена актива на бирже: ".$AllExchange[$exticker]['close']."<br>";
-            //             echo "Какое кол-во актива получим с обмена: ".$amount."<br>";
-            //              echo "Сколько получим после продажи актива в обменниках: ".$final."<br>";
-
-            if ($final > $BestPrice)
-            {
-                $BestPrice = $final;
-                $BestTicker = $val['ticker'];
-
-            }
-
-
+            $DATA[] = $MASS;
 
         }
 
-        $MASS['exitmoneta'] = $BestTicker;
-        $MASS['exitprice'] = $BestPrice;
 
-
-
-        return $MASS;
+        return $DATA;
     }
+
+
+
+
 
 
 
