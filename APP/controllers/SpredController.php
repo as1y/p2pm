@@ -73,15 +73,18 @@ class SpredController extends AppController {
         foreach ($this->EXCHANGES as $key=>$exchange)
         {
 
-            echo "<h2>СКАН ".$exchange." </h2>";
+        //    echo "<h2>СКАН ".$exchange." </h2>";
             $MassivWork =  $this->GetArrWorkExchange($exchange, $Base);
 
+            //show($MassivWork);
 
-            show($MassivWork);
+            $this->RenderFinalExchange($MassivWork, $exchange, "USDT");
 
 
 
-           //  $this->RenderFinalExchange($MassivEnter, $exchange, "USDT");
+
+
+
 
         }
 
@@ -128,27 +131,30 @@ class SpredController extends AppController {
     private function RenderFinalExchange($MassivEX, $exname, $Method){
 
 
+        echo "<h3>Вход - ".$exname."</h3>";
 
-        //echo "<h2>".$exname."</h2>";
-
-
-        foreach ($MassivEX as $key=>$val)
-        {
-            if ($val['finalspred'] < 0.1) continue;
-
-            echo "<b>1.</b> На BestChange отдаем <b>".$Method."</b> получаем <b>".$val['moneta']."</b> . Вводим кошелек для зачисления биржи <b>".$exname."</b> <br>";
-
-            echo "<b>2.</b> На бирже <b>".$exname."</b> монету <b>".$val['moneta']."</b>  меняем на <b>".$val['symbol']."</b> <br>";
-
-            echo "<b>3.</b> На бирже <b>".$exname."</b> меняем <b>".$val['symbol']."</b>  на <b>".$val['exitmoneta']."</b> <br>";
-
-            echo "<b>4.</b> Отдаем монету <b> ".$val['exitmoneta']."</b>  получаем <b>".$Method."</b> по лучшему курсу через BestChange <br>";
-
-
-            echo "<b>5.</b> Зарабатываем <b> <font color='green'>".$val['finalspred']."% </font></b> с круга <br>";
+        foreach ($MassivEX['enter'] as $key=>$val){
+            echo "<b>1.</b> Через <a href='".$val['url']."' target='_blank'>BestChange</a> меняем <b>".$Method."</b> на <b>".$val['symbol']."</b>. Цена ~ ".$val['enterprice']."  Вводим кошелек для зачисления биржи <b>".$exname."</b> <br>";
+            echo "<b>2.</b> На бирже <b>".$exname."</b> монету <b>".$val['symbol']."</b>  меняем на <b>".$Method."</b>  Цена ~ ".$val['exitprice']." <br>";
+            echo "<b>3.</b> Зарабатываем <b> <font color='green'>".$val['spred']."% </font></b> с круга <br>";
+            echo "<b>4.</b> Рекомендуемый объем <b> <font color='#b8860b'>".$val['limit']."</font></b> ".$Method." <br>";
             echo "<hr>";
 
         }
+
+        echo "<h3>Выход - ".$exname."</h3>";
+
+        foreach ($MassivEX['exit'] as $key=>$val){
+
+            echo "<b>1.</b> На бирже <b>".$exname."</b> покупаем монету <b>".$val['symbol']."</b>  за  <b>".$Method."</b>  Цена ~ ".$val['enterprice']." <br>";
+            echo "<b>2.</b> Через <a href='".$val['url']."' target='_blank' >BestChange</a> меняем <b>".$val['symbol']."</b> на <b>".$Method."</b>. Цена ~ ".$val['enterprice']."  Вводим кошелек для зачисления биржи <b>".$exname."</b> <br>";
+            echo "<b>3.</b> Зарабатываем <b> <font color='green'>".$val['spred']."% </font></b> с круга <br>";
+            echo "<b>4.</b> Рекомендуемый объем <b> <font color='#b8860b'>".$val['limit']."</font></b> ".$Method." <br>";
+
+            echo "<hr>";
+
+        }
+
 
 
 
