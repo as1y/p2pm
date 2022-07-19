@@ -20,7 +20,7 @@ class SpredController extends AppController {
     public $EXIT = [];
 
 
-    public $minumumspred = 0.1;
+    public $minumumspred = 0.4;
 
 
     // ТЕХНИЧЕСКИЕ ПЕРЕМЕННЫЕ
@@ -146,10 +146,10 @@ class SpredController extends AppController {
 
         foreach ($MassivEX['exit'] as $key=>$val){
 
-            echo "<b>1.</b> На бирже <b>".$exname."</b> покупаем монету <b>".$val['symbol']."</b>  за  <b>".$Method."</b>  Цена ~ ".$val['enterprice']." <br>";
-            echo "<b>2.</b> Через <a href='".$val['url']."' target='_blank' >BestChange</a> меняем <b>".$val['symbol']."</b> на <b>".$Method."</b>. Цена ~ ".$val['enterprice']."  Вводим кошелек для зачисления биржи <b>".$exname."</b> <br>";
+            echo "<b>1.</b> На бирже <b>".$exname."</b> покупаем монету <b>".$val['symbol']."</b>  за  <b>".$Method."</b>  <b>Рекомендумая цена</b>  ~  ".$val['enterprice']." </b> <br>";
+            echo "<b>2.</b> Через <a href='".$val['url']."' target='_blank' >BestChange</a> меняем <b>".$val['symbol']."</b> на <b>".$Method."</b>. <b>Рекомендумая цена</b>  ~  ".$val['exitprice']." </b> Вводим кошелек для зачисления биржи <b>".$exname."</b> <br>";
             echo "<b>3.</b> Зарабатываем <b> <font color='green'>".$val['spred']."% </font></b> с круга <br>";
-            echo "<b>4.</b> Рекомендуемый объем <b> <font color='#b8860b'>".$val['limit']."</font></b> ".$Method." <br>";
+          //  echo "<b>4.</b> Рекомендуемый объем <b> <font color='#b8860b'>".$val['limit']."</font></b> ".$Method." <br>";
 
             echo "<hr>";
 
@@ -165,53 +165,7 @@ class SpredController extends AppController {
 
 
 
-    private function GetArrExit($TickersBDOUT,$ExchangeTickers, $base ){
 
-        $MASSIV = [];
-
-        foreach ($TickersBDOUT as $ket=>$TickerWork)
-        {
-
-            if ($TickerWork['price'] == "none") continue;
-            if ($TickerWork['ticker'] == $base) continue;
-            if ($TickerWork['price'] == 0) continue;
-
-
-            $TickerBirga = $TickerWork['ticker']."/".$base."";
-
-            // ПРИ ДЕБАГЕ И РЕФАКТОРИНГЕ ТЕСТИТЬ И ПРОВЕРЯТЬ!!!!!
-            if (empty(($ExchangeTickers[$TickerBirga]['close']))) continue;
-
-            $ExPRICE = $ExchangeTickers[$TickerBirga]['close'];
-            $change = changemet($ExPRICE, $TickerWork['price'] );
-
-
-           //   echo "Работаем с <b> ".$TickerWork['ticker']."</b> <br>";
-          //    echo "На бирже покупаем ".$TickerWork['ticker']." за ".$base." получаем  ".$TickerWork['ticker']." <br> ";
-         //    echo "Цена покупки на бирже: ".$ExPRICE."<br>";
-         //    echo "Цена продажи по обменникам: ".$TickerWork['price']."<br>";
-         //    echo "Спред выхода: ".$change."<br>";
-
-            $MASSIV['spred'][$TickerWork['ticker']] = $change;
-
-            $MASSIV['enterprice'][$TickerWork['ticker']] = $ExPRICE;
-            $MASSIV['exitprice'][$TickerWork['ticker']] = $TickerWork['price'];
-
-            $MASSIV['url'][$TickerWork['ticker']] = $TickerWork['url'];
-            $MASSIV['limit'][$TickerWork['ticker']] = $TickerWork['limit']*$TickerWork['price'];
-
-
-
-
-        }
-
-        arsort($MASSIV['spred']);
-
-
-        return $MASSIV;
-
-
-    }
 
     private function GetArrEnter($TickersBDIN,$ExchangeTickers, $base ){
 
@@ -230,7 +184,8 @@ class SpredController extends AppController {
             // ПРИ ДЕБАГЕ И РЕФАКТОРИНГЕ ТЕСТИТЬ И ПРОВЕРЯТЬ!!!!!
             if (empty(($ExchangeTickers[$TickerBirga]['close']))) continue;
 
-            $ExPRICE = $ExchangeTickers[$TickerBirga]['close'];
+            $ExPRICE = ($ExchangeTickers[$TickerBirga]['bid']+$ExchangeTickers[$TickerBirga]['ask'])/2;
+
             $change = changemet($TickerWork['price'], $ExPRICE );
  
 
@@ -259,6 +214,61 @@ class SpredController extends AppController {
 
 
     }
+
+
+
+    private function GetArrExit($TickersBDOUT,$ExchangeTickers, $base ){
+
+        $MASSIV = [];
+
+        foreach ($TickersBDOUT as $ket=>$TickerWork)
+        {
+
+            if ($TickerWork['price'] == "none") continue;
+            if ($TickerWork['ticker'] == $base) continue;
+            if ($TickerWork['price'] == 0) continue;
+
+
+            $TickerBirga = $TickerWork['ticker']."/".$base."";
+
+            // ПРИ ДЕБАГЕ И РЕФАКТОРИНГЕ ТЕСТИТЬ И ПРОВЕРЯТЬ!!!!!
+            if (empty(($ExchangeTickers[$TickerBirga]['close']))) continue;
+
+      //      $ExPRICE = ($ExchangeTickers[$TickerBirga]['bid']+$ExchangeTickers[$TickerBirga]['ask'])/2;
+
+            $ExPRICE = $ExchangeTickers[$TickerBirga]['bid'];
+
+
+            $change = changemet($ExPRICE, $TickerWork['price'] );
+
+
+            //   echo "Работаем с <b> ".$TickerWork['ticker']."</b> <br>";
+            //    echo "На бирже покупаем ".$TickerWork['ticker']." за ".$base." получаем  ".$TickerWork['ticker']." <br> ";
+            //    echo "Цена покупки на бирже: ".$ExPRICE."<br>";
+            //    echo "Цена продажи по обменникам: ".$TickerWork['price']."<br>";
+            //    echo "Спред выхода: ".$change."<br>";
+
+            $MASSIV['spred'][$TickerWork['ticker']] = $change;
+
+            $MASSIV['enterprice'][$TickerWork['ticker']] = $ExPRICE;
+            $MASSIV['exitprice'][$TickerWork['ticker']] = $TickerWork['price'];
+
+            $MASSIV['url'][$TickerWork['ticker']] = $TickerWork['url'];
+            $MASSIV['limit'][$TickerWork['ticker']] = $TickerWork['limit']*$TickerWork['price'];
+
+
+
+
+        }
+
+        arsort($MASSIV['spred']);
+
+
+        return $MASSIV;
+
+
+    }
+
 
     private function LoadObrabotka($ARR, $type, $exchange){
         $DATA = [];
