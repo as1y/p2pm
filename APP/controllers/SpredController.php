@@ -20,7 +20,7 @@ class SpredController extends AppController {
     public $EXIT = [];
 
 
-    public $minumumspred = 0.4;
+    public $minumumspred = 0.3;
 
 
     // ТЕХНИЧЕСКИЕ ПЕРЕМЕННЫЕ
@@ -51,23 +51,16 @@ class SpredController extends AppController {
 
         $this->EXCHANGES[] = "Binance";
         $this->EXCHANGES[] = "Poloniex";
-        $this->EXCHANGES[] = "Gateio";
-        $this->EXCHANGES[] = "Huobi";
+ //       $this->EXCHANGES[] = "Gateio";
+ //       $this->EXCHANGES[] = "Huobi";
    //     $this->EXCHANGES[] = "Ftx";
    //     $this->EXCHANGES[] = "Exmo";
   //      $this->EXCHANGES[] = "Kucoin";
   //      $this->EXCHANGES[] = "Okex";
 
 
-        $ENTER[] = "QIWI";
 
-
-        $EXIT[] = "VISA";
-
-
-
-
-        echo "<h2><font color='#8b0000'>СВЯЗКИ USDT-EXCHANGE-USDT</font></h2>";
+      //  echo "<h2><font color='#8b0000'>СВЯЗКИ USDT-EXCHANGE-USDT</font></h2>";
         $Base = "USDT";
 
         foreach ($this->EXCHANGES as $key=>$exchange)
@@ -112,7 +105,6 @@ class SpredController extends AppController {
         $ArrEnter =  $this->GetArrEnter($TickersBDIN, $ExchangeTickers, $base);
         $Obrabotka['enter'] = $this->LoadObrabotka($ArrEnter, "enter", $exchange);
 
-       // echo "<b>ТОЧКИ ВХОДА</b><br>";
       //  show($Obrabotka);
 
 
@@ -134,10 +126,11 @@ class SpredController extends AppController {
         echo "<h3>Вход - ".$exname."</h3>";
 
         foreach ($MassivEX['enter'] as $key=>$val){
-            echo "<b>1.</b> Через <a href='".$val['url']."' target='_blank'>BestChange</a> меняем <b>".$Method."</b> на <b>".$val['symbol']."</b>. Цена ~ ".$val['enterprice']."  Вводим кошелек для зачисления биржи <b>".$exname."</b> <br>";
+            echo "<b>1.</b> Через <a href='".$val['url']."' target='_blank'>BestChange</a> меняем <b>".$Method."</b> на <b>".$val['symbol']."</b>. Цена ~ ".$val['enterprice']."  Вводим кошелек для зачисления биржи <b>".$exname."</b>";
+            echo " <a href='".$val['redirect']."' target='_blank'><b>ССЫЛКА НА ОБМЕННИК</b></a>  <br>";
             echo "<b>2.</b> На бирже <b>".$exname."</b> монету <b>".$val['symbol']."</b>  меняем на <b>".$Method."</b>  Цена ~ ".$val['exitprice']." <br>";
             echo "<b>3.</b> Зарабатываем <b> <font color='green'>".$val['spred']."% </font></b> с круга <br>";
-            echo "<b>4.</b> Рекомендуемый объем <b> <font color='#b8860b'>".$val['limit']."</font></b> ".$Method." <br>";
+            echo "<b>4.</b> Мин: <b> <font color='#b8860b'>".$val['limit']."</font></b> ".$Method." <br>";
             echo "<hr>";
 
         }
@@ -196,12 +189,17 @@ class SpredController extends AppController {
             // echo "Цена продажи тикера: ".$ExPRICE."<br>";
             // echo "Спред захода: ".$change."<br>";
 
+
+
             $MASSIV['spred'][$TickerWork['ticker']] = $change;
 
             $MASSIV['enterprice'][$TickerWork['ticker']] = $TickerWork['price'];
             $MASSIV['exitprice'][$TickerWork['ticker']] = $ExPRICE;
 
             $MASSIV['url'][$TickerWork['ticker']] = $TickerWork['url'];
+
+            $MASSIV['redirect'][$TickerWork['ticker']] = $TickerWork['redirect'];
+
             $MASSIV['limit'][$TickerWork['ticker']] = $TickerWork['limit'];
 
 
@@ -253,6 +251,8 @@ class SpredController extends AppController {
             $MASSIV['enterprice'][$TickerWork['ticker']] = $ExPRICE;
             $MASSIV['exitprice'][$TickerWork['ticker']] = $TickerWork['price'];
 
+            $MASSIV['redirect'][$TickerWork['ticker']] = $TickerWork['redirect'];
+            
             $MASSIV['url'][$TickerWork['ticker']] = $TickerWork['url'];
             $MASSIV['limit'][$TickerWork['ticker']] = $TickerWork['limit']*$TickerWork['price'];
 
@@ -287,7 +287,7 @@ class SpredController extends AppController {
             $MASS['exitprice'] = $ARR['exitprice'][$MASS['symbol']];
             $MASS['url'] = $ARR['url'][$MASS['symbol']];
             $MASS['limit'] = $ARR['limit'][$MASS['symbol']];
-
+            $MASS['redirect'] = $ARR['redirect'][$MASS['symbol']];
 
             array_shift($ARR['spred']);
 

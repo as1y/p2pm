@@ -12,7 +12,7 @@ class ParseoutController extends AppController {
     public $BreadcrumbsControllerUrl = "/panel";
 
 
-    public $vremya = 200; // Секунд
+    public $vremya = 50; // Секунд
     public $type = "OUT";
     public $Methods = [];
     public $debug = false;
@@ -25,7 +25,7 @@ class ParseoutController extends AppController {
         $this->layaout = false;
         $Panel =  new Panel();
 
-        $this->Methods[] = "VISA";
+       // $this->Methods[] = "VISA";
         $this->Methods[] = "USDT";
   //      $this->Methods[] = "ADVRUB";
 
@@ -398,7 +398,8 @@ class ParseoutController extends AppController {
             $MASSIV[$value[0]][] = $value[1];
             $MASSIV[$value[0]][] = $value[2];
             $MASSIV[$value[0]][] = $value[3];
-        }
+            $MASSIV[$value[0]][] = $value[4];
+         }
 
 
         $obmen = $this->GetBaseTable($Method);
@@ -416,6 +417,7 @@ class ParseoutController extends AppController {
 
             $ticker->price = $MASSIV[$ticker['url']][0];
             $ticker->limit = $MASSIV[$ticker['url']][1];
+            $ticker->redirect = $MASSIV[$ticker['url']][3];
 
             if ($MASSIV[$ticker['url']][0] == 1)
             {
@@ -424,6 +426,7 @@ class ParseoutController extends AppController {
 
 
             $ticker->time = time();
+
             R::store($ticker);
 
         }

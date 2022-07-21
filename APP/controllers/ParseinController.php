@@ -12,7 +12,7 @@ class ParseinController extends AppController {
     public $BreadcrumbsControllerUrl = "/panel";
 
 
-    public $vremya = 200; // Секунд
+    public $vremya = 50; // Секунд
     public $type = "IN";
     public $Methods = [];
     public $debug = false;
@@ -25,7 +25,7 @@ class ParseinController extends AppController {
 
         $this->layaout = false;
         $Panel =  new Panel();
-        $this->Methods[] = "VISA";
+   //     $this->Methods[] = "VISA";
         $this->Methods[] = "USDT";
    //     $this->Methods[] = "ADVRUB";
 
@@ -398,13 +398,14 @@ foreach ($this->Methods as $Method){
             $MASSIV[$value[0]][] = $value[1];
             $MASSIV[$value[0]][] = $value[2];
             $MASSIV[$value[0]][] = $value[3];
+            $MASSIV[$value[0]][] = $value[4];
         }
 
 
         $obmen = $this->GetBaseTable($Method);
 
 
-      //  show($MASSIV);
+        //show($MASSIV);
 
 
         // Добавляем в БД данные из спарсенного контента!
@@ -416,6 +417,8 @@ foreach ($this->Methods as $Method){
 
            $ticker->price = $MASSIV[$ticker['url']][0];
            $ticker->limit = $MASSIV[$ticker['url']][1];
+           $ticker->redirect = $MASSIV[$ticker['url']][3];
+
 
            if ($MASSIV[$ticker['url']][0] == 1)
            {
