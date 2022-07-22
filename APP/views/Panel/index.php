@@ -1,6 +1,6 @@
 <div class="card">
     <div class="card-header bg-dark text-white header-elements-inline">
-        <h5 class="card-title">СВОДКА</h5>
+        <h5 class="card-title">МОИ СПРЕДЫ</h5>
 
     </div>
 
@@ -9,11 +9,26 @@
     <div class="card-body">
 
 
-       <?php
+        <?php
 
-       echo "<h1><font color='#006400'>BURAN 2.0 PART 1 </font></h1>";
+        //show($DATA);
 
-       ?>
+
+
+        foreach ($DATA as $exname=>$MassivEX)
+        {
+
+         //   echo " - ".$exchangemassiv."<br>";
+
+            \APP\core\base\View::RenderFinalExchange($MassivEX, $exname, "USDT");
+
+
+
+        }
+
+
+        ?>
+
 
 
     </div>

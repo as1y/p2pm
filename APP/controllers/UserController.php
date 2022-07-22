@@ -87,7 +87,7 @@ class UserController extends AppController
 
 
                 redir('/panel/');
-                
+
 
             }
             else

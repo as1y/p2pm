@@ -13,13 +13,7 @@ class SpredController extends AppController {
 
     public $TickersBDIN = [];
     public $TickersBDOUT = [];
-
     public $EXCHANGES = [];
-
-    public $ENTER = [];
-    public $EXIT = [];
-
-
     public $minumumspred = 0.3;
 
 
@@ -29,8 +23,10 @@ class SpredController extends AppController {
 
         $this->layaout = false;
 
-        date_default_timezone_set('UTC');
+      //  date_default_timezone_set('UTC');
         // Браузерная часть
+
+
         $Panel =  new Panel();
         $META = [
             'title' => 'Панель BURAN',
@@ -58,34 +54,28 @@ class SpredController extends AppController {
   //      $this->EXCHANGES[] = "Kucoin";
   //      $this->EXCHANGES[] = "Okex";
 
-
+        exit("-_-.!.");
 
       //  echo "<h2><font color='#8b0000'>СВЯЗКИ USDT-EXCHANGE-USDT</font></h2>";
         $Base = "USDT";
+
+        $DATA = [];
+
 
         foreach ($this->EXCHANGES as $key=>$exchange)
         {
 
         //    echo "<h2>СКАН ".$exchange." </h2>";
             $MassivWork =  $this->GetArrWorkExchange($exchange, $Base);
-
-            //show($MassivWork);
-
-            $this->RenderFinalExchange($MassivWork, $exchange, "USDT");
-
-
-
-
-
-
+            $DATA[$exchange] = $MassivWork;
+            //$this->RenderFinalExchange($MassivWork, $exchange, "USDT");
 
         }
 
 
+        show($DATA);
+
         echo "<hr>";
-
-
-
 
 
 
@@ -214,8 +204,6 @@ class SpredController extends AppController {
 
     }
 
-
-
     private function GetArrExit($TickersBDOUT,$ExchangeTickers, $base ){
 
         $MASSIV = [];
@@ -275,7 +263,6 @@ class SpredController extends AppController {
 
     }
 
-
     private function LoadObrabotka($ARR, $type, $exchange){
         $DATA = [];
 
@@ -305,12 +292,6 @@ class SpredController extends AppController {
         return $DATA;
     }
 
-
-
-
-
-
-
     private function LoadTickersBD($type, $method)
     {
 
@@ -320,11 +301,7 @@ class SpredController extends AppController {
 
         return $table;
     }
-    private function GetPriceAct($MONETA, $method){
-        $zapis = R::findOne("obmenin", 'WHERE method =? AND ticker=?', [$method, $MONETA]);
-        return $zapis['price'];
 
-    }
     private function GetTickerText($exchange){
 
         $file = file_get_contents(WWW."/Ticker".$exchange.".txt");     // Открыть файл data.json

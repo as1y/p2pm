@@ -7,42 +7,222 @@ use RedBeanPHP\R;
 
 class Panel extends \APP\core\base\Model {
 
+    public $minumumspred = 0.3;
 
-    public function GetTickerRest($exchange = "binance"){
 
-        $TICKERS = [];
+    public $maxamountUSDT = 5000;
 
-        if ($exchange == "binance"){
 
-            $binance = new \ccxt\binance ();
+    public $TickersBDIN = [];
+    public $TickersBDOUT = [];
 
-            $TICKERS = $binance->fetchTickers();
+
+
+    public function GetArrWorkExchange($exchange, $base){
+
+
+        $TickersBDIN = $this->LoadTickersBD("IN", $base);
+        $TickersBDOUT = $this->LoadTickersBD("OUT", $base);
+
+        $ExchangeTickers = $this->GetTickerText($exchange);
+
+        $ArrEnter =  $this->GetArrEnter($TickersBDIN, $ExchangeTickers, $base);
+        $Obrabotka['enter'] = $this->LoadObrabotka($ArrEnter, "enter", $exchange);
+
+        //  show($Obrabotka);
+
+
+        $ArrExit =  $this->GetArrExit($TickersBDOUT, $ExchangeTickers, $base);
+        $Obrabotka['exit'] = $this->LoadObrabotka($ArrExit, "exit", $exchange);
+
+
+
+
+
+        return $Obrabotka;
+
+
+    }
+
+
+
+    private function GetArrEnter($TickersBDIN,$ExchangeTickers, $base ){
+
+        $MASSIV = [];
+
+        foreach ($TickersBDIN as $ket=>$TickerWork)
+        {
+
+            if ($TickerWork['price'] == "none") continue;
+            if ($TickerWork['ticker'] == $base) continue;
+            if ($TickerWork['price'] == 0) continue;
+
+
+            $TickerBirga = $TickerWork['ticker']."/".$base."";
+
+            // ПРИ ДЕБАГЕ И РЕФАКТОРИНГЕ ТЕСТИТЬ И ПРОВЕРЯТЬ!!!!!
+            if (empty(($ExchangeTickers[$TickerBirga]['close']))) continue;
+
+            $ExPRICE = ($ExchangeTickers[$TickerBirga]['bid']+$ExchangeTickers[$TickerBirga]['ask'])/2;
+
+            $change = changemet($TickerWork['price'], $ExPRICE );
+
+
+            //  echo "Работаем с <b> ".$TickerWork['ticker']."</b> <br>";
+            //  echo "За ".$startdeposit." ".$MethodENTER." покупаем ".$amountbuy." <b> ".$TickerWork['ticker']." </b> <br> ";
+            //  echo "На бирже продаем ".$TickerWork['ticker']." за ".$MethodENTER." получаем  ".$amountsell." <br> ";
+            // echo "Цена входа по обменникам: ".$TickerWork['price']."<br>";
+            // echo "Цена продажи тикера: ".$ExPRICE."<br>";
+            // echo "Спред захода: ".$change."<br>";
+
+
+
+            $MASSIV['spred'][$TickerWork['ticker']] = $change;
+
+            $MASSIV['enterprice'][$TickerWork['ticker']] = $TickerWork['price'];
+            $MASSIV['exitprice'][$TickerWork['ticker']] = $ExPRICE;
+
+            $MASSIV['url'][$TickerWork['ticker']] = $TickerWork['url'];
+
+            $MASSIV['redirect'][$TickerWork['ticker']] = $TickerWork['redirect'];
+
+            $MASSIV['limit'][$TickerWork['ticker']] = $TickerWork['limit'];
+
+            $MASSIV['scanid'][$TickerWork['ticker']] = $TickerWork['id'];
+
+
+        }
+
+        arsort($MASSIV['spred']);
+
+
+        return $MASSIV;
+
+
+    }
+
+    private function GetArrExit($TickersBDOUT,$ExchangeTickers, $base ){
+
+        $MASSIV = [];
+
+        foreach ($TickersBDOUT as $ket=>$TickerWork)
+        {
+
+            if ($TickerWork['price'] == "none") continue;
+            if ($TickerWork['ticker'] == $base) continue;
+            if ($TickerWork['price'] == 0) continue;
+
+
+            $TickerBirga = $TickerWork['ticker']."/".$base."";
+
+            // ПРИ ДЕБАГЕ И РЕФАКТОРИНГЕ ТЕСТИТЬ И ПРОВЕРЯТЬ!!!!!
+            if (empty(($ExchangeTickers[$TickerBirga]['close']))) continue;
+
+            //      $ExPRICE = ($ExchangeTickers[$TickerBirga]['bid']+$ExchangeTickers[$TickerBirga]['ask'])/2;
+
+            $ExPRICE = $ExchangeTickers[$TickerBirga]['bid'];
+
+
+            $change = changemet($ExPRICE, $TickerWork['price'] );
+
+
+
+
+            //   echo "Работаем с <b> ".$TickerWork['ticker']."</b> <br>";
+            //    echo "На бирже покупаем ".$TickerWork['ticker']." за ".$base." получаем  ".$TickerWork['ticker']." <br> ";
+            //    echo "Цена покупки на бирже: ".$ExPRICE."<br>";
+            //    echo "Цена продажи по обменникам: ".$TickerWork['price']."<br>";
+            //    echo "Спред выхода: ".$change."<br>";
+
+
+            $limit =  round($TickerWork['limit']*$TickerWork['price']);
+
+            $MASSIV['spred'][$TickerWork['ticker']] = $change;
+
+            $MASSIV['enterprice'][$TickerWork['ticker']] = $ExPRICE;
+            $MASSIV['exitprice'][$TickerWork['ticker']] = $TickerWork['price'];
+
+            $MASSIV['redirect'][$TickerWork['ticker']] = $TickerWork['redirect'];
+
+            $MASSIV['url'][$TickerWork['ticker']] = $TickerWork['url'];
+            $MASSIV['limit'][$TickerWork['ticker']] = $limit;
+
+            $MASSIV['scanid'][$TickerWork['ticker']] = $TickerWork['id'];
+
+
+        }
+
+        arsort($MASSIV['spred']);
+
+
+        return $MASSIV;
+
+
+    }
+
+    private function LoadObrabotka($ARR, $type, $exchange){
+        $DATA = [];
+
+        // echo "КАУНТ: ".count($ARR['spred'])."<br>";
+
+        for ($i=0; $i<=count($ARR['spred']); $i++ ) {
+
+            if (reset($ARR['spred']) < $this->minumumspred) continue;
+
+            $MASS['symbol'] = array_key_first($ARR['spred']);
+
+            if ( $ARR['limit'][$MASS['symbol']] > $this->maxamountUSDT) continue;
+
+
+            $MASS['exchange'] = $exchange;
+            $MASS['type'] = $type;
+            $MASS['spred'] = reset($ARR['spred']);
+            $MASS['enterprice'] = $ARR['enterprice'][$MASS['symbol']];
+            $MASS['exitprice'] = $ARR['exitprice'][$MASS['symbol']];
+            $MASS['url'] = $ARR['url'][$MASS['symbol']];
+            $MASS['limit'] = $ARR['limit'][$MASS['symbol']];
+            $MASS['redirect'] = $ARR['redirect'][$MASS['symbol']];
+            $MASS['scanid'] = $ARR['scanid'][$MASS['symbol']];
+
+            array_shift($ARR['spred']);
+
+            $DATA[] = $MASS;
 
         }
 
 
-
-
-        return $TICKERS;
-
-
-
+        return $DATA;
     }
 
 
-    public function GetBalance(){
+    public function LoadScan($id, $type)
+    {
 
-            $binance = new \ccxt\binance ();
+        $table = [];
+        if ($type == "enter") $table = R::Load("obmenin", $id);
+        if ($type == "exit") $table = R::Load("obmenout", $id);
 
-            $balance = $binance->fetchTickers();
-
-
-        return $balance;
-
-
-
+        return $table;
     }
 
+
+    private function LoadTickersBD($type, $method)
+    {
+
+        $table = [];
+        if ($type == "IN") $table = R::findAll("obmenin", 'WHERE method=?', [$method]);
+        if ($type == "OUT") $table = R::findAll("obmenout",'WHERE method=?', [$method]);
+
+        return $table;
+    }
+
+    private function GetTickerText($exchange){
+
+        $file = file_get_contents(WWW."/Ticker".$exchange.".txt");     // Открыть файл data.json
+        $MASSIV = json_decode($file,TRUE);              // Декодировать в массив
+        return $MASSIV;
+
+    }
 
 
 
