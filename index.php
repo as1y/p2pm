@@ -10,7 +10,7 @@ define('BASEAVATAR', '/assets/oper1.jpg');
 define('BASELOGO', '/uploads/user_logo/baselogo.jpg');
 define('APPNAME', 'CRYPTOFARM');
 define('MORDA', true);
-define('description', 'CRYPTOFARM');
+define('description', 'ARBYSCAN');
 // Переменные для приложения
 
 

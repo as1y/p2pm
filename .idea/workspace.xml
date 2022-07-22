@@ -3,10 +3,26 @@
   <component name="ChangeListManager">
     <list default="true" id="660fb730-6725-4866-851d-b5f1a7801e6d" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/APP/controllers/ParseinController.php" beforeDir="false" afterPath="$PROJECT_DIR$/APP/controllers/ParseinController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/APP/controllers/ParseoutController.php" beforeDir="false" afterPath="$PROJECT_DIR$/APP/controllers/ParseoutController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/APP/controllers/ParsetickersoneController.php" beforeDir="false" afterPath="$PROJECT_DIR$/APP/controllers/ParsetickersoneController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/APP/controllers/BlController.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/APP/controllers/BsController.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/APP/controllers/FlowController.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/APP/controllers/KonorController.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/APP/controllers/LController.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/APP/controllers/LongController(stable2708).php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/APP/controllers/PriceController.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/APP/controllers/SController.php" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/APP/controllers/SpredController.php" beforeDir="false" afterPath="$PROJECT_DIR$/APP/controllers/SpredController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/APP/controllers/StatController.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/APP/controllers/State3Controller.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/APP/controllers/UniController.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/APP/controllers/UniControllerOLD.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/APP/controllers/UserController.php" beforeDir="false" afterPath="$PROJECT_DIR$/APP/controllers/UserController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/APP/controllers/WorkController(11un).php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/APP/controllers/WorkController(market).php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/APP/models/User.php" beforeDir="false" afterPath="$PROJECT_DIR$/APP/models/User.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/APP/views/Main/index.php" beforeDir="false" afterPath="$PROJECT_DIR$/APP/views/Main/index.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/APP/views/User/register.php" beforeDir="false" afterPath="$PROJECT_DIR$/APP/views/User/register.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/index.php" beforeDir="false" afterPath="$PROJECT_DIR$/index.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -221,7 +237,7 @@
       <workItem from="1657576131212" duration="76964000" />
       <workItem from="1658151227049" duration="9362000" />
       <workItem from="1658325994592" duration="3576000" />
-      <workItem from="1658442313466" duration="1936000" />
+      <workItem from="1658442313466" duration="6290000" />
     </task>
     <servers />
   </component>

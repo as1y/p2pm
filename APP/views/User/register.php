@@ -1,63 +1,19 @@
-
-<?php
-
-if (!empty($_GET) && $_GET['role'] == "R") $_SESSION['form_data']['role'] = "R";
-
-?>
-
 <!-- Registration form -->
 <form action="/user/register" method="post" class="login-form" style="width: 30rem">
     <div class="card mb-0">
         <div class="card-body">
             <div class="text-center mb-3">
                 <h5 class="mb-0">Регистрация</h5>
-                <span class="d-block text-muted"><?=APPNAME?> - биржа операторов на телефоне</span>
+                <span class="d-block text-muted"><?=APPNAME?></span>
             </div>
-
-            <div class="form-group">
-                <label class="d-block font-weight-semibold">РЕГИСТРАЦИЯ КАК</label>
-                <div class="form-check form-check-inline">
-                    <label class="form-check-label">
-                        <input type="radio" class="form-check-input" onchange="changerole()" name="role" value="O" <?=( empty($_SESSION['form_data']['role']) || $_SESSION['form_data']['role'] == "O" ) ? 'checked' : '';?>>
-                        <i class="icon-headphones"></i> &nbsp; Я ОПЕРАТОР
-                    </label>
-                </div>
-
-                <div class="form-check form-check-inline">
-                    <label class="form-check-label">
-                        <input type="radio" class="form-check-input" onchange="changerole()" name="role" value="R" <?=( !empty($_SESSION['form_data']['role']) && $_SESSION['form_data']['role'] == "R" ) ? 'checked' : '';?>>
-                        <i class="icon-coin-dollar"></i> &nbsp; Я ЗАКАЗЧИК
-                    </label>
-                </div>
-            </div>
-
-
 
 
             <div class="form-group form-group-feedback form-group-feedback-left">
-                <input type="text" name="username" value="<?=isset($_SESSION['form_data']['username']) ? h($_SESSION['form_data']['username']) : '';?>" class="form-control" placeholder="Имя Фамилия">
+                <input type="text" name="username" value="<?=isset($_SESSION['form_data']['username']) ? h($_SESSION['form_data']['username']) : '';?>" class="form-control" placeholder="Nickname">
                 <div class="form-control-feedback">
                     <i class="icon-user-check text-muted"></i>
                 </div>
             </div>
-
-            <div id="phone" <?=( !empty($_SESSION['form_data']['role']) && $_SESSION['form_data']['role'] == "R" ) ? '' : 'style="display: none;"';?>  class="form-group form-group-feedback form-group-feedback-left">
-                <input type="text" name="phone" value="<?=isset($_SESSION['form_data']['phone']) ? h($_SESSION['form_data']['phone']) : '';?>" class="form-control" placeholder="Телефон">
-                <div class="form-control-feedback">
-                    <i class="icon-phone text-muted"></i>
-                </div>
-                <span class="d-block text-muted">Звоним только чтобы помочь начать работу в сервисе</span>
-            </div>
-
-
-            <div id="contact" <?=( !empty($_SESSION['form_data']['role']) && $_SESSION['form_data']['role'] == "R" ) ? 'style="display: none;"' : '';?>  class="form-group form-group-feedback form-group-feedback-left">
-                <input type="text" name="contact" value="<?=isset($_SESSION['form_data']['contact']) ? h($_SESSION['form_data']['contact']) : '';?>" class="form-control" placeholder="SKYPE или TELEGRAMM">
-                <div class="form-control-feedback">
-                    <i class="icon-bubble-dots4 text-muted"></i>
-                </div>
-                <span class="d-block text-muted">Наставник свяжется только чтобы помочь разобраться в сервисе</span>
-            </div>
-
 
 
             <div class="form-group form-group-feedback form-group-feedback-left">
@@ -100,35 +56,6 @@ if (!empty($_GET) && $_GET['role'] == "R") $_SESSION['form_data']['role'] = "R";
         </div>
     </div>
 </form>
-
-
-
-<script>
-    function changerole() {
-
-
-        var role = $('[name=role]:checked').val();
-
-        if (role == "R"){
-            $('#phone').show();
-            $('#contact').hide();
-
-        }
-
-
-        if (role == "O"){
-            $('#phone').hide();
-            $('#contact').show();
-
-        }
-
-
-    }
-
-
-
-
-</script>
 
 
 <?php if (isset($_SESSION['form_data']) ) unset($_SESSION['form_data'])?>

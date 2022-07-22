@@ -86,9 +86,8 @@ class UserController extends AppController
                 $user->login(CONFIG['USERTABLE']);
 
 
-                if ($_SESSION['ulogin']['role'] == "R") redir('/panel/operator/');
-                if ($_SESSION['ulogin']['role'] == "O") redir('/operator/');
-
+                redir('/panel/');
+                
 
             }
             else

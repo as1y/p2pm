@@ -130,7 +130,7 @@ class SpredController extends AppController {
             echo " <a href='".$val['redirect']."' target='_blank'><b>ССЫЛКА НА ОБМЕННИК</b></a>  <br>";
             echo "<b>2.</b> На бирже <b>".$exname."</b> монету <b>".$val['symbol']."</b>  меняем на <b>".$Method."</b>  Цена ~ ".$val['exitprice']." <br>";
             echo "<b>3.</b> Зарабатываем <b> <font color='green'>".$val['spred']."% </font></b> с круга <br>";
-            echo "<b>4.</b> Мин: <b> <font color='#b8860b'>".$val['limit']."</font></b> ".$Method." <br>";
+            echo "<b>4.</b> МИН: <b> <font color='#b8860b'>".$val['limit']."</font></b> ".$Method." <br>";
             echo "<hr>";
 
         }
@@ -140,9 +140,10 @@ class SpredController extends AppController {
         foreach ($MassivEX['exit'] as $key=>$val){
 
             echo "<b>1.</b> На бирже <b>".$exname."</b> покупаем монету <b>".$val['symbol']."</b>  за  <b>".$Method."</b>  <b>Рекомендумая цена</b>  ~  ".$val['enterprice']." </b> <br>";
-            echo "<b>2.</b> Через <a href='".$val['url']."' target='_blank' >BestChange</a> меняем <b>".$val['symbol']."</b> на <b>".$Method."</b>. <b>Рекомендумая цена</b>  ~  ".$val['exitprice']." </b> Вводим кошелек для зачисления биржи <b>".$exname."</b> <br>";
+            echo "<b>2.</b> Через <a href='".$val['url']."' target='_blank' >BestChange</a> меняем <b>".$val['symbol']."</b> на <b>".$Method."</b>. <b>Рекомендумая цена</b>  ~  ".$val['exitprice']." </b> Вводим кошелек для зачисления биржи <b>".$exname."</b>";
+            echo " <a href='".$val['redirect']."' target='_blank'><b>ССЫЛКА НА ОБМЕННИК</b></a>  <br>";
             echo "<b>3.</b> Зарабатываем <b> <font color='green'>".$val['spred']."% </font></b> с круга <br>";
-          //  echo "<b>4.</b> Рекомендуемый объем <b> <font color='#b8860b'>".$val['limit']."</font></b> ".$Method." <br>";
+            echo "<b>4.</b> МИН: <b> <font color='#b8860b'>".$val['limit']."</font></b> ".$Method." <br>";
 
             echo "<hr>";
 
@@ -240,11 +241,16 @@ class SpredController extends AppController {
             $change = changemet($ExPRICE, $TickerWork['price'] );
 
 
+
+
             //   echo "Работаем с <b> ".$TickerWork['ticker']."</b> <br>";
             //    echo "На бирже покупаем ".$TickerWork['ticker']." за ".$base." получаем  ".$TickerWork['ticker']." <br> ";
             //    echo "Цена покупки на бирже: ".$ExPRICE."<br>";
             //    echo "Цена продажи по обменникам: ".$TickerWork['price']."<br>";
             //    echo "Спред выхода: ".$change."<br>";
+
+
+            $limit =  round($TickerWork['limit']*$TickerWork['price']);
 
             $MASSIV['spred'][$TickerWork['ticker']] = $change;
 
@@ -252,9 +258,9 @@ class SpredController extends AppController {
             $MASSIV['exitprice'][$TickerWork['ticker']] = $TickerWork['price'];
 
             $MASSIV['redirect'][$TickerWork['ticker']] = $TickerWork['redirect'];
-            
+
             $MASSIV['url'][$TickerWork['ticker']] = $TickerWork['url'];
-            $MASSIV['limit'][$TickerWork['ticker']] = $TickerWork['limit']*$TickerWork['price'];
+            $MASSIV['limit'][$TickerWork['ticker']] = $limit;
 
 
 

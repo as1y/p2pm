@@ -36,7 +36,7 @@ class User extends \APP\core\base\Model
 
 
         $labels = [
-            'username' => '<b>Имя Фамилия</b>',
+            'username' => '<b>Nickname</b>',
             'email' => '<b>email</b>',
             'password' => '<b>Пароль</b>',
             'password2' => '<b>Повтор пароля</b>'
