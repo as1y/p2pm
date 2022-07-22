@@ -135,7 +135,7 @@ class Panel extends \APP\core\base\Model {
             //    echo "Спред выхода: ".$change."<br>";
 
 
-            $limit =  round($TickerWork['limit']*$TickerWork['price']);
+            $limit =  round($TickerWork['limit']*$TickerWork['price'], 5);
 
             $MASSIV['spred'][$TickerWork['ticker']] = $change;
 

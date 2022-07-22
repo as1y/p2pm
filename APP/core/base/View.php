@@ -194,12 +194,12 @@ class View {
         foreach ($MassivEX['exit'] as $key=>$val){
 
             ?>
-            <a href="/panel/work/?scanid=<?=$val['scanid']?>&exchange=<?=$exname?>&type=enter" type="button" class="btn btn-warning"><i class="icon-alert mr-2"></i>ВЗЯТЬ В РАБОТУ</a> <br>
+            <a href="/panel/work/?scanid=<?=$val['scanid']?>&exchange=<?=$exname?>&type=exit" type="button" class="btn btn-warning"><i class="icon-alert mr-2"></i>ВЗЯТЬ В РАБОТУ</a> <br>
             <?php
 
             echo "<b>1.</b>(".$val['scanid'].") На бирже <b>".$exname."</b> покупаем монету <b>".$val['symbol']."</b>  за  <b>".$Method."</b>  <b>Рекомендумая цена</b>  ~  ".$val['enterprice']." </b> <br>";
-            echo "<b>2.</b> Через <a href='".$val['url']."' target='_blank' >BestChange</a> меняем <b>".$val['symbol']."</b> на <b>".$Method."</b>. <b>Рекомендумая цена</b>  ~  ".$val['exitprice']." </b> Вводим кошелек для зачисления биржи <b>".$exname."</b>";
-            echo " <a href='".$val['redirect']."' target='_blank'><b>ССЫЛКА НА ОБМЕННИК</b></a>  <br>";
+            echo "<b>2.</b> Через <a href='".$val['url']."' target='_blank' >BestChange</a> меняем <b>".$val['symbol']."</b> на <b>".$Method."</b>. <b>Рекомендумая цена</b>  ~  ".$val['exitprice']." </b> Вводим кошелек для зачисления биржи <b>".$exname."</b><br>";
+      //      echo " <a href='".$val['redirect']."' target='_blank'><b>ССЫЛКА НА ОБМЕННИК</b></a>  <br>";
             echo "<b>3.</b> Зарабатываем <b> <font color='green'>".$val['spred']."% </font></b> с круга <br>";
             echo "<b>4.</b> МИН: <b> <font color='#b8860b'>".$val['limit']."</font></b> ".$Method." <br>";
 

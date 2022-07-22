@@ -36,12 +36,12 @@ class PanelController extends AppController {
         // Браузерная часть
 
 
-        $this->EXCHANGES[] = "Poloniex";
         $this->EXCHANGES[] = "Binance";
+        $this->EXCHANGES[] = "Poloniex";
 
 
 
-        $Base = "USDT";
+        $Base = "BTC";
         $DATA = [];
 
         foreach ($this->EXCHANGES as $key=>$exchange)
@@ -55,7 +55,7 @@ class PanelController extends AppController {
       //  show($DATA);
 
 
-        $this->set(compact('DATA'));
+        $this->set(compact('DATA','Base'));
 
 
 

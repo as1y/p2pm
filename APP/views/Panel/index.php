@@ -20,7 +20,7 @@
 
          //   echo " - ".$exchangemassiv."<br>";
 
-            \APP\core\base\View::RenderFinalExchange($MassivEX, $exname, "USDT");
+            \APP\core\base\View::RenderFinalExchange($MassivEX, $exname, $Base);
 
 
 

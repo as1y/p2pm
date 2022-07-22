@@ -25,9 +25,9 @@ class ParseoutController extends AppController {
         $this->layaout = false;
         $Panel =  new Panel();
 
-       // $this->Methods[] = "VISA";
-        $this->Methods[] = "USDT";
-  //      $this->Methods[] = "ADVRUB";
+      //  $this->Methods[] = "USDT";
+  //      $this->Methods[] = "BTC";
+        $this->Methods[] = "ETH";
 
 
         $this->ControlTrek();
@@ -273,11 +273,13 @@ class ParseoutController extends AppController {
         $arr['uri'] = "ontology";
         $SYMBOLS[] = $arr;
 
-
+ 
         $first = "";
-        if ($Method == "VISA") $first = "visa-mastercard-rub";
+        if ($Method == "BTC") $first = "bitcoin";
         if ($Method == "USDT") $first = "tether-trc20";
-        if ($Method == "ADVRUB") $first = "advanced-cash-rub";
+        if ($Method == "ETH") $first = "ethereum";
+
+//        if ($Method == "ADVRUB") $first = "advanced-cash-rub";
 
         // show($SYMBOLS);
 
