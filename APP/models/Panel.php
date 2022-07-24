@@ -301,8 +301,8 @@ class Panel extends \APP\core\base\Model {
 
            // show($EXCHANGECCXT->has['createDepositAddress']);
 
-         //   $params = [];
-         //   if ($moneta == "USDT") $params = ['network' => 'TRX',];
+           // $params = [];
+           // if ($moneta == "USDT") $params = ['network' => 'TRX',];
 
            // $addr = $EXCHANGECCXT->fetch_deposit_address($moneta, $params);
 

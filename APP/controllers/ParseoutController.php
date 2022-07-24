@@ -283,6 +283,8 @@ class ParseoutController extends AppController {
         if ($Method == "EOS") $first = "eos";
         if ($Method == "SOL") $first = "solana";
         if ($Method == "XMR") $first = "monero";
+        if ($Method == "XRP") $first = "ripple";
+
         /*
         if ($Method == "QIWI") $first = "qiwi";
         if ($Method == "ADVRUB") $first = "advanced-cash-rub";

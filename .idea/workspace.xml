@@ -5,8 +5,8 @@
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/APP/controllers/ParseinController.php" beforeDir="false" afterPath="$PROJECT_DIR$/APP/controllers/ParseinController.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/APP/controllers/ParseoutController.php" beforeDir="false" afterPath="$PROJECT_DIR$/APP/controllers/ParseoutController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/APP/controllers/ParsetickersoneController.php" beforeDir="false" afterPath="$PROJECT_DIR$/APP/controllers/ParsetickersoneController.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/APP/controllers/SpredController.php" beforeDir="false" afterPath="$PROJECT_DIR$/APP/controllers/SpredController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/APP/models/Panel.php" beforeDir="false" afterPath="$PROJECT_DIR$/APP/models/Panel.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -221,7 +221,7 @@
       <workItem from="1657576131212" duration="76964000" />
       <workItem from="1658151227049" duration="9362000" />
       <workItem from="1658325994592" duration="3576000" />
-      <workItem from="1658442313466" duration="54256000" />
+      <workItem from="1658442313466" duration="58709000" />
     </task>
     <servers />
   </component>
