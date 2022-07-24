@@ -59,9 +59,9 @@ class ParsetickersoneController extends AppController {
 
 
 /*
-        $exchange = new \ccxt\hitbtc (array ('timeout' => 30000));
+        $exchange = new \ccxt\huobipro (array ('timeout' => 30000));
         $DATA = $exchange->fetch_tickers();
-        $this->WriteTickers("Hitbtc", $DATA);
+        $this->WriteTickers("Huobi", $DATA);
 */
 
         // Проверка наличие файла

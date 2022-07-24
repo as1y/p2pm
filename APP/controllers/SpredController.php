@@ -59,12 +59,12 @@ class SpredController extends AppController {
 
 
       //  echo "<h2><font color='#8b0000'>СВЯЗКИ USDT-EXCHANGE-USDT</font></h2>";
-        $Method = "LTC";
+        $Method = "XMR";
 
 
         $StartCapintal = 1000;
 
-        $exchange = "Poloniex";
+        $exchange = "Binance";
 
         $this->FC = $this->GetFC($exchange);
 
@@ -83,6 +83,7 @@ class SpredController extends AppController {
         $ArrPER[] = "BTC";
         $ArrPER[] = "ETH";
         $ArrPER[] = "TRX";
+
 
 
     //    $ArrPER[] = "BNB";
@@ -144,6 +145,15 @@ class SpredController extends AppController {
             $exchange = new \ccxt\hitbtc (array ('timeout' => 30000));
             $DATA = $exchange->fetchCurrencies();
         }
+
+
+        if ($exchange == "Huobi")
+        {
+
+            $exchange = new \ccxt\huobipro (array ('timeout' => 30000));
+            $DATA = $exchange->fetchCurrencies();
+        }
+
 
 
         if ($exchange == "Binance")
