@@ -3,16 +3,8 @@
   <component name="ChangeListManager">
     <list default="true" id="660fb730-6725-4866-851d-b5f1a7801e6d" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/APP/controllers/PanelController.php" beforeDir="false" afterPath="$PROJECT_DIR$/APP/controllers/PanelController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/APP/controllers/ParseinController.php" beforeDir="false" afterPath="$PROJECT_DIR$/APP/controllers/ParseinController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/APP/controllers/ParseoutController.php" beforeDir="false" afterPath="$PROJECT_DIR$/APP/controllers/ParseoutController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/APP/controllers/UserController.php" beforeDir="false" afterPath="$PROJECT_DIR$/APP/controllers/UserController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/APP/controllers/SpredController.php" beforeDir="false" afterPath="$PROJECT_DIR$/APP/controllers/SpredController.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/APP/models/Panel.php" beforeDir="false" afterPath="$PROJECT_DIR$/APP/models/Panel.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/APP/views/Panel/index.php" beforeDir="false" afterPath="$PROJECT_DIR$/APP/views/Panel/index.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/APP/views/Panel/work.php" beforeDir="false" afterPath="$PROJECT_DIR$/APP/views/Panel/work.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/APP/views/layaouts/PANEL.php" beforeDir="false" afterPath="$PROJECT_DIR$/APP/views/layaouts/PANEL.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/index.php" beforeDir="false" afterPath="$PROJECT_DIR$/index.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/functions.php" beforeDir="false" afterPath="$PROJECT_DIR$/lib/functions.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -227,7 +219,7 @@
       <workItem from="1657576131212" duration="76964000" />
       <workItem from="1658151227049" duration="9362000" />
       <workItem from="1658325994592" duration="3576000" />
-      <workItem from="1658442313466" duration="33839000" />
+      <workItem from="1658442313466" duration="34993000" />
     </task>
     <servers />
   </component>

@@ -299,12 +299,12 @@ class Panel extends \APP\core\base\Model {
                 'enableRateLimit' => true,
             ));
 
-            show($EXCHANGECCXT->has['createDepositAddress']);
+           // show($EXCHANGECCXT->has['createDepositAddress']);
 
-            $params = [];
-            if ($moneta == "USDT") $params = ['network' => 'TRX',];
+         //   $params = [];
+         //   if ($moneta == "USDT") $params = ['network' => 'TRX',];
 
-            $addr = $EXCHANGECCXT->createDepositAddress($moneta);
+           // $addr = $EXCHANGECCXT->fetch_deposit_address($moneta, $params);
 
 
 
