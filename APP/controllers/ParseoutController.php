@@ -27,7 +27,7 @@ class ParseoutController extends AppController {
 
       //  $this->Methods[] = "ETH";
   //      $this->Methods[] = "BTC";
-        $this->Methods[] = "DOGE";
+        $this->Methods[] = "SOL";
 
 
         $this->ControlTrek();

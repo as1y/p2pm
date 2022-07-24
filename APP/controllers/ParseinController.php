@@ -27,7 +27,7 @@ class ParseinController extends AppController {
         $Panel =  new Panel();
    //     $this->Methods[] = "USDT";
    //     $this->Methods[] = "BTC";
-        $this->Methods[] = "DOGE";
+        $this->Methods[] = "SOL";
 
         $this->ControlTrek();
         $this->StartTrek();
