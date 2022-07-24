@@ -27,7 +27,7 @@ class ParseinController extends AppController {
         $Panel =  new Panel();
    //     $this->Methods[] = "USDT";
    //     $this->Methods[] = "BTC";
-        $this->Methods[] = "XMR";
+        $this->Methods[] = "DOGE";
 
         $this->ControlTrek();
         $this->StartTrek();
@@ -285,6 +285,8 @@ foreach ($this->Methods as $Method){
         if ($Method == "SOL") $first = "solana";
         if ($Method == "XMR") $first = "monero";
         if ($Method == "XRP") $first = "ripple";
+        if ($Method == "TRX") $first = "tron";
+        if ($Method == "DOGE") $first = "dogecoin";
 
       //  if ($Method == "QIWI") $first = "qiwi";
       //  if ($Method == "ADVRUB") $first = "advanced-cash-rub";

@@ -59,9 +59,9 @@ class SpredController extends AppController {
 
 
       //  echo "<h2><font color='#8b0000'>СВЯЗКИ USDT-EXCHANGE-USDT</font></h2>";
-        $Method = "XMR";
+        $Method = "DOGE";
 
-        $StartCapintal = 10000;
+        $StartCapintal = 14000;
         $exchange = "Poloniex";
 
         $this->FC = $this->GetFC($exchange);
