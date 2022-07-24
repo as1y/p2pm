@@ -66,7 +66,7 @@ class SpredController extends AppController {
 
         $this->FC = $this->GetFC($exchange);
 
-       // show($this->FC);
+        show($this->FC);
 
 
         echo "<h2>VER 3.0</h2>";
@@ -269,7 +269,7 @@ class SpredController extends AppController {
 
 
 
-        if ($this->FC[$symbol]['id'] == $symbol)
+        if ($this->FC[$symbol]['code'] == $symbol)
         {
             if (!empty($this->FC[$symbol]['info']['disabled']) && $this->FC[$symbol]['info']['disabled'] == 1) return false;
 
