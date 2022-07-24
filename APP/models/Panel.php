@@ -7,10 +7,10 @@ use RedBeanPHP\R;
 
 class Panel extends \APP\core\base\Model {
 
-    public $minumumspred = 0;
+    public $minumumspred = 0.2;
 
 
-    public $maxamountUSDT = 4000;
+    public $maxamountUSDT = 15000;
 
 
     public $TickersBDIN = [];

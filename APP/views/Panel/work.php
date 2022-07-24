@@ -27,7 +27,8 @@
 
 
             <h2>ШАГ-1: ПЕРЕХОД В ОБМЕННИК</h2>
-            <a href="<?=$Scanload['redirect']?>" type="button" class="btn btn-success" target="_blank"><b>Перейти в обменник</b></a><br>
+            <a href="<?=$Scanload['redirect']?>" type="button" class="btn btn-success" target="_blank"><b>Перейти в обменник</b></a> |         <a href="/panel/" type="button" class="btn btn-danger"><i class="icon-alert mr-2"></i>НАЗАД</a> <br>
+            <br>
 
             Вводим сумму которую хотим отдать в <b><?=$Scanload['method']?></b><br>
             Вводим кол-во получаемоемой монеты <b><?=$Scanload['ticker']?></b><br>
@@ -86,9 +87,7 @@
 
         <?php endif;?>
 
-        <hr>
 
-        <a href="/panel/" type="button" class="btn btn-danger"><i class="icon-alert mr-2"></i>НАЗАД</a> <br>
 
     </div>
 

@@ -47,20 +47,20 @@ class ParsetickersoneController extends AppController {
 
 
 
-/*
+
 
         $exchange = new \ccxt\gateio (array ('timeout' => 30000));
         $DATA = $exchange->fetch_tickers();
         $this->WriteTickers("Gateio", $DATA);
-*/
 
 
-/*
 
-        $exchange = new \ccxt\huobipro (array ('timeout' => 30000));
+
+
+        $exchange = new \ccxt\hitbtc (array ('timeout' => 30000));
         $DATA = $exchange->fetch_tickers();
-        $this->WriteTickers("Huobi", $DATA);
-        */
+        $this->WriteTickers("hitbtc", $DATA);
+
 
         // Проверка наличие файла
 

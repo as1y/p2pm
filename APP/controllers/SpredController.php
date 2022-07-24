@@ -54,15 +54,48 @@ class SpredController extends AppController {
   //      $this->EXCHANGES[] = "Kucoin";
   //      $this->EXCHANGES[] = "Okex";
 
-        exit("-_-.!.");
 
       //  echo "<h2><font color='#8b0000'>СВЯЗКИ USDT-EXCHANGE-USDT</font></h2>";
-        $Base = "USDT";
+        $Method = "QIWI";
+        $StartCapintal = 10000;
 
-        $DATA = [];
+        $exchange = "Hitbtc";
+
+
+        //show($StartArr);
 
         echo "<h2>VER 3.0</h2>";
 
+        // Получаем базовые заходы монет
+        $StartArr = $this->GetStartArr($Method, $StartCapintal);
+
+
+        // СИТО ЧЕРЕЗ ТОРГОВЛЮ
+
+        $ArrPER[] = "USDT";
+        $ArrPER[] = "BTC";
+        $ArrPER[] = "ETH";
+
+
+        foreach ($ArrPER as $vl)
+        {
+            echo $vl."<br>";
+            $STEP1 = $this->Sito1($StartArr, $exchange, $vl);
+
+            //show($STEP1);
+
+          //  echo "Монеты после СИТА<br>";
+            $EndArr = $this->GetEndArr($STEP1['sito'], $Method);
+            show($EndArr);
+
+
+        }
+
+
+
+//        echo "Монеты ДО СИТА<br>";
+//        $EndArr = $this->GetEndArr($StartArr, $Method);
+//        show($EndArr);
 
 
 
@@ -75,6 +108,98 @@ class SpredController extends AppController {
 
     }
 
+
+
+    private function Sito1($WorkArr, $exchange, $Perekrestok){
+
+        $DATA = [];
+
+        $ExchangeTickers = $this->GetTickerText($exchange);
+        // Берем монету BTC -> МЕНЯЕМ НА БНБ -> НА БНБ покупаем остальные монеты
+
+        // ШАГ-1 Получаем самый выгодный курс переход в монету перекрестка
+        foreach ($WorkArr as $key=>$value)
+        {
+
+            
+            // Получаем ТИКЕР с БИРЖИ
+            $TickerBirga = $key."/".$Perekrestok."";
+            if (empty($ExchangeTickers[$TickerBirga]['bid'])) continue;
+          //  show($ExchangeTickers[$TickerBirga]);
+     //       echo "Тикер на бирже: ".$TickerBirga." <br>";
+            $avgprice = ($ExchangeTickers[$TickerBirga]['bid']+$ExchangeTickers[$TickerBirga]['ask'])/2;
+            $amountPerekrestok = $value*$avgprice;
+           // echo "Берем монету ".$key." меняем ее на ".$Perekrestok." и получаем ".$amountPerekrestok." ".$Perekrestok." <br> ";
+            $STEP1[$key] = $amountPerekrestok;
+        }
+        arsort($STEP1);
+
+        $DATA['symbol'] = array_key_first($STEP1);
+        $DATA['perekrestok'] = $Perekrestok;
+        $DATA['amount'] = reset($STEP1);
+
+        // ШАГ2 Получаем кол-во монет, которые сможем купить за монету перекрестка
+
+
+        foreach ($WorkArr as $key=>$value){
+
+            $TickerBirga = $key."/".$Perekrestok."";
+            if (empty($ExchangeTickers[$TickerBirga]['bid'])) continue;
+
+            $avgprice = ($ExchangeTickers[$TickerBirga]['bid']+$ExchangeTickers[$TickerBirga]['ask'])/2;
+            $amoumtMoneta = $DATA['amount']/$avgprice;
+
+          //  echo "Работаем с тикером ".$key."<br>";
+          //  echo "Тикер на бирже ".$TickerBirga."<br>";
+         //   echo "Цена ".$avgprice."<br>";
+         //   echo "Кол-во актива ".$amoumtMoneta."<br>";
+            $DATA['sito'][$key] = $amoumtMoneta;
+
+        }
+
+
+
+        return $DATA;
+    }
+
+
+
+
+    private function GetStartArr($Method, $StartCapintal){
+
+        $DATA = [];
+
+        $WORk = $this->LoadTickersBD("IN", $Method);
+        foreach ($WORk as $VAl)
+        {
+            $DATA[$VAl['ticker']] = $StartCapintal/$VAl['price'];
+        }
+
+
+
+        return $DATA;
+    }
+
+    private function GetEndArr($WorkArr, $Method){
+
+        $DATA = [];
+
+        $WORk = $this->LoadTickersBD("OUT", $Method);
+
+        foreach ($WORk as $VAL){
+
+           // echo "Цена выхода: ".$VAL['price']."<br>";
+            if (empty($WorkArr[$VAL['ticker']])) continue;
+
+            $DATA[$VAL['ticker']] = $WorkArr[$VAL['ticker']]*$VAL['price'];
+
+        }
+
+        arsort($DATA);
+
+        return $DATA;
+
+    }
 
 
 
