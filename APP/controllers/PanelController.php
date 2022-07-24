@@ -2,6 +2,7 @@
 namespace APP\controllers;
 use APP\core\Cache;
 use APP\models\Addp;
+use APP\models\Operator;
 use APP\models\Panel;
 use APP\core\base\Model;
 use RedBeanPHP\R;
@@ -39,9 +40,11 @@ class PanelController extends AppController {
         $this->EXCHANGES[] = "Binance";
         $this->EXCHANGES[] = "Poloniex";
 
+        $Base = "USDT";
 
 
-        $Base = "BTC";
+
+
         $DATA = [];
 
         foreach ($this->EXCHANGES as $key=>$exchange)
@@ -60,9 +63,6 @@ class PanelController extends AppController {
 
 
     }
-
-
-
 
 
     public function workAction(){
@@ -93,6 +93,65 @@ class PanelController extends AppController {
 
 
     }
+
+
+
+    public function profileAction(){
+        $Panel =  new Panel();
+
+
+        $META = [
+            'title' => 'Вывести средства',
+            'description' => 'Вывести средства',
+            'keywords' => 'Вывести средства',
+        ];
+        \APP\core\base\View::setMeta($META);
+
+        $BREADCRUMBS['DATA'][] = ['Label' => "Вывести средства"];
+        \APP\core\base\View::setBreadcrumbs($BREADCRUMBS);
+
+
+
+        $ASSETS[] = ["js" => "/global_assets/js/demo_pages/form_actions.js"];
+        $ASSETS[] = ["js" => "/assets/js/form_inputs.js"];
+        $ASSETS[] = ["js" => "/global_assets/js/plugins/forms/selects/select2.min.js"];
+        $ASSETS[] = ["js" => "/global_assets/js/plugins/forms/styling/uniform.min.js"];
+        $ASSETS[] = ["js" => "/global_assets/js/plugins/tables/datatables/datatables.min.js"];
+        $ASSETS[] = ["js" => "/assets/js/datatables_basic.js"];
+        \APP\core\base\View::setAssets($ASSETS);
+
+
+        $requis = json_decode($Panel::$USER->requis, true);
+        if (empty($requis)) $requis = [];
+
+
+
+        if ($_POST && $_GET['action'] == "changerequis"){
+
+
+
+
+            $Panel->addrequis($_POST);
+
+
+            $_SESSION['success'] .= "Успешно сохранено! <br>";
+
+
+
+            redir();
+
+
+        }
+
+
+
+
+        $this->set(compact('requis'));
+
+    }
+
+
+
 
 
 }

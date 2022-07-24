@@ -140,16 +140,24 @@ function getExtension($filename) {
 
 
 
-function getconversion ($value1, $value2){
-    if ($value2 == 0) return 0;
-    $result = $value1/$value2*100;
-    $result = round($result);
-    return $result;
-}
 
 
 function SystemUserId(){
     return  md5(uniqid().$_SERVER['REMOTE_ADDR'].$_SERVER['UNIQUE_ID']);
+}
+
+
+
+function generateprofilelink($user = ""){
+
+    if (empty($user)){
+        return "//".CONFIG['DOMAIN']."/user/operator/?name=".translit_sef($_SESSION['ulogin']['imya'])."-".$_SESSION['ulogin']['id'];
+    }else{
+
+        return "//".CONFIG['DOMAIN']."/user/operator/?name=".translit_sef($user['imya'])."-".$user['id'];
+
+    }
+
 }
 
 
@@ -232,33 +240,41 @@ function fCURL($url, $PARAMS = [], $headers = []){
 }
 
 
-function get_signed_params_bybit($public_key, $secret_key, $params) {
-    $params = array_merge(['api_key' => $public_key], $params);
-    ksort($params);
-    //decode return value of http_build_query to make sure signing by plain parameter string
-    $signature = hash_hmac('sha256', urldecode(http_build_query($params)), $secret_key);
-    return http_build_query($params) . "&sign=$signature";
-}
-
-
-// Форматирование цен.
-function format_price($value)
+function clearrequis($value)
 {
-    return number_format($value, 2, ',', ' ');
+
+    $value = trim($value);
+    $value = strip_tags($value);
+    $value = htmlspecialchars($value);
+    $value = str_replace(" ", "", $value);
+
+    return $value;
+
+
 }
 
+function translit_sef($value)
+{
+    $converter = array(
+        'а' => 'a',    'б' => 'b',    'в' => 'v',    'г' => 'g',    'д' => 'd',
+        'е' => 'e',    'ё' => 'e',    'ж' => 'zh',   'з' => 'z',    'и' => 'i',
+        'й' => 'y',    'к' => 'k',    'л' => 'l',    'м' => 'm',    'н' => 'n',
+        'о' => 'o',    'п' => 'p',    'р' => 'r',    'с' => 's',    'т' => 't',
+        'у' => 'u',    'ф' => 'f',    'х' => 'h',    'ц' => 'c',    'ч' => 'ch',
+        'ш' => 'sh',   'щ' => 'sch',  'ь' => '',     'ы' => 'y',    'ъ' => '',
+        'э' => 'e',    'ю' => 'yu',   'я' => 'ya',
+    );
 
-/**
- * Склоняем словоформу
- * @ author runcore
- */
-function morph($n, $f1, $f2, $f5) {
-    $n = abs(intval($n)) % 100;
-    if ($n>10 && $n<20) return $f5;
-    $n = $n % 10;
-    if ($n>1 && $n<5) return $f2;
-    if ($n==1) return $f1;
-    return $f5;
+    $value = mb_strtolower($value);
+    $value = strtr($value, $converter);
+    $value = mb_ereg_replace('[^-0-9a-z]', '_', $value);
+    $value = mb_ereg_replace('[-]+', '_', $value);
+    $value = trim($value, '_');
+
+    $value = str_replace("-", "_", $value); //Убираем тире, чтобы использовать его для IDшника
+
+
+    return $value;
 }
 
 ?>

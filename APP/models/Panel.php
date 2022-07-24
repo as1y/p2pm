@@ -7,10 +7,10 @@ use RedBeanPHP\R;
 
 class Panel extends \APP\core\base\Model {
 
-    public $minumumspred = 0.3;
+    public $minumumspred = 0;
 
 
-    public $maxamountUSDT = 5000;
+    public $maxamountUSDT = 4000;
 
 
     public $TickersBDIN = [];
@@ -43,8 +43,6 @@ class Panel extends \APP\core\base\Model {
 
 
     }
-
-
 
     private function GetArrEnter($TickersBDIN,$ExchangeTickers, $base ){
 
@@ -194,7 +192,6 @@ class Panel extends \APP\core\base\Model {
         return $DATA;
     }
 
-
     public function LoadScan($id, $type)
     {
 
@@ -204,7 +201,6 @@ class Panel extends \APP\core\base\Model {
 
         return $table;
     }
-
 
     private function LoadTickersBD($type, $method)
     {
@@ -216,12 +212,110 @@ class Panel extends \APP\core\base\Model {
         return $table;
     }
 
-    private function GetTickerText($exchange){
+    public static function GetTickerText($exchange){
 
         $file = file_get_contents(WWW."/Ticker".$exchange.".txt");     // Открыть файл data.json
         $MASSIV = json_decode($file,TRUE);              // Декодировать в массив
         return $MASSIV;
 
+    }
+
+    public function addrequis($DATA){
+
+        if (!empty($DATA['apiBinance'])){
+
+            $requis = json_decode(self::$USER->requis, true);
+            $DATA['apiBinance'] = clearrequis( $DATA['apiBinance']);
+            $DATA['keyBinance'] = clearrequis( $DATA['keyBinance']);
+
+            $requis['apiBinance'] = $DATA['apiBinance'];
+            $requis['keyBinance'] = $DATA['keyBinance'];
+
+            $requis = json_encode($requis, true);
+
+
+            $_SESSION['ulogin']['requis'] = $requis;
+
+            self::$USER->requis = $requis;
+        }
+
+        if (!empty($DATA['apiPoloniex'])){
+
+            $requis = json_decode(self::$USER->requis, true);
+            $DATA['apiPoloniex'] = clearrequis( $DATA['apiPoloniex']);
+            $DATA['keyPoloniex'] = clearrequis( $DATA['keyPoloniex']);
+
+            $requis['apiPoloniex'] = $DATA['apiPoloniex'];
+            $requis['keyPoloniex'] = $DATA['keyPoloniex'];
+
+            $requis = json_encode($requis, true);
+
+
+            $_SESSION['ulogin']['requis'] = $requis;
+
+            self::$USER->requis = $requis;
+        }
+
+
+
+
+
+
+        R::store(self::$USER);
+
+        return true;
+    }
+
+
+
+    public static function GetWalletAddr($exchange, $moneta){
+
+        $addr = "test";
+
+        if($exchange == "Binance")
+        {
+            $EXCHANGECCXT = new \ccxt\binance (array(
+                'apiKey' => json_decode($_SESSION['ulogin']['requis'], true)['apiBinance'],
+                'secret' => json_decode($_SESSION['ulogin']['requis'], true)['keyBinance'],
+                'timeout' => 30000,
+                'enableRateLimit' => true,
+            ));
+
+
+            $params = [];
+            if ($moneta == "USDT") $params = ['network' => 'TRX',];
+            $addr = $EXCHANGECCXT->fetch_deposit_address($moneta, $params);
+
+        }
+
+        if($exchange == "Poloniex")
+        {
+
+
+            $EXCHANGECCXT = new \ccxt\poloniex (array(
+                'apiKey' => json_decode($_SESSION['ulogin']['requis'], true)['apiPoloniex'],
+                'secret' => json_decode($_SESSION['ulogin']['requis'], true)['keyPoloniex'],
+                'timeout' => 30000,
+                'enableRateLimit' => true,
+            ));
+
+            show($EXCHANGECCXT->has['createDepositAddress']);
+
+            $params = [];
+            if ($moneta == "USDT") $params = ['network' => 'TRX',];
+
+            $addr = $EXCHANGECCXT->createDepositAddress($moneta);
+
+
+
+        }
+
+
+
+
+
+
+        return $addr;
     }
 
 

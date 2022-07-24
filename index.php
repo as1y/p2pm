@@ -1,5 +1,6 @@
 <?php
 
+
 //Базовые переменные
 define('ERRORS', '1' ); // 0 - нет 1 - ОТОБРАЖАЮТСЯ
 define('WWW', __DIR__);
@@ -19,10 +20,14 @@ define('CONFIG', require 'config/main.php');
 
 
 
+
+
 require 'vendor/autoload.php';
 require 'lib/functions.php'; //ОБЩИЕ ФУНКЦИИ
 require 'lib/functions_app.php'; //ФУНКЦИИ ПРИЛОЖЕНИЯ
 require_once 'lib/aparser-api-php-client.php'; //APARSER
+
+
 
 
 //ВАЛИДАТОР
@@ -44,11 +49,11 @@ require_once 'APP/core/PHPM.php';
 // ПОЧТА promocode@coupons.gallery
 
 
+
 //НАСТРОЙКА ПОЧТЫ НА ЯНДЕКС
 define('MAILHOST', 'ssl://smtp.yandex.ru');
 define('MAILUSERNAME', 'promocode@coupons.gallery');
 define('MAILPASSWORD', 'Bersuk113322');
-define('API', 'https://api.admitad.com');
 //НАСТРОЙКА ПОЧТЫ НА ЯНДЕКС
 
 use APP\core\Router;

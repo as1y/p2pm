@@ -11,7 +11,7 @@
 
         <?php
 
-        //show($DATA);
+        //show($_SESSION['ulogin']);
 
 
 

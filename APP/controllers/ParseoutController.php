@@ -25,9 +25,9 @@ class ParseoutController extends AppController {
         $this->layaout = false;
         $Panel =  new Panel();
 
-      //  $this->Methods[] = "USDT";
+      //  $this->Methods[] = "ETH";
   //      $this->Methods[] = "BTC";
-        $this->Methods[] = "ETH";
+        $this->Methods[] = "USDT";
 
 
         $this->ControlTrek();
@@ -273,7 +273,7 @@ class ParseoutController extends AppController {
         $arr['uri'] = "ontology";
         $SYMBOLS[] = $arr;
 
- 
+
         $first = "";
         if ($Method == "BTC") $first = "bitcoin";
         if ($Method == "USDT") $first = "tether-trc20";

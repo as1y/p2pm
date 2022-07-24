@@ -175,13 +175,14 @@ class UserController extends AppController
 	}
 
 
-	public function logoutAction()
-	{
-		if(isset($_SESSION['ulogin'])){
-			$_SESSION['ulogin'] = array();
-			redir('/user/login');
-		}
-	}
+    public function logoutAction()
+    {
+        if(isset($_SESSION['ulogin'])){
+            $_SESSION['ulogin'] = [];
+        }
+        redir('/user/login');
+    }
+
 
 
 

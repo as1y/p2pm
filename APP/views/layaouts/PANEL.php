@@ -79,6 +79,7 @@
                 </a>
 
                 <div class="dropdown-menu dropdown-menu-right">
+                    <a href="/panel/profile/" class="dropdown-item"><i class="icon-question3"></i> Профиль</a>
                     <a href="/panel/stat/" class="dropdown-item"><i class="icon-question3"></i> Статистика</a>
                     <a href="/user/logout/" class="dropdown-item"><i class="icon-switch2"></i> Выход</a>
                 </div>
