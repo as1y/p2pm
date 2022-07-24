@@ -27,7 +27,7 @@ class ParseoutController extends AppController {
 
       //  $this->Methods[] = "ETH";
   //      $this->Methods[] = "BTC";
-        $this->Methods[] = "USDT";
+        $this->Methods[] = "LTC";
 
 
         $this->ControlTrek();
@@ -279,10 +279,13 @@ class ParseoutController extends AppController {
         if ($Method == "USDT") $first = "tether-trc20";
         if ($Method == "ETH") $first = "ethereum";
 
+        if ($Method == "LTC") $first = "litecoin";
+
+
         if ($Method == "QIWI") $first = "qiwi";
 
 
-//        if ($Method == "ADVRUB") $first = "advanced-cash-rub";
+        if ($Method == "ADVRUB") $first = "advanced-cash-rub";
 
         // show($SYMBOLS);
 

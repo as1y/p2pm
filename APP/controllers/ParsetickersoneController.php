@@ -36,9 +36,11 @@ class ParsetickersoneController extends AppController {
         */
 
 
+
         $exchange = new \ccxt\poloniex (array ('timeout' => 30000));
         $DATA = $exchange->fetch_tickers();
         $this->WriteTickers("Poloniex", $DATA);
+
 
 
         $exchange = new \ccxt\binance (array ('timeout' => 30000));
@@ -47,20 +49,20 @@ class ParsetickersoneController extends AppController {
 
 
 
-
+/*
 
         $exchange = new \ccxt\gateio (array ('timeout' => 30000));
         $DATA = $exchange->fetch_tickers();
         $this->WriteTickers("Gateio", $DATA);
+*/
 
 
 
-
-
+/*
         $exchange = new \ccxt\hitbtc (array ('timeout' => 30000));
         $DATA = $exchange->fetch_tickers();
-        $this->WriteTickers("hitbtc", $DATA);
-
+        $this->WriteTickers("Hitbtc", $DATA);
+*/
 
         // Проверка наличие файла
 

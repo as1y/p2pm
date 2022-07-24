@@ -16,6 +16,9 @@ class SpredController extends AppController {
     public $EXCHANGES = [];
     public $minumumspred = 0.3;
 
+    public $FC = [];
+
+
 
     // ТЕХНИЧЕСКИЕ ПЕРЕМЕННЫЕ
     public function indexAction()
@@ -45,7 +48,7 @@ class SpredController extends AppController {
 
         // Входные данные
 
-        $this->EXCHANGES[] = "Binance";
+     //   $this->EXCHANGES[] = "Binance";
 //        $this->EXCHANGES[] = "Poloniex";
  //       $this->EXCHANGES[] = "Gateio";
  //       $this->EXCHANGES[] = "Huobi";
@@ -56,15 +59,17 @@ class SpredController extends AppController {
 
 
       //  echo "<h2><font color='#8b0000'>СВЯЗКИ USDT-EXCHANGE-USDT</font></h2>";
-        $Method = "USDT";
+        $Method = "LTC";
 
 
         $StartCapintal = 1000;
 
         $exchange = "Poloniex";
 
+        $this->FC = $this->GetFC($exchange);
 
-        //show($StartArr);
+       // show($this->FC);
+
 
         echo "<h2>VER 3.0</h2>";
 
@@ -77,12 +82,15 @@ class SpredController extends AppController {
         $ArrPER[] = "USDT";
         $ArrPER[] = "BTC";
         $ArrPER[] = "ETH";
-
         $ArrPER[] = "TRX";
-//        $ArrPER[] = "BNB";
+
+
+    //    $ArrPER[] = "BNB";
+    //    $ArrPER[] = "RUB";
 
 
         echo "<h2>".$exchange."</h2>";
+
 
         foreach ($ArrPER as $vl)
         {
@@ -121,19 +129,72 @@ class SpredController extends AppController {
     }
 
 
+    private function GetFC($exchange){
+
+        $DATA = [];
+
+        if ($exchange == "Poloniex")
+        {
+            $exchange = new \ccxt\poloniex (array ('timeout' => 30000));
+            $DATA = $exchange->fetchCurrencies();
+        }
+
+        if ($exchange == "Hitbtc")
+        {
+            $exchange = new \ccxt\hitbtc (array ('timeout' => 30000));
+            $DATA = $exchange->fetchCurrencies();
+        }
+
+
+        if ($exchange == "Binance")
+        {
+
+            $exchange = new \ccxt\binance (array(
+                'apiKey' => json_decode($_SESSION['ulogin']['requis'], true)['apiBinance'],
+                'secret' => json_decode($_SESSION['ulogin']['requis'], true)['keyBinance'],
+                'timeout' => 30000,
+                'enableRateLimit' => true,
+                'options' => array(
+                    'fetchCurrencies' => true
+
+                )
+            ));
+
+            $DATA = $exchange->fetchCurrencies();
+        }
+
+
+        if ($exchange == "Gateio")
+        {
+            $exchange = new \ccxt\gateio (array ('timeout' => 30000));
+            $DATA = $exchange->fetchCurrencies();
+        }
+
+
+
+
+        if (empty($DATA))
+        {
+            echo "<font color='red'>Ошибка загрузки статуса монет!</font>";
+        }
+
+        return $DATA;
+
+    }
+
 
     private function Sito1($WorkArr, $exchange, $Perekrestok){
 
         $DATA = [];
 
         $ExchangeTickers = $this->GetTickerText($exchange);
+
+
         // Берем монету BTC -> МЕНЯЕМ НА БНБ -> НА БНБ покупаем остальные монеты
 
         // ШАГ-1 Получаем самый выгодный курс переход в монету перекрестка
         foreach ($WorkArr as $key=>$value)
         {
-
-            if ($key == "ZEC") continue;
 
             // Получаем ТИКЕР с БИРЖИ
             $TickerBirga = $key."/".$Perekrestok."";
@@ -177,6 +238,40 @@ class SpredController extends AppController {
 
 
 
+    private function checksymbolenter($symbol)
+    {
+
+        if ($symbol == "USDT") return true;
+        if ($symbol == "BTC") return true;
+        if ($symbol == "ETH") return true;
+
+
+        if (empty($this->FC[$symbol]))
+        {
+            //echo "Символа ".$symbol." нет на бирже! <br>";
+            return false;
+        }
+
+
+        if (isset($this->FC[$symbol]['payin']) && $this->FC[$symbol]['payin'] == false) return false;
+        if (isset($this->FC[$symbol]['payout']) && $this->FC[$symbol]['payout'] == false) return false;
+
+
+
+        if ($this->FC[$symbol]['id'] == $symbol)
+        {
+            if (!empty($this->FC[$symbol]['info']['disabled']) && $this->FC[$symbol]['info']['disabled'] == 1) return false;
+
+        }
+
+
+
+
+
+        return true;
+
+    }
+
 
     private function GetStartArr($Method, $StartCapintal){
 
@@ -185,6 +280,16 @@ class SpredController extends AppController {
         $WORk = $this->LoadTickersBD("IN", $Method);
         foreach ($WORk as $VAl)
         {
+
+            $checksymbol = $this->checksymbolenter($VAl['ticker']);
+
+            if ($checksymbol == false)
+            {
+                echo "<font color='red'>Тикер ".$VAl['ticker']." отключен  </font> <br>";
+                continue;
+
+            }
+
             $DATA[$VAl['ticker']] = $StartCapintal/$VAl['price'];
         }
 
