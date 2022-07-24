@@ -56,10 +56,12 @@ class SpredController extends AppController {
 
 
       //  echo "<h2><font color='#8b0000'>СВЯЗКИ USDT-EXCHANGE-USDT</font></h2>";
-        $Method = "QIWI";
-        $StartCapintal = 10000;
+        $Method = "USDT";
 
-        $exchange = "Hitbtc";
+
+        $StartCapintal = 1000;
+
+        $exchange = "Poloniex";
 
 
         //show($StartArr);
@@ -76,13 +78,23 @@ class SpredController extends AppController {
         $ArrPER[] = "BTC";
         $ArrPER[] = "ETH";
 
+        $ArrPER[] = "TRX";
+//        $ArrPER[] = "BNB";
+
+
+        echo "<h2>".$exchange."</h2>";
 
         foreach ($ArrPER as $vl)
         {
             echo $vl."<br>";
             $STEP1 = $this->Sito1($StartArr, $exchange, $vl);
 
-            //show($STEP1);
+            show($STEP1);
+
+            echo "Отдаем ".$StartCapintal."  ".$Method." -> Покупаем ".$STEP1['symbol']." на биржу ".$exchange."  <br> ";
+
+            echo "Продаем ".$STEP1['symbol']." за ".$STEP1['perekrestok']."  <br> ";
+
 
           //  echo "Монеты после СИТА<br>";
             $EndArr = $this->GetEndArr($STEP1['sito'], $Method);
@@ -121,7 +133,8 @@ class SpredController extends AppController {
         foreach ($WorkArr as $key=>$value)
         {
 
-            
+            if ($key == "ZEC") continue;
+
             // Получаем ТИКЕР с БИРЖИ
             $TickerBirga = $key."/".$Perekrestok."";
             if (empty($ExchangeTickers[$TickerBirga]['bid'])) continue;
