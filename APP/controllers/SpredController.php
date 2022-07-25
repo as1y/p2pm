@@ -59,10 +59,10 @@ class SpredController extends AppController {
 
 
       //  echo "<h2><font color='#8b0000'>СВЯЗКИ USDT-EXCHANGE-USDT</font></h2>";
-        $Method = "SOL";
+        $Method = "USDT";
 
-        $StartCapintal = 20;
-        $exchange = "Poloniex";
+        $StartCapintal = 10000;
+        $exchange = "Binance";
 
         $this->FC = $this->GetFC($exchange);
 
@@ -75,7 +75,6 @@ class SpredController extends AppController {
         //  ЩАГ-1 МОНЕТЫ ВХОДА
 
         $StartArr = $this->GetStartArr($Method, $StartCapintal);
-
 
         // СИТО ЧЕРЕЗ ТОРГОВЛЮ
         $ArrPER[] = "USDT";
@@ -131,67 +130,6 @@ class SpredController extends AppController {
     }
 
 
-    private function GetFC($exchange){
-
-        $DATA = [];
-
-        if ($exchange == "Poloniex")
-        {
-            $exchange = new \ccxt\poloniex (array ('timeout' => 30000));
-            $DATA = $exchange->fetchCurrencies();
-        }
-
-        if ($exchange == "Hitbtc")
-        {
-            $exchange = new \ccxt\hitbtc (array ('timeout' => 30000));
-            $DATA = $exchange->fetchCurrencies();
-        }
-
-
-        if ($exchange == "Huobi")
-        {
-
-            $exchange = new \ccxt\huobipro (array ('timeout' => 30000));
-            $DATA = $exchange->fetchCurrencies();
-        }
-
-
-
-        if ($exchange == "Binance")
-        {
-
-            $exchange = new \ccxt\binance (array(
-                'apiKey' => json_decode($_SESSION['ulogin']['requis'], true)['apiBinance'],
-                'secret' => json_decode($_SESSION['ulogin']['requis'], true)['keyBinance'],
-                'timeout' => 30000,
-                'enableRateLimit' => true,
-                'options' => array(
-                    'fetchCurrencies' => true
-
-                )
-            ));
-
-            $DATA = $exchange->fetchCurrencies();
-        }
-
-
-        if ($exchange == "Gateio")
-        {
-            $exchange = new \ccxt\gateio (array ('timeout' => 30000));
-            $DATA = $exchange->fetchCurrencies();
-        }
-
-
-
-
-        if (empty($DATA))
-        {
-            echo "<font color='red'>Ошибка загрузки статуса монет!</font>";
-        }
-
-        return $DATA;
-
-    }
 
 
     private function Sito1($WorkArr, $exchange, $Perekrestok){
@@ -201,7 +139,11 @@ class SpredController extends AppController {
         $ExchangeTickers = $this->GetTickerText($exchange);
 
 
+       // echo "Массив WORKARR<br>";
+      //  show($WorkArr);
+
         // Берем монету BTC -> МЕНЯЕМ НА БНБ -> НА БНБ покупаем остальные монеты
+        $STEP1 = [];
 
         // ШАГ-1 Получаем самый выгодный курс переход в монету перекрестка
         foreach ($WorkArr as $key=>$value)
@@ -217,6 +159,13 @@ class SpredController extends AppController {
            // echo "Берем монету ".$key." меняем ее на ".$Perekrestok." и получаем ".$amountPerekrestok." ".$Perekrestok." <br> ";
             $STEP1[$key] = $amountPerekrestok;
         }
+
+        if (empty($STEP1))
+        {
+            echo "<font color='#8b0000'>На бирже отсутсвует перекидывание через <b>".$Perekrestok."</b></font>";
+            return true;
+        }
+
         arsort($STEP1);
 
         $DATA['symbol'] = array_key_first($STEP1);
@@ -283,17 +232,82 @@ class SpredController extends AppController {
 
     }
 
+    private function GetFC($exchange){
+
+        $DATA = [];
+
+        if ($exchange == "Poloniex")
+        {
+            $exchange = new \ccxt\poloniex (array ('timeout' => 30000));
+            $DATA = $exchange->fetchCurrencies();
+        }
+
+        if ($exchange == "Hitbtc")
+        {
+            $exchange = new \ccxt\hitbtc (array ('timeout' => 30000));
+            $DATA = $exchange->fetchCurrencies();
+        }
+
+
+        if ($exchange == "Huobi")
+        {
+
+            $exchange = new \ccxt\huobipro (array ('timeout' => 30000));
+            $DATA = $exchange->fetchCurrencies();
+        }
+
+
+
+        if ($exchange == "Binance")
+        {
+
+            $exchange = new \ccxt\binance (array(
+                'apiKey' => json_decode($_SESSION['ulogin']['requis'], true)['apiBinance'],
+                'secret' => json_decode($_SESSION['ulogin']['requis'], true)['keyBinance'],
+                'timeout' => 30000,
+                'enableRateLimit' => true,
+                'options' => array(
+                    'fetchCurrencies' => true
+
+                )
+            ));
+
+            $DATA = $exchange->fetchCurrencies();
+        }
+
+
+        if ($exchange == "Gateio")
+        {
+            $exchange = new \ccxt\gateio (array ('timeout' => 30000));
+            $DATA = $exchange->fetchCurrencies();
+        }
+
+
+
+
+        if (empty($DATA))
+        {
+            echo "<font color='red'>Ошибка загрузки статуса монет!</font>";
+        }
+
+        return $DATA;
+
+    }
+
+
 
     private function GetStartArr($Method, $StartCapintal){
 
         $DATA = [];
 
         $WORk = $this->LoadTickersBD("IN", $Method);
+
         foreach ($WORk as $VAL)
         {
 
             // Проверка на доступностью тикера на покупку в бирже
             $checksymbol = $this->checksymbolenter($VAL['ticker']);
+
             if ($checksymbol == false)
             {
                 echo "<font color='red'>Тикер ".$VAL['ticker']." отключен  </font> <br>";
