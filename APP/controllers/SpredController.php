@@ -60,21 +60,18 @@ class SpredController extends AppController {
 
       //  echo "<h2><font color='#8b0000'>СВЯЗКИ USDT-EXCHANGE-USDT</font></h2>";
         $Method = "USDT";
-
-        $StartCapintal = 10000;
-        $exchange = "Binance";
-
-        $this->FC = $this->GetFC($exchange);
-
-       // show($this->FC);
+        $StartCapintal = "5000";
+        $exchange = "Poloniex";
 
 
-        echo "<h2>VER 3.0</h2>";
+        $DATA = $this->GetWorkARR($Method, $StartCapintal, $exchange);
 
-        // Получаем базовые заходы монет
-        //  ЩАГ-1 МОНЕТЫ ВХОДА
+        show($DATA);
 
-        $StartArr = $this->GetStartArr($Method, $StartCapintal);
+        // Вводные данные:
+        // USDT, Биржа, Монета
+        exit("111");
+
 
         // СИТО ЧЕРЕЗ ТОРГОВЛЮ
         $ArrPER[] = "USDT";
@@ -82,8 +79,6 @@ class SpredController extends AppController {
         $ArrPER[] = "ETH";
         $ArrPER[] = "TRX";
 
-
-        echo "<h2>".$exchange."</h2>";
 
 
         foreach ($ArrPER as $vl)
@@ -132,11 +127,60 @@ class SpredController extends AppController {
 
 
 
-    private function Sito1($WorkArr, $exchange, $Perekrestok){
-
+    private function GetWorkARR($Method, $StartCapintal, $exchange){
         $DATA = [];
 
+        // Загрузка данных
+        $TickersIN = $this->LoadTickersBD("IN", $Method);
+        $TickersOUT = $this->LoadTickersBD("OUT", $Method);
         $ExchangeTickers = $this->GetTickerText($exchange);
+
+
+        // Проверка параметров
+
+        if (empty($TickersIN))
+        {
+            $DATA['errors'] = "Монета ".$Method." не поддерживается<br>";
+            return $DATA;
+        }
+
+        if (!is_numeric($StartCapintal)){
+            $DATA['errors'] = "Не корректно задан рабочий капитал<br>";
+            return $DATA;
+        }
+
+        // Получение положения монет
+       $this->FC = $this->GetCurText($exchange);
+        if (empty($this->FC)){
+            $DATA['errors'] = "Ошибка загрузки монет<br>";
+            return $DATA;
+        }
+
+
+
+        // ШАГ -1 БАЗОВЫЙ ВХОД НА МОНЕТУ ИЗ ВСЕХ БИРЖ
+        $StartArr = $this->GetStartArr($TickersIN, $StartCapintal);
+
+        echo "Возможные варианты покупки монет<br>";
+        show($StartArr);
+
+        $vl = "USDT";
+
+        $STEP1 = $this->Sito1($StartArr, $exchange, $ExchangeTickers);
+
+
+
+
+        return $DATA;
+
+    }
+
+
+
+
+    private function Sito1($WorkArr, $Perekrestok, $ExchangeTickers){
+
+        $DATA = [];
 
 
        // echo "Массив WORKARR<br>";
@@ -232,63 +276,15 @@ class SpredController extends AppController {
 
     }
 
-    private function GetFC($exchange){
+    private function GetCurText($exchange){
 
         $DATA = [];
 
-        if ($exchange == "Poloniex")
-        {
-            $exchange = new \ccxt\poloniex (array ('timeout' => 30000));
-            $DATA = $exchange->fetchCurrencies();
-        }
-
-        if ($exchange == "Hitbtc")
-        {
-            $exchange = new \ccxt\hitbtc (array ('timeout' => 30000));
-            $DATA = $exchange->fetchCurrencies();
-        }
+        $file = file_get_contents(WWW."/Cur".$exchange.".txt");     // Открыть файл data.json
+        $DATA = json_decode($file,TRUE);              // Декодировать в массив
 
 
-        if ($exchange == "Huobi")
-        {
-
-            $exchange = new \ccxt\huobipro (array ('timeout' => 30000));
-            $DATA = $exchange->fetchCurrencies();
-        }
-
-
-
-        if ($exchange == "Binance")
-        {
-
-            $exchange = new \ccxt\binance (array(
-                'apiKey' => json_decode($_SESSION['ulogin']['requis'], true)['apiBinance'],
-                'secret' => json_decode($_SESSION['ulogin']['requis'], true)['keyBinance'],
-                'timeout' => 30000,
-                'enableRateLimit' => true,
-                'options' => array(
-                    'fetchCurrencies' => true
-
-                )
-            ));
-
-            $DATA = $exchange->fetchCurrencies();
-        }
-
-
-        if ($exchange == "Gateio")
-        {
-            $exchange = new \ccxt\gateio (array ('timeout' => 30000));
-            $DATA = $exchange->fetchCurrencies();
-        }
-
-
-
-
-        if (empty($DATA))
-        {
-            echo "<font color='red'>Ошибка загрузки статуса монет!</font>";
-        }
+        if (empty($DATA)) return false;
 
         return $DATA;
 
@@ -296,13 +292,11 @@ class SpredController extends AppController {
 
 
 
-    private function GetStartArr($Method, $StartCapintal){
+    private function GetStartArr($$TickersIN, $StartCapintal){
 
         $DATA = [];
 
-        $WORk = $this->LoadTickersBD("IN", $Method);
-
-        foreach ($WORk as $VAL)
+        foreach ($TickersIN as $VAL)
         {
 
             // Проверка на доступностью тикера на покупку в бирже
