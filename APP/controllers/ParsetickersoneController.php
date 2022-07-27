@@ -42,19 +42,19 @@ class ParsetickersoneController extends AppController {
         $this->WriteTickers("Poloniex", $DATA);
 
 
-
+    /*
         $exchange = new \ccxt\binance (array ('timeout' => 30000));
         $DATA = $exchange->fetch_tickers();
         $this->WriteTickers("Binance", $DATA);
+*/
 
 
 
-/*
 
         $exchange = new \ccxt\gateio (array ('timeout' => 30000));
         $DATA = $exchange->fetch_tickers();
         $this->WriteTickers("Gateio", $DATA);
-*/
+
 
 
 

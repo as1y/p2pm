@@ -3,7 +3,11 @@
   <component name="ChangeListManager">
     <list default="true" id="660fb730-6725-4866-851d-b5f1a7801e6d" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/APP/controllers/ParseinController.php" beforeDir="false" afterPath="$PROJECT_DIR$/APP/controllers/ParseinController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/APP/controllers/ParseoutController.php" beforeDir="false" afterPath="$PROJECT_DIR$/APP/controllers/ParseoutController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/APP/controllers/ParsetickersoneController.php" beforeDir="false" afterPath="$PROJECT_DIR$/APP/controllers/ParsetickersoneController.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/APP/controllers/SpredController.php" beforeDir="false" afterPath="$PROJECT_DIR$/APP/controllers/SpredController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/index.php" beforeDir="false" afterPath="$PROJECT_DIR$/index.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -34,7 +38,7 @@
     <property name="WebServerToolWindowPanel.toolwindow.show.date" value="false" />
     <property name="WebServerToolWindowPanel.toolwindow.show.permissions" value="false" />
     <property name="WebServerToolWindowPanel.toolwindow.show.size" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../ARBY" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="settings.editor.selected.configurable" value="web.server" />
   </component>
   <component name="SvnConfiguration">
@@ -222,6 +226,8 @@
       <workItem from="1658760614542" duration="4691000" />
       <workItem from="1658774012711" duration="11348000" />
       <workItem from="1658801911182" duration="641000" />
+      <workItem from="1658811455036" duration="962000" />
+      <workItem from="1658847301311" duration="5011000" />
     </task>
     <servers />
   </component>
@@ -237,10 +243,10 @@
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state x="93" y="93" width="1350" height="638" key="DirDiffDialog/0.0.1536.824@0.0.1536.824" timestamp="1658461078393" />
-    <state x="548" y="168" key="FileChooserDialogImpl" timestamp="1658803784527">
+    <state x="548" y="168" key="FileChooserDialogImpl" timestamp="1658812757891">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state x="548" y="168" key="FileChooserDialogImpl/0.0.1536.824@0.0.1536.824" timestamp="1658803784527" />
+    <state x="548" y="168" key="FileChooserDialogImpl/0.0.1536.824@0.0.1536.824" timestamp="1658812757891" />
     <state x="277" y="56" key="SettingsEditor" timestamp="1658461021674">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
@@ -257,9 +263,9 @@
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state x="425" y="187" width="672" height="677" key="run.anything.popup/0.0.1536.824@0.0.1536.824" timestamp="1658621148628" />
-    <state x="431" y="145" width="672" height="678" key="search.everywhere.popup" timestamp="1658453874192">
+    <state x="431" y="145" width="672" height="678" key="search.everywhere.popup" timestamp="1658886580824">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state x="431" y="145" width="672" height="678" key="search.everywhere.popup/0.0.1536.824@0.0.1536.824" timestamp="1658453874192" />
+    <state x="431" y="145" width="672" height="678" key="search.everywhere.popup/0.0.1536.824@0.0.1536.824" timestamp="1658886580824" />
   </component>
 </project>

@@ -286,6 +286,9 @@ class ParseoutController extends AppController {
         if ($Method == "XRP") $first = "ripple";
         if ($Method == "TRX") $first = "tron";
         if ($Method == "DOGE") $first = "dogecoin";
+        if ($Method == "XEM") $first = "nem";
+        if ($Method == "XTZ") $first = "tezos";
+
         /*
         if ($Method == "QIWI") $first = "qiwi";
         if ($Method == "ADVRUB") $first = "advanced-cash-rub";

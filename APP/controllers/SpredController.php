@@ -68,7 +68,6 @@ class SpredController extends AppController {
         // USDT, Биржа, Монета
 
 
-        exit("11111");
 
 
 
@@ -89,6 +88,8 @@ class SpredController extends AppController {
         $TickersOUT = $this->LoadTickersBD("OUT", $this->StartMoneta);
         $ExchangeTickers = $this->GetTickerText($exchange);
 
+       // show($ExchangeTickers);
+       // exit("11");
 
         // Проверка параметров
 
@@ -117,6 +118,7 @@ class SpredController extends AppController {
             // ШАГ -1 БАЗОВЫЙ ВХОД НА МОНЕТУ ИЗ ВСЕХ БИРЖ
             //  echo "Получаем сколько можем получить ".$Perekrestok." если продадим купленную монету <br>";
             $StartArr = $this->GetStartArr($TickersIN);
+
             $SITO1 = $this->SitoStep1($StartArr, $Perekrestok, $ExchangeTickers);
 
             //show($SITO1);
@@ -158,6 +160,8 @@ class SpredController extends AppController {
                 // echo "<font color='red'>Тикер ".$VAL['ticker']." отключен  </font> <br>";
                 continue;
             }
+
+
             if ($VAL['limit'] > $this->StartCapital){
                 //  echo "<font color='red'>Тикер ".$VAL['ticker']." не проходит по стартовому капиталу  </font> <br>";
                 continue;
@@ -184,16 +188,26 @@ class SpredController extends AppController {
             // Получаем ТИКЕР с БИРЖИ
             $TickerBirga = $key."/".$Perekrestok."";
             if (empty($ExchangeTickers[$TickerBirga]['bid'])) continue;
-            //  show($ExchangeTickers[$TickerBirga]);
+           //   show($ExchangeTickers[$TickerBirga]);
             //       echo "Тикер на бирже: ".$TickerBirga." <br>";
             $avgprice = ($ExchangeTickers[$TickerBirga]['bid']+$ExchangeTickers[$TickerBirga]['ask'])/2;
             $amountPerekrestok = $value*$avgprice;
             // echo "Берем монету ".$key." меняем ее на ".$Perekrestok." и получаем ".$amountPerekrestok." ".$Perekrestok." <br> ";
+
+            // Фильтрация символ на ОБЪЕМ ТОРГОВ
+           // echo "Объем торгов монетой: ".$TickerBirga." - ".$ExchangeTickers[$TickerBirga]['baseVolume']." <br>";
+           // echo "Наше кол-во монеты: ".$value."<br>";
+
+            if ($value > $ExchangeTickers[$TickerBirga]['baseVolume']/2)
+            {
+                //echo "<font color='red'>Тикер ".$TickerBirga." не проходит по объему торгов</font> <br> ";
+                continue;
+            }
+
             $STEP1['amount'][$key] = $value;
             $STEP1['result'][$key] = $amountPerekrestok;
 
         }
-
 
         if (empty($STEP1))
         {
@@ -212,6 +226,22 @@ class SpredController extends AppController {
         $DATA['symbolamount'] = $STEP1['amount'][$DATA['symbolbest']];
         $DATA['perekrestok'] = $Perekrestok;
         $DATA['amount'] = reset($STEP1['result']);
+
+        if ($this->StartMoneta == $Perekrestok)
+        {
+            $DATA['amountstart'] = reset($STEP1['result']);
+        }
+
+        if ($this->StartMoneta != $Perekrestok)
+        {
+            $pricetick = $Perekrestok."/".$this->StartMoneta;
+            $avgprice = ($ExchangeTickers[$pricetick]['bid']+$ExchangeTickers[$pricetick]['ask'])/2;
+            $DATA['amountstart'] = $DATA['amount']*$avgprice;
+        }
+ 
+
+        // Добавление кол-во итоговой монеты в монете входа
+
 
         return $DATA;
 
@@ -247,6 +277,18 @@ class SpredController extends AppController {
 
             $avgprice = ($ExchangeTickers[$TickerBirga]['bid']+$ExchangeTickers[$TickerBirga]['ask'])/2;
             $amoumtMoneta = $SITO1['amount']/$avgprice;
+
+
+            // Фильтрация символ на ОБЪЕМ ТОРГОВ
+            // echo "Объем торгов монетой: ".$TickerBirga." - ".$ExchangeTickers[$TickerBirga]['baseVolume']." <br>";
+            // echo "Наше кол-во монеты: ".$amoumtMoneta."<br>";
+
+            if ($amoumtMoneta > $ExchangeTickers[$TickerBirga]['baseVolume']/2)
+            {
+              //  echo "<font color='red'>Тикер ".$TickerBirga." не проходит по объему торгов</font> <br> ";
+                continue;
+            }
+
 
             //  echo "Работаем с тикером ".$VAL['ticker']."<br>";
            //   echo "Тикер на бирже ".$TickerBirga."<br>";
